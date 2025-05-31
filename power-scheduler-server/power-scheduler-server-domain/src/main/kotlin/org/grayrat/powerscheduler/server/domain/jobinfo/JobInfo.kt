@@ -2,12 +2,12 @@ package org.grayrat.powerscheduler.server.domain.jobinfo
 
 import org.grayrat.powerscheduler.common.enums.*
 import org.grayrat.powerscheduler.common.enums.ScheduleTypeEnum.*
+import org.grayrat.powerscheduler.common.exception.BizException
 import org.grayrat.powerscheduler.server.domain.appgroup.AppGroup
 import org.grayrat.powerscheduler.server.domain.jobinstance.JobInstance
 import org.grayrat.powerscheduler.server.domain.utils.CronUtils
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 
 /**
  * 任务信息
@@ -168,71 +168,72 @@ class JobInfo {
 
     fun updateNextScheduleTime() {
         validScheduleConfig()
-        val nextScheduleAt = if (this.nextScheduleAt == null) {
-            when (scheduleType) {
-                CRON -> CronUtils.nextExecution(scheduleConfig!!, LocalDateTime.now())
-                FIX_RATE -> LocalDateTime.now()
-                FIX_DELAY -> LocalDateTime.now()
-                ONE_TIME -> throw IllegalArgumentException("scheduleConfig can not be null when scheduleType is ONE_TIME")
-                null -> throw IllegalArgumentException("scheduleType can not be null")
+        this.nextScheduleAt = when (scheduleType!!) {
+            CRON -> CronUtils.nextExecution(scheduleConfig!!, LocalDateTime.now())
+
+            FIX_RATE -> if (nextScheduleAt == null) {
+                LocalDateTime.now()
+            } else {
+                LocalDateTime.now().plusSeconds(scheduleConfig!!.toLong())
             }
-        } else {
-            when (scheduleType) {
-                CRON -> CronUtils.nextExecution(scheduleConfig!!, LocalDateTime.now())
 
-                FIX_RATE -> {
-                    LocalDateTime.now().plusSeconds(scheduleConfig!!.toLong())
+            FIX_DELAY -> if (nextScheduleAt == null) {
+                LocalDateTime.now()
+            } else {
+                if (lastCompletedAt == null) {
+                    LocalDateTime.now()
+                } else {
+                    lastCompletedAt!!.plusSeconds(scheduleConfig!!.toLong())
                 }
+            }
 
-                FIX_DELAY -> {
-                    if (lastCompletedAt == null) {
-                        LocalDateTime.now()
-                    } else {
-                        lastCompletedAt!!.plusSeconds(scheduleConfig!!.toLong())
-                    }
-                }
-
-                ONE_TIME -> this.nextScheduleAt
-                null -> throw IllegalArgumentException("scheduleType can not be null")
+            ONE_TIME -> if (nextScheduleAt == null) {
+                parseLocalDateTime(scheduleConfig)
+            } else {
+                nextScheduleAt
             }
         }
-        this.nextScheduleAt = nextScheduleAt
     }
 
     fun validScheduleConfig() {
         if (scheduleConfig.isNullOrBlank()) {
-            throw IllegalArgumentException("scheduleConfig can not be null or blank")
+            throw BizException("任务[$id]的调度配置校验失败: 调度配置不能为空")
         }
         when (scheduleType) {
             CRON -> {
                 if (CronUtils.isValidCron(scheduleConfig!!).not()) {
-                    throw IllegalArgumentException("Invalid schedule config: $scheduleConfig")
+                    throw BizException("任务[$id]的调度配置校验失败: 非法cron表达式. 当前值=$scheduleConfig")
                 }
             }
 
-            FIX_RATE -> {
+            FIX_RATE, FIX_DELAY -> {
                 if (isPositiveNumber(scheduleConfig!!).not()) {
-                    throw IllegalArgumentException("Invalid schedule config: $scheduleConfig, expect a positive number")
-                }
-            }
-
-            FIX_DELAY -> {
-                if (isPositiveNumber(scheduleConfig!!).not()) {
-                    throw IllegalArgumentException("Invalid schedule config: $scheduleConfig, expect a positive number")
+                    throw BizException("任务[$id]的调度配置校验失败: 调度配置不是正整数. 当前值=$scheduleConfig")
                 }
             }
 
             ONE_TIME -> {
-                val pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                try {
-                    pattern.parse(scheduleConfig!!)
-                } catch (_: DateTimeParseException) {
-                    throw IllegalArgumentException("Invalid schedule config format: $scheduleConfig, expect 'yyyy-MM-dd HH:mm:ss'")
+                if (isDateTimeText(scheduleConfig).not()) {
+                    throw BizException("任务[$id]的调度配置校验失败: 调度配置不是 'yyyy-MM-dd HH:mm:ss'格式. 当前值=$scheduleConfig")
                 }
             }
 
-            null -> throw IllegalArgumentException("scheduleType can not be null")
+            null -> throw BizException("调度类型不能为null")
         }
+    }
+
+    private fun isDateTimeText(text: String?): Boolean {
+        try {
+            parseLocalDateTime(text)
+            return true
+        } catch (_: Exception) {
+            return false
+        }
+    }
+
+    private fun parseLocalDateTime(scheduleConfig: String?): LocalDateTime {
+        val pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        return LocalDateTime.parse(scheduleConfig!!, pattern)
     }
 
     private fun isPositiveNumber(s: String): Boolean {
