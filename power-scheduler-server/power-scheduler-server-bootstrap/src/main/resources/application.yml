@@ -17,7 +17,7 @@ spring:
       pool-name: HikariCP
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     open-in-view: false
     show-sql: false
 
@@ -25,10 +25,16 @@ server:
   port: ${SERVER_PORT:8080}
 
 power-scheduler-server:
+  # 集群模式, 默认为单节点集群
   cluster-mode: ${CLUSTER_MODE:singleton}
+  # 如果集群模式为CLUSTER(多节点集群), 则需要配置akka相关内容（以下内容仅用于server集群内部的通信）
   akka:
+    # 暴露给集群其他节点的地址
     host: ${AKKA_HOST:127.0.0.1}
-    endpoints: ${CLUSTER_ENDPOINTS:127.0.0.1:8551,127.0.0.2:8552}
+    # 集群启动时的引导节点(至少需要2个节点在线才能创建集群成功)
+    endpoints: ${AKKA_CLUSTER_ENDPOINTS:127.0.0.1:8551,127.0.0.2:8552}
+    # 集群管理接口, 用于创建集群
     management-http-port: ${AKKA_MANAGEMENT_PORT:8558}
+    # 节点通信端口
     remote-port: ${AKKA_REMOTE_PORT:25258}
 
