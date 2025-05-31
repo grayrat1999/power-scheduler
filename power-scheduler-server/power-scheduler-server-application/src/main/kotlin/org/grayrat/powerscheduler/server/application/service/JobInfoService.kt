@@ -58,11 +58,8 @@ class JobInfoService(
         val jobId = JobId(param.jobId!!)
         val jobInfo = jobInfoRepository.findById(jobId)
             ?: throw BizException(message = "任务保存失败: 任务不存在")
-        val jobInfoToSave = jobInfoAssembler.toDomainModel4EditRequest(jobInfo, param)
-        try {
-            jobInfoToSave.validScheduleConfig()
-        } catch (e: Exception) {
-            throw BizException(e.message)
+        val jobInfoToSave = jobInfoAssembler.toDomainModel4EditRequest(jobInfo, param).apply {
+            validScheduleConfig()
         }
         jobInfoRepository.save(jobInfoToSave)
     }
