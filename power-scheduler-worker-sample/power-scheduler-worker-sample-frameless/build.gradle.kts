@@ -1,5 +1,6 @@
 plugins {
-    id("java")
+    java
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 dependencies {
@@ -8,4 +9,21 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok:1.18.38")
     annotationProcessor("org.projectlombok:lombok:1.18.38")
+}
+
+tasks {
+    shadowJar {
+        archiveBaseName.set("app")
+        archiveClassifier.set("")
+        archiveVersion.set("")
+        manifest {
+            attributes(
+                mapOf("Main-Class" to "org.grayrat.powerscheduler.worker.sample.frameless.FramelessApp")
+            )
+        }
+    }
+
+    build {
+        dependsOn(shadowJar)
+    }
 }
