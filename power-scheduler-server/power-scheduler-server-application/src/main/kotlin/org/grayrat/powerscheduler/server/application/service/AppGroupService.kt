@@ -1,5 +1,6 @@
 package org.grayrat.powerscheduler.server.application.service
 
+import org.grayrat.powerscheduler.common.exception.BizException
 import org.grayrat.powerscheduler.server.application.assembler.AppGroupAssembler
 import org.grayrat.powerscheduler.server.application.context.UserContext
 import org.grayrat.powerscheduler.server.application.dto.request.AppGroupAddRequestDTO
@@ -7,7 +8,6 @@ import org.grayrat.powerscheduler.server.application.dto.request.AppGroupEditReq
 import org.grayrat.powerscheduler.server.application.dto.request.AppGroupQueryRequestDTO
 import org.grayrat.powerscheduler.server.application.dto.response.AppGroupQueryResponseDTO
 import org.grayrat.powerscheduler.server.application.dto.response.PageDTO
-import org.grayrat.powerscheduler.server.application.exception.BizException
 import org.grayrat.powerscheduler.server.application.utils.toDTO
 import org.grayrat.powerscheduler.server.domain.appgroup.AppGroupRepository
 import org.springframework.stereotype.Service

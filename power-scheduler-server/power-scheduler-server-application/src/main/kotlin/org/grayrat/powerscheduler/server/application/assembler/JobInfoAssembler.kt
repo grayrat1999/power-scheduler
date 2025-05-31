@@ -3,11 +3,11 @@ package org.grayrat.powerscheduler.server.application.assembler
 import org.grayrat.powerscheduler.common.enums.JobTypeEnum.JAVA
 import org.grayrat.powerscheduler.common.enums.JobTypeEnum.SCRIPT
 import org.grayrat.powerscheduler.common.enums.ScheduleTypeEnum
+import org.grayrat.powerscheduler.common.exception.BizException
 import org.grayrat.powerscheduler.server.application.dto.request.JobInfoAddRequestDTO
 import org.grayrat.powerscheduler.server.application.dto.request.JobInfoEditRequestDTO
 import org.grayrat.powerscheduler.server.application.dto.response.JobInfoDetailResponseDTO
 import org.grayrat.powerscheduler.server.application.dto.response.JobInfoQueryResponseDTO
-import org.grayrat.powerscheduler.server.application.exception.BizException
 import org.grayrat.powerscheduler.server.application.utils.toDTO
 import org.grayrat.powerscheduler.server.domain.appgroup.AppGroup
 import org.grayrat.powerscheduler.server.domain.jobinfo.JobInfo
@@ -135,12 +135,6 @@ class JobInfoAssembler {
             this.maxAttemptCnt = param.maxAttemptCnt
             this.priority = param.priority
             this.schedulerAddress = null
-
-            try {
-                this.validScheduleConfig()
-            } catch (e: Exception) {
-                throw BizException(e.message)
-            }
         }
     }
 

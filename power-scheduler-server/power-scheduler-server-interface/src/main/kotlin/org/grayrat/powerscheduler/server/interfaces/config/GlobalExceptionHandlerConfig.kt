@@ -2,7 +2,7 @@ package org.grayrat.powerscheduler.server.interfaces.config
 
 import jakarta.validation.ConstraintViolationException
 import org.grayrat.powerscheduler.common.dto.response.ResponseWrapper
-import org.grayrat.powerscheduler.server.application.exception.BizException
+import org.grayrat.powerscheduler.common.exception.BizException
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler

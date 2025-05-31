@@ -5,13 +5,13 @@ import org.grayrat.powerscheduler.common.dto.request.JobTerminateRequestDTO
 import org.grayrat.powerscheduler.common.enums.JobStatusEnum
 import org.grayrat.powerscheduler.common.enums.JobStatusEnum.*
 import org.grayrat.powerscheduler.common.enums.ScheduleTypeEnum
+import org.grayrat.powerscheduler.common.exception.BizException
 import org.grayrat.powerscheduler.server.application.assembler.JobInstanceAssembler
 import org.grayrat.powerscheduler.server.application.dto.request.JobInstanceQueryRequestDTO
 import org.grayrat.powerscheduler.server.application.dto.request.JobRunRequestDTO
 import org.grayrat.powerscheduler.server.application.dto.response.JobInstanceDetailResponseDTO
 import org.grayrat.powerscheduler.server.application.dto.response.JobInstanceQueryResponseDTO
 import org.grayrat.powerscheduler.server.application.dto.response.PageDTO
-import org.grayrat.powerscheduler.server.application.exception.BizException
 import org.grayrat.powerscheduler.server.application.utils.toDTO
 import org.grayrat.powerscheduler.server.domain.jobinfo.JobId
 import org.grayrat.powerscheduler.server.domain.jobinfo.JobInfoRepository

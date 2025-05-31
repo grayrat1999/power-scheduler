@@ -1,7 +1,7 @@
 package org.grayrat.powerscheduler.server.application.service
 
+import org.grayrat.powerscheduler.common.exception.BizException
 import org.grayrat.powerscheduler.server.application.dto.request.CronParseRequestDTO
-import org.grayrat.powerscheduler.server.application.exception.BizException
 import org.grayrat.powerscheduler.server.domain.utils.CronUtils
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime

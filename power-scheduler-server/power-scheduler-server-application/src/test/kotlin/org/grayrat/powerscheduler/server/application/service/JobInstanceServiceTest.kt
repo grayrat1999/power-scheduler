@@ -7,12 +7,12 @@ import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.*
+import org.grayrat.powerscheduler.common.exception.BizException
 import org.grayrat.powerscheduler.server.application.assembler.JobInstanceAssembler
 import org.grayrat.powerscheduler.server.application.dto.request.JobInstanceQueryRequestDTO
 import org.grayrat.powerscheduler.server.application.dto.request.JobRunRequestDTO
 import org.grayrat.powerscheduler.server.application.dto.response.JobInstanceDetailResponseDTO
 import org.grayrat.powerscheduler.server.application.dto.response.JobInstanceQueryResponseDTO
-import org.grayrat.powerscheduler.server.application.exception.BizException
 import org.grayrat.powerscheduler.server.domain.common.Page
 import org.grayrat.powerscheduler.server.domain.jobinfo.JobId
 import org.grayrat.powerscheduler.server.domain.jobinfo.JobInfo

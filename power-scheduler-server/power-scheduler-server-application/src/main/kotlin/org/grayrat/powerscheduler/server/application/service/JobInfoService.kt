@@ -1,5 +1,6 @@
 package org.grayrat.powerscheduler.server.application.service
 
+import org.grayrat.powerscheduler.common.exception.BizException
 import org.grayrat.powerscheduler.server.application.assembler.JobInfoAssembler
 import org.grayrat.powerscheduler.server.application.dto.request.JobInfoAddRequestDTO
 import org.grayrat.powerscheduler.server.application.dto.request.JobInfoEditRequestDTO
@@ -8,7 +9,6 @@ import org.grayrat.powerscheduler.server.application.dto.request.JobSwitchReques
 import org.grayrat.powerscheduler.server.application.dto.response.JobInfoDetailResponseDTO
 import org.grayrat.powerscheduler.server.application.dto.response.JobInfoQueryResponseDTO
 import org.grayrat.powerscheduler.server.application.dto.response.PageDTO
-import org.grayrat.powerscheduler.server.application.exception.BizException
 import org.grayrat.powerscheduler.server.application.utils.toDTO
 import org.grayrat.powerscheduler.server.domain.appgroup.AppGroupRepository
 import org.grayrat.powerscheduler.server.domain.jobinfo.JobId
@@ -59,6 +59,11 @@ class JobInfoService(
         val jobInfo = jobInfoRepository.findById(jobId)
             ?: throw BizException(message = "任务保存失败: 任务不存在")
         val jobInfoToSave = jobInfoAssembler.toDomainModel4EditRequest(jobInfo, param)
+        try {
+            jobInfoToSave.validScheduleConfig()
+        } catch (e: Exception) {
+            throw BizException(e.message)
+        }
         jobInfoRepository.save(jobInfoToSave)
     }
 

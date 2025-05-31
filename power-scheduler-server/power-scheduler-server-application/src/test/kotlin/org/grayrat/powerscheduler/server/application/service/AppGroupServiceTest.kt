@@ -6,13 +6,13 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import org.grayrat.powerscheduler.common.exception.BizException
 import org.grayrat.powerscheduler.server.application.assembler.AppGroupAssembler
 import org.grayrat.powerscheduler.server.application.context.UserContext
 import org.grayrat.powerscheduler.server.application.dto.request.AppGroupAddRequestDTO
 import org.grayrat.powerscheduler.server.application.dto.request.AppGroupEditRequestDTO
 import org.grayrat.powerscheduler.server.application.dto.request.AppGroupQueryRequestDTO
 import org.grayrat.powerscheduler.server.application.dto.response.AppGroupQueryResponseDTO
-import org.grayrat.powerscheduler.server.application.exception.BizException
 import org.grayrat.powerscheduler.server.domain.appgroup.AppGroup
 import org.grayrat.powerscheduler.server.domain.appgroup.AppGroupId
 import org.grayrat.powerscheduler.server.domain.appgroup.AppGroupQuery

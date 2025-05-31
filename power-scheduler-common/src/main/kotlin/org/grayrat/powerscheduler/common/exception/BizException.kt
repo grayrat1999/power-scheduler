@@ -1,4 +1,4 @@
-package org.grayrat.powerscheduler.server.application.exception
+package org.grayrat.powerscheduler.common.exception
 
 /**
  * 业务异常
