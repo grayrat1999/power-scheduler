@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: power-scheduler-worker-sample-springboot
+
+server:
+  port: 9999
+
+power-scheduler-worker:
+  enabled: true
+  app-code: appCode
+  # app-secret从控制台页面获取
+  app-secret: 2mU6Qs9OzPeKHAZSF3UlxBjfYHkgZROF
+  server-endpoint: ${SERVER_ENDPOINTS:127.0.0.1:8080}
+  port: 7758
+  # 如果服务部署在docker且使用bridge模式做了端口映射，则需要配置external-host为宿主机的ip，external-port为映射到宿主机上的端口
+#  external-host: 127.0.0.1
+#  external-port: 17758
+
