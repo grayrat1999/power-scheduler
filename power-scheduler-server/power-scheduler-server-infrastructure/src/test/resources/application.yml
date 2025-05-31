@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: power-scheduler-server
+  datasource:
+    url: jdbc:h2:mem:default
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 10000
+      validation-timeout: 5000
+      leak-detection-threshold: 15000
+      pool-name: HikariCP
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    show-sql: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+  profiles:
+    active: IT
+
+server:
+  port: ${SERVER_PORT:8080}
+
+power-scheduler-server:
+  cluster-mode: ${CLUSTER_MODE:singleton}
+  akka:
+    host: ${AKKA_HOST:127.0.0.1}
+    endpoints: ${CLUSTER_ENDPOINTS:127.0.0.1:8551,127.0.0.2:8552}
+    management-http-port: ${AKKA_MANAGEMENT_PORT:8558}
+    remote-port: ${AKKA_REMOTE_PORT:25258}
+
