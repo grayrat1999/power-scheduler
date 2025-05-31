@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="/opt/homebrew/Cellar/gradle/8.14.1/libexec" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/power-scheduler-common" />
+            <option value="$PROJECT_DIR$/power-scheduler-server" />
+            <option value="$PROJECT_DIR$/power-scheduler-server/power-scheduler-server-application" />
+            <option value="$PROJECT_DIR$/power-scheduler-server/power-scheduler-server-bootstrap" />
+            <option value="$PROJECT_DIR$/power-scheduler-server/power-scheduler-server-domain" />
+            <option value="$PROJECT_DIR$/power-scheduler-server/power-scheduler-server-infrastructure" />
+            <option value="$PROJECT_DIR$/power-scheduler-server/power-scheduler-server-interface" />
+            <option value="$PROJECT_DIR$/power-scheduler-worker" />
+            <option value="$PROJECT_DIR$/power-scheduler-worker-sample" />
+            <option value="$PROJECT_DIR$/power-scheduler-worker-sample/power-scheduler-worker-sample-frameless" />
+            <option value="$PROJECT_DIR$/power-scheduler-worker-sample/power-scheduler-worker-sample-springboot" />
+            <option value="$PROJECT_DIR$/power-scheduler-worker-spring-boot-autoconfigure" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

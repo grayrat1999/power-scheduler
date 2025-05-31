@@ -1,0 +1,61 @@
+[versions]
+akka = "2.6.21"
+akka-managment = "1.1.4"
+kotest = "5.9.1"
+mockk = "1.13.17"
+ktor = "3.0.3"
+
+[libraries]
+akka-actor-typed = { module = "com.typesafe.akka:akka-actor-typed_2.13", version.ref = "akka" }
+akka-cluster-typed = { module = "com.typesafe.akka:akka-cluster-typed_2.13", version.ref = "akka" }
+akka-serialization-jackson = { module = "com.typesafe.akka:akka-serialization-jackson_2.13", version.ref = "akka" }
+akka-discovery = { module = "com.typesafe.akka:akka-discovery_2.13", version.ref = "akka" }
+akka-management = { module = "com.lightbend.akka.management:akka-management_2.13", version.ref = "akka-managment" }
+akka-management-cluster-bootstrap = { module = "com.lightbend.akka.management:akka-management-cluster-bootstrap_2.13", version.ref = "akka-managment" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+kotest = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+kotest-extensions-junitxml = { module = "io.kotest:kotest-extensions-junitxml", version.ref = "kotest" }
+kotest-extensions-htmlreporter = { module = "io.kotest:kotest-extensions-htmlreporter", version.ref = "kotest" }
+
+ktor-serialization-jackson = { module = "io.ktor:ktor-serialization-jackson", version.ref = "ktor" }
+ktor-server-core-jvm = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
+ktor-server-content-negotiation-jvm = { module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
+ktor-client-core-jvm = { module = "io.ktor:ktor-client-core-jvm", version.ref = "ktor" }
+ktor-client-cio-jvm = { module = "io.ktor:ktor-client-cio-jvm", version.ref = "ktor" }
+ktor-client-logging-jvm = { module = "io.ktor:ktor-client-logging-jvm", version.ref = "ktor" }
+ktor-client-content-negotiation-jvm = { module = "io.ktor:ktor-client-content-negotiation-jvm", version.ref = "ktor" }
+
+[bundles]
+kotlin-test = [
+    "mockk",
+    "kotest",
+    "kotest-extensions-junitxml",
+    "kotest-extensions-htmlreporter",
+]
+akka = [
+    "akka-actor-typed",
+    "akka-cluster-typed",
+    "akka-serialization-jackson",
+    "akka-discovery",
+    "akka-management",
+    "akka-management-cluster-bootstrap",
+]
+
+ktor-client = [
+    "ktor-serialization-jackson",
+    "ktor-client-core-jvm",
+    "ktor-client-cio-jvm",
+    "ktor-client-logging-jvm",
+    "ktor-client-content-negotiation-jvm",
+]
+
+ktor-server = [
+    "ktor-serialization-jackson",
+    "ktor-server-core-jvm",
+    "ktor-server-content-negotiation-jvm",
+    "ktor-server-cio",
+]
+
+[plugins]
+versions = { id = "com.github.ben-manes.versions", version = "0.45.0" }
