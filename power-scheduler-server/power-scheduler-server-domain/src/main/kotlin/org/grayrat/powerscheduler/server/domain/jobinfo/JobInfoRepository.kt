@@ -1,0 +1,41 @@
+package org.grayrat.powerscheduler.server.domain.jobinfo
+
+import org.grayrat.powerscheduler.server.domain.common.Enabled
+import org.grayrat.powerscheduler.server.domain.common.Page
+import org.grayrat.powerscheduler.server.domain.common.PageQuery
+import java.time.LocalDateTime
+
+/**
+ * 任务信息持久化仓库
+ *
+ * @author grayrat
+ * @since 2025/4/16
+ */
+interface JobInfoRepository {
+
+    fun countGroupedByEnabledWithAppCode(appCode: String?): Map<Enabled, Long>
+
+    fun lockById(id: JobId): JobInfo?
+
+    fun pageQuery(query: JobInfoQuery): Page<JobInfo>
+
+    fun findById(id: JobId): JobInfo?
+
+    fun findAllByIds(ids: Iterable<JobId>): List<JobInfo>
+
+    fun save(jobInfo: JobInfo): JobId
+
+    fun deleteById(id: JobId)
+
+    fun listAllIds(pageQuery: PageQuery): Page<JobId>
+
+    fun listAssignableIds(pageQuery: PageQuery): Page<JobId>
+
+    fun findSchedulableByIds(ids: Iterable<JobId>, baseTime: LocalDateTime): List<JobInfo>
+
+    fun listIdsByEnabledAndSchedulerAddress(
+        enabled: Boolean?,
+        schedulerAddress: String,
+        pageQuery: PageQuery
+    ): Page<JobId>
+}
