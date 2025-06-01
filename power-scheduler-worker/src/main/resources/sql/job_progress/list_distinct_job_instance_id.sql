@@ -1,2 +1,2 @@
 SELECT DISTINCT job_instance_id
-FROM job_progress LIMIT 30;
+FROM job_progress LIMIT 100;

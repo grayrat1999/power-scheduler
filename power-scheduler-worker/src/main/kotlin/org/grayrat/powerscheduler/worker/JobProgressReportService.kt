@@ -1,6 +1,7 @@
 package org.grayrat.powerscheduler.worker
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import org.grayrat.powerscheduler.common.dto.request.JobProgressReportRequestDTO
 import org.grayrat.powerscheduler.worker.persistence.JobProgressRepository
 import org.grayrat.powerscheduler.worker.util.ExecutorCoroutineScope
@@ -66,12 +67,16 @@ class JobProgressReportService(
             delay(300)
             return
         }
+        val channel = Channel<Unit>(10)
         val deferredList = jobInstanceIdSet.map { jobInstanceId ->
             async {
                 try {
+                    channel.send(Unit)
                     doReportProgress(jobInstanceId)
                 } catch (e: Exception) {
                     log.warn("[Powerscheduler] reportProgress failed: {}", e.message, e)
+                } finally {
+                    channel.receive()
                 }
             }
         }
