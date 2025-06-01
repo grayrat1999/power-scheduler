@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("jvm") version "2.1.20"
-    id("org.jetbrains.kotlin.kapt") version "2.1.20"
+    kotlin("jvm")
+    id("org.jetbrains.kotlin.kapt")
 }
 
 kotlin {
