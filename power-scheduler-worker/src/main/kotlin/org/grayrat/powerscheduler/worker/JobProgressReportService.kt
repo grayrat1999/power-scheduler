@@ -96,6 +96,7 @@ class JobProgressReportService(
             this.startAt = latestJobProgress.startAt
             this.endAt = latestJobProgress.endAt
             this.jobStatus = latestJobProgress.status
+            this.message = latestJobProgress.message
         }
         val result = httpClient.reportProgress(baseUrl = serverUrl, param = param)
         if (result.success && result.data == true) {

@@ -116,6 +116,7 @@ class JobInstanceService(
             this.jobStatus = param.jobStatus
             this.startAt = param.startAt
             this.endAt = param.endAt
+            this.message = param.message?.take(5000)
         }
         transactionTemplate.executeWithoutResult {
             if (param.jobStatus == FAILED && jobInstance.canReattempt) {
