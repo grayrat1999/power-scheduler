@@ -1,5 +1,6 @@
 plugins {
     java
+    application
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
@@ -9,6 +10,10 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok:1.18.38")
     annotationProcessor("org.projectlombok:lombok:1.18.38")
+}
+
+application {
+    mainClass.set("org.grayrat.powerscheduler.worker.sample.frameless.FramelessApp")
 }
 
 tasks {
