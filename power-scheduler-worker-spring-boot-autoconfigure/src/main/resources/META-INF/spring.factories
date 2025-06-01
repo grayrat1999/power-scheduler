@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.grayrat.powerscheduler.worker.autoconfigure.PowerSchedulerWorkerAutoConfiguration
+tech.powerscheduler.worker.autoconfigure.PowerSchedulerWorkerAutoConfiguration

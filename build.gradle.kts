@@ -1,5 +1,5 @@
 allprojects {
-    group = "org.grayrat"
+    group = "tech.powerscheduler"
     version = "1.0-SNAPSHOT"
 
     repositories {
