@@ -1,9 +1,10 @@
 [versions]
+kotest = "5.9.1"
+mockk = "1.14.2"
+ktor = "3.1.3"
+# akka和akka-managment的版本请勿升级，更高的版本需要购买许可证才能使用
 akka = "2.6.21"
 akka-managment = "1.1.4"
-kotest = "5.9.1"
-mockk = "1.13.17"
-ktor = "3.0.3"
 
 [libraries]
 akka-actor-typed = { module = "com.typesafe.akka:akka-actor-typed_2.13", version.ref = "akka" }
