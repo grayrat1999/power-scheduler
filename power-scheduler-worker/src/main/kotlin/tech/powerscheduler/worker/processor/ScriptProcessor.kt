@@ -1,6 +1,5 @@
 package tech.powerscheduler.worker.processor
 
-import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import tech.powerscheduler.worker.job.JobContext
 import tech.powerscheduler.worker.job.ScriptJobContext
@@ -10,7 +9,6 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
 
 /**
  * 脚本任务处理器
@@ -41,7 +39,7 @@ class ScriptProcessor : Processor {
         val scriptFilePath = scriptFileDir + File.separator + context.jobInstanceId + scriptType!!.suffix
         val file = File(scriptFilePath)
         try {
-            FileUtils.writeStringToFile(file, context.scriptCode, StandardCharsets.UTF_8)
+            file.writeText(context.scriptCode.orEmpty(), Charsets.UTF_8)
         } catch (e: Exception) {
             return failure("Failed to write script file: " + e.message)
         }
