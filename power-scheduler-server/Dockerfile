@@ -22,12 +22,18 @@ RUN gradle :power-scheduler-server:power-scheduler-server-bootstrap:bootJar --no
 
 # 第二阶段：运行
 FROM eclipse-temurin:21-jre
+
+ENV TZ=Asia/Shanghai
+ENV JVM_OPTIONS=""
+ENV ARGS=""
+
 WORKDIR /app
+
 RUN apt update && \
-    apt install -y vim-tiny iputils-ping curl iproute2 && \
-    apt clean
+    apt install -y vim-tiny iputils-ping curl tini && \
+    apt clean \
+
 COPY --from=builder /app/power-scheduler-server/power-scheduler-server-bootstrap/build/libs/app.jar app.jar
-# web端口
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["/usr/bin/tini", "--", "sh", "-c", "exec java $JVM_OPTIONS -jar /app/app.jar $ARGS"]
 
