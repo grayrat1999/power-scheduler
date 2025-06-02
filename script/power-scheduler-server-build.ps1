@@ -1,2 +1,16 @@
-#!/bin/pwsh
-docker build -t power-scheduler-server -f ../power-scheduler-server/Dockerfile ../
+#!/usr/bin/env pwsh
+
+param (
+    [string]$repo = "",
+    [string]$tag = "latest"
+)
+
+if ( [string]::IsNullOrEmpty($repo))
+{
+    $repo = "$repo/"
+}
+
+docker build `
+    -t $repo/power-scheduler-server:$tag  `
+    -f ../power-scheduler-server/Dockerfile `
+    ../
