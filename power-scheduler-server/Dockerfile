@@ -31,7 +31,7 @@ WORKDIR /app
 
 RUN apt update && \
     apt install -y vim-tiny iputils-ping curl tini && \
-    apt clean \
+    apt clean
 
 COPY --from=builder /app/power-scheduler-server/power-scheduler-server-bootstrap/build/libs/app.jar app.jar
 EXPOSE 8080
