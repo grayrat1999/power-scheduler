@@ -6,16 +6,6 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-tasks.withType<JavaCompile> {
-    options.release.set(17)
-}
-
 dependencies {
     implementation(project(":power-scheduler-worker-spring-boot-autoconfigure"))
     implementation("org.springframework.boot:spring-boot-starter")

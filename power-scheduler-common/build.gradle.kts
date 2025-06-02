@@ -7,8 +7,6 @@ plugins {
 
 kotlin {
     jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_1_8)
         }
@@ -21,9 +19,6 @@ kotlin {
 
 java {
     targetCompatibility = JavaVersion.VERSION_1_8
-
-//    withJavadocJar()
-//    withSourcesJar()
 }
 
 dependencies {

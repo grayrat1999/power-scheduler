@@ -26,10 +26,6 @@ subprojects {
 
     plugins.withType<KotlinBasePlugin> {
         kotlin {
-            jvmToolchain {
-                languageVersion.set(JavaLanguageVersion.of(21))
-            }
-
             compilerOptions {
                 freeCompilerArgs.add("-Xjsr305=strict")
             }
