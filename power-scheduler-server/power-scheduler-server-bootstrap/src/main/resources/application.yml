@@ -17,7 +17,7 @@ spring:
       pool-name: HikariCP
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: ${DDL_AUTO:none}
     open-in-view: false
     show-sql: false
 
