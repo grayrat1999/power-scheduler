@@ -2,10 +2,10 @@ spring:
   application:
     name: power-scheduler-server
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: postgres
+    url: jdbc:h2:/root/power-scheduler-server/data
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
     hikari:
       minimum-idle: 5
       maximum-pool-size: 20
@@ -17,7 +17,7 @@ spring:
       pool-name: HikariCP
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     open-in-view: false
     show-sql: false
 
