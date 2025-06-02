@@ -2,10 +2,10 @@ spring:
   application:
     name: power-scheduler-server
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: postgres
+    url: jdbc:mysql://localhost:5432/your_db
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: your_username
+    password: user_password
     hikari:
       minimum-idle: 5
       maximum-pool-size: 20
