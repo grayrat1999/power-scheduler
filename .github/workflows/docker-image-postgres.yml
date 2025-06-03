@@ -39,4 +39,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: 771592594/power-scheduler-server:${{ inputs.image_tag }}
+          tags: 771592594/power-scheduler-server:${{ inputs.image_tag || 'latest-postgres' }}
