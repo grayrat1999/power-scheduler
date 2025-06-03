@@ -3,9 +3,10 @@ package tech.powerscheduler.common.enums
 import tech.powerscheduler.common.annotation.Metadata
 
 /**
+ * 脚本类型枚举
+ *
  * @author grayrat
  * @since 2025/5/18
- * @description TODO
  */
 @Metadata(label = "脚本类型", code = "ScriptTypeEnum")
 enum class ScriptTypeEnum(

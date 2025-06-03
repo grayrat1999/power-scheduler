@@ -3,9 +3,10 @@ package tech.powerscheduler.common.enums
 import tech.powerscheduler.common.annotation.Metadata
 
 /**
+ * 调度方式枚举
+ *
  * @author grayrat
  * @since 2025/5/18
- * @description TODO
  */
 @Metadata(label = "调度方式", code = "ScheduleTypeEnum")
 enum class ScheduleTypeEnum(
