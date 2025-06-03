@@ -5,12 +5,12 @@ param (
     [string]$tag = "latest"
 )
 
-if ( [string]::IsNullOrEmpty($repo))
+if (-not  [string]::IsNullOrEmpty($repo))
 {
     $repo = "$repo/"
 }
 
 docker build `
-    -t $repo/power-scheduler-server:$tag  `
+    -t ${repo}power-scheduler-server:$tag  `
     -f ../power-scheduler-server/Dockerfile `
     ../
