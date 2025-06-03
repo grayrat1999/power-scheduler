@@ -3,9 +3,10 @@ package tech.powerscheduler.common.enums
 import tech.powerscheduler.common.annotation.Metadata
 
 /**
+ * 执行模式枚举
+ *
  * @author grayrat
  * @since 2025/5/18
- * @description TODO
  */
 @Metadata(label = "执行模式", code = "ExecuteModeEnum")
 enum class ExecuteModeEnum(

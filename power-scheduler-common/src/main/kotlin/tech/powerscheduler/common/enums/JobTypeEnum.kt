@@ -3,9 +3,10 @@ package tech.powerscheduler.common.enums
 import tech.powerscheduler.common.annotation.Metadata
 
 /**
+ * 任务类型枚举
+ *
  * @author grayrat
  * @since 2025/5/18
- * @description TODO
  */
 @Metadata(label = "任务类型", code = "JobTypeEnum")
 enum class JobTypeEnum(
