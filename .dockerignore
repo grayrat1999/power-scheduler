@@ -2,23 +2,24 @@
 .idea
 
 # git相关
-.git
-.gitignore
+**/.git
+**/.gitignore
+**/.gitattributes
 
 # 本地构建相关
-.gradle
-.kotlin
-build
+**/.gradle
+**/.kotlin
+**/build
 
 # 文档
-README.md
+**/README.md
 
 # 本地脚本
-script
-gradlew
-gradlew.bat
+**/script
+**/gradlew
+**/gradlew.bat
 
 # docker相关文件
-.dockerignore
-Dockerfile
-docker-compose.yml
+**/.dockerignore
+**/Dockerfile
+**/docker-compose.yml

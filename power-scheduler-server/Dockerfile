@@ -16,7 +16,8 @@ COPY ./power-scheduler-server/power-scheduler-server-interface/build.gradle.kts 
 RUN gradle clean dependencies
 
 # 依赖下载完成后, 再拷贝源代码进行项目构建（目的是利用docker的缓存机制, 每次构建镜像都可以利用之前的构建缓存来节省依赖下载的时间）
-COPY ./ ./
+COPY ./power-scheduler-common ./power-scheduler-common
+COPY ./power-scheduler-server ./power-scheduler-server
 RUN gradle :power-scheduler-server:power-scheduler-server-bootstrap:bootJar --no-daemon
 #ENTRYPOINT ["tail", "-f", "/dev/null"]
 
