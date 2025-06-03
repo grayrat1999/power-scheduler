@@ -3,9 +3,10 @@ package tech.powerscheduler.common.enums
 import tech.powerscheduler.common.annotation.Metadata
 
 /**
+ * 任务状态枚举
+ *
  * @author grayrat
  * @since 2025/5/18
- * @description TODO
  */
 @Metadata(label = "任务状态", code = "JobStatusEnum")
 enum class JobStatusEnum(
@@ -50,12 +51,18 @@ enum class JobStatusEnum(
     override val code = this.name
 
     companion object {
+        /**
+         * 未完成状态集合
+         */
         val UNCOMPLETED_STATUSES = setOf(
             WAITING_DISPATCH,
             PENDING,
             PROCESSING,
         )
 
+        /**
+         * 已完成状态集合
+         */
         val COMPLETED_STATUSES = setOf(
             SUCCESS,
             FAILED,

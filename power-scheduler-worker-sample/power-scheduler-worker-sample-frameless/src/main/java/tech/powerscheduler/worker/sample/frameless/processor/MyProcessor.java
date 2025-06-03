@@ -8,8 +8,9 @@ import tech.powerscheduler.worker.processor.ProcessResult;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 自定义的任务处理器
+ *
  * @author grayrat
- * @description TODO
  * @since 2025/5/9
  */
 public class MyProcessor extends JavaProcessor {
