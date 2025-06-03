@@ -3,8 +3,6 @@ name: Docker Image For Mysql CI
 on:
   push:
     branches: [ "docker/mysql_image" ]
-  pull_request:
-    branches: [ "docker/mysql_image" ]
 
   workflow_dispatch:
     inputs:
