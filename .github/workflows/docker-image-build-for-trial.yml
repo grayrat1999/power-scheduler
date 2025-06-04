@@ -1,4 +1,4 @@
-name: Docker Image For Trial
+name: Docker Image For Trial CI
 
 on:
   push:
