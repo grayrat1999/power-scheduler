@@ -10,6 +10,6 @@ if (-not [string]::IsNullOrEmpty($repo))
 }
 
 docker build `
-  -t ${repo}power-scheduler-worker-sample-frameless:${tag} `
-  -f ../power-scheduler-worker-sample/power-scheduler-worker-sample-frameless/Dockerfile `
-  ../
+    -t ${repo}power-scheduler-worker-sample-frameless:${tag} `
+    -f ../power-scheduler-worker-sample/power-scheduler-worker-sample-frameless/Dockerfile `
+    ../power-scheduler-worker-sample/power-scheduler-worker-sample-frameless
