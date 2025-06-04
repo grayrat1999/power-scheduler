@@ -117,7 +117,10 @@ class JobInfoAssembler {
             this.jobType = param.jobType
             this.scheduleType = param.scheduleType
             this.scheduleConfig = param.scheduleConfig
-            this.processor = param.processor
+            this.processor = when (param.jobType!!) {
+                JAVA -> param.processor
+                SCRIPT -> "ScriptProcessor"
+            }
             this.executeMode = param.executeMode
             this.executeParams = param.executeParams
             this.enabled = false
