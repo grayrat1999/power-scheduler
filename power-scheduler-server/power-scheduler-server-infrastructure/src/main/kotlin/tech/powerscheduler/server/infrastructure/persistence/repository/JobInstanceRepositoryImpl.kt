@@ -105,6 +105,44 @@ class JobInstanceRepositoryImpl(
         return group.associate { JobId(it[0] as Long) to it[1] as Long }
     }
 
+    override fun listIdByJobIdAndJobStatus(
+        jobId: JobId,
+        jobStatuses: Iterable<JobStatusEnum>,
+        pageQuery: PageQuery,
+    ): Page<JobInstanceId> {
+        val pageable = PageRequest.of(
+            pageQuery.pageNo - 1,
+            pageQuery.pageSize,
+            Sort.by(JobInstanceEntity::id.name).ascending()
+        )
+        val page = jobInstanceJpaRepository.listIdByJobIdAndJobStatus(
+            jobId = jobId.value,
+            jobStatuses = jobStatuses,
+            pageable = pageable,
+        )
+        return page.map { JobInstanceId(it) }.toDomainPage()
+    }
+
+    override fun listIdByJobIdAndJobStatusAndEndAtBefore(
+        jobId: JobId,
+        jobStatuses: Set<JobStatusEnum>,
+        endAt: LocalDateTime,
+        pageQuery: PageQuery
+    ): Page<JobInstanceId> {
+        val pageable = PageRequest.of(
+            pageQuery.pageNo - 1,
+            pageQuery.pageSize,
+            Sort.by(JobInstanceEntity::id.name).ascending()
+        )
+        val page = jobInstanceJpaRepository.listIdByJobIdAndJobStatusAndEndAtBefore(
+            jobId = jobId.value,
+            jobStatuses = jobStatuses,
+            endAt = endAt,
+            pageable = pageable,
+        )
+        return page.map { JobInstanceId(it) }.toDomainPage()
+    }
+
     override fun listDispatchable(
         jobIds: Iterable<JobId>,
         pageQuery: PageQuery
@@ -136,4 +174,7 @@ class JobInstanceRepositoryImpl(
         return list.map { it.toDomainModel() }
     }
 
+    override fun deleteByIds(ids: Iterable<JobInstanceId>) {
+        jobInstanceJpaRepository.deleteAllByIdInBatch(ids.map { it.value })
+    }
 }

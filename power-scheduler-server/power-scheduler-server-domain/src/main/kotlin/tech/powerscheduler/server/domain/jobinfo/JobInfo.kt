@@ -123,6 +123,16 @@ class JobInfo {
     var schedulerAddress: String? = null
 
     /**
+     * 保留策略
+     */
+    var retentionPolicy: RetentionPolicyEnum? = null
+
+    /**
+     * 保留值
+     */
+    var retentionValue: Int? = null
+
+    /**
      * 创建人
      */
     var createdBy: String? = null

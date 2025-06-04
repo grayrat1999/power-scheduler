@@ -13,5 +13,7 @@ class Page<T>(
     var totalElements: Long = 0L,
     var content: List<T> = emptyList()
 ) {
+    fun isEmpty(): Boolean = content.isEmpty()
+
     fun isNotEmpty(): Boolean = content.isNotEmpty()
 }

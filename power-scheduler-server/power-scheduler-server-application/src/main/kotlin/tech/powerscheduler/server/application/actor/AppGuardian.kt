@@ -12,6 +12,7 @@ import akka.management.javadsl.AkkaManagement
 import com.typesafe.config.ConfigFactory
 import org.springframework.context.ApplicationContext
 import tech.powerscheduler.server.application.actor.singleton.JobAssignorActor
+import tech.powerscheduler.server.application.actor.singleton.JobInstanceCleanActor
 import tech.powerscheduler.server.application.actor.singleton.WorkerRegistryCleanActor
 import java.util.concurrent.TimeUnit
 
@@ -79,8 +80,17 @@ class AppGuardian(
         return Behaviors.setup { context ->
             val singleton = ClusterSingleton.get(actorSystem)
 
+            SingletonActor.of(
+                JobInstanceCleanActor.create(
+                    applicationContext = applicationContext,
+                ),
+                JobInstanceCleanActor::class.simpleName,
+            )
+                .withProps(Props.empty().withDispatcherFromConfig("job-instance-clean-dispatcher"))
+                .let { singleton.init(it) }
+
             val jobAssignorActorRef = SingletonActor.of(
-                JobAssignorActor.Companion.create(
+                JobAssignorActor.create(
                     applicationContext = applicationContext,
                 ),
                 JobAssignorActor::class.simpleName

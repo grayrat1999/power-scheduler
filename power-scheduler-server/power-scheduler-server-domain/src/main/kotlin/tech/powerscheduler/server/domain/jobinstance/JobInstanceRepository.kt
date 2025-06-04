@@ -32,6 +32,19 @@ interface JobInstanceRepository {
         jobStatuses: Iterable<JobStatusEnum>
     ): Map<JobId, Long>
 
+    fun listIdByJobIdAndJobStatus(
+        jobId: JobId,
+        jobStatuses: Iterable<JobStatusEnum>,
+        pageQuery: PageQuery
+    ): Page<JobInstanceId>
+
+    fun listIdByJobIdAndJobStatusAndEndAtBefore(
+        jobId: JobId,
+        jobStatuses: Set<JobStatusEnum>,
+        endAt: LocalDateTime,
+        pageQuery: PageQuery
+    ): Page<JobInstanceId>
+
     fun listDispatchable(
         jobIds: Iterable<JobId>,
         pageQuery: PageQuery
@@ -39,4 +52,5 @@ interface JobInstanceRepository {
 
     fun findAllUncompletedByWorkerAddress(workerAddress: String): List<JobInstance>
 
+    fun deleteByIds(ids: Iterable<JobInstanceId>)
 }

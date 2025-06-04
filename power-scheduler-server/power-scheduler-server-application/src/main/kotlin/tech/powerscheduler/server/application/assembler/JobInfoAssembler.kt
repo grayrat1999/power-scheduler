@@ -104,6 +104,8 @@ class JobInfoAssembler {
             this.scriptCode = param.scriptCode
             this.maxAttemptCnt = param.maxAttemptCnt
             this.priority = param.priority
+            this.retentionPolicy = param.retentionPolicy
+            this.retentionValue = param.retentionValue
         }
     }
 
@@ -131,6 +133,8 @@ class JobInfoAssembler {
             this.maxAttemptCnt = param.maxAttemptCnt
             this.priority = param.priority
             this.schedulerAddress = null
+            this.retentionPolicy = param.retentionPolicy
+            this.retentionValue = param.retentionValue
         }
     }
 
