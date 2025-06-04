@@ -1,4 +1,4 @@
-name: Docker Image For Worker Sample CI
+name: Docker Image CI
 
 on:
   push:
