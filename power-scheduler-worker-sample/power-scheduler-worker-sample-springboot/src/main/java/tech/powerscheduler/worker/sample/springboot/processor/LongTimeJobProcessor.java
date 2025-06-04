@@ -20,9 +20,9 @@ public class LongTimeJobProcessor extends JavaProcessor {
 
     @Override
     public ProcessResult process(JobContext context) throws InterruptedException {
-        log.info("job start");
-        TimeUnit.MINUTES.sleep(3);
-        log.info("job complete");
+        log.info("耗时的任务开始");
+        TimeUnit.SECONDS.sleep(300);
+        log.info("耗时的任务完成");
         return ProcessResult.success();
     }
 

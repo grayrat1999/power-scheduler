@@ -21,7 +21,7 @@ public class MayFailJobProcessor extends JavaProcessor {
     @Override
     public ProcessResult process(JobContext context) throws InterruptedException {
         boolean fail = System.currentTimeMillis() % 2 == 1;
-        TimeUnit.MINUTES.sleep(1);
+        TimeUnit.SECONDS.sleep(3);
         if (fail) {
             return ProcessResult.failure("这是错误信息的内容");
         }

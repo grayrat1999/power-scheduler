@@ -20,9 +20,9 @@ public class ShortTimeJobProcessor extends JavaProcessor {
 
     @Override
     public ProcessResult process(JobContext context) throws InterruptedException {
-        log.info("job start");
+        log.info("短暂的任务开始");
         TimeUnit.SECONDS.sleep(3);
-        log.info("job complete");
+        log.info("短暂的任务完成");
         return ProcessResult.success();
     }
 
