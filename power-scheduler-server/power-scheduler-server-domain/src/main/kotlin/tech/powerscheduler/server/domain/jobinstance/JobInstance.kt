@@ -64,7 +64,7 @@ class JobInstance {
     var startAt: LocalDateTime? = null
 
     /**
-     * 完成时间
+     * 结束时间
      */
     var endAt: LocalDateTime? = null
 

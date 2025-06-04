@@ -3,6 +3,7 @@ package tech.powerscheduler.server.infrastructure.persistence.model
 import jakarta.persistence.*
 import tech.powerscheduler.common.enums.ExecuteModeEnum
 import tech.powerscheduler.common.enums.JobTypeEnum
+import tech.powerscheduler.common.enums.RetentionPolicyEnum
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
 import tech.powerscheduler.common.enums.ScriptTypeEnum
 import java.time.LocalDateTime
@@ -141,4 +142,17 @@ class JobInfoEntity : BaseEntity() {
      */
     @Column(name = "scheduler_address")
     var schedulerAddress: String? = null
+
+    /**
+     * 保留策略
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "retention_policy")
+    var retentionPolicy: RetentionPolicyEnum? = null
+
+    /**
+     * 保留值
+     */
+    @Column(name = "retention_value")
+    var retentionValue: Int? = null
 }

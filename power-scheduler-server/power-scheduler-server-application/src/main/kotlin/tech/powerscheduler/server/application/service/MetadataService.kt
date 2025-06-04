@@ -20,6 +20,7 @@ class MetadataService {
         ScheduleTypeEnum::class,
         ExecuteModeEnum::class,
         ScriptTypeEnum::class,
+        RetentionPolicyEnum::class,
     ).associateBy { it.simpleName!! }
 
     fun listMetadata(metadataCodes: List<String>): List<MetadataDTO> {

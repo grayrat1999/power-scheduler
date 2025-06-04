@@ -74,6 +74,8 @@ class JobInfoAssembler {
             this.maxAttemptCnt = jobInfo.maxAttemptCnt
             this.attemptInterval = jobInfo.attemptInterval
             this.priority = jobInfo.priority
+            this.retentionPolicy = jobInfo.retentionPolicy.toDTO()
+            this.retentionValue = jobInfo.retentionValue
             this.createdBy = jobInfo.createdBy
             this.createdAt = jobInfo.createdAt
             this.updatedBy = jobInfo.updatedBy
@@ -104,6 +106,8 @@ class JobInfoAssembler {
             this.scriptCode = param.scriptCode
             this.maxAttemptCnt = param.maxAttemptCnt
             this.priority = param.priority
+            this.retentionPolicy = param.retentionPolicy
+            this.retentionValue = param.retentionValue
         }
     }
 
@@ -131,6 +135,8 @@ class JobInfoAssembler {
             this.maxAttemptCnt = param.maxAttemptCnt
             this.priority = param.priority
             this.schedulerAddress = null
+            this.retentionPolicy = param.retentionPolicy
+            this.retentionValue = param.retentionValue
         }
     }
 
