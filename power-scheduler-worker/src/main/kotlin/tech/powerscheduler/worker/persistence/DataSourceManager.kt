@@ -2,6 +2,7 @@ package tech.powerscheduler.worker.persistence
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import tech.powerscheduler.worker.util.H2_DIR
 import java.io.File
 import java.sql.Connection
 
@@ -13,8 +14,10 @@ import java.sql.Connection
  */
 object DataSourceManager {
 
+    private const val DATA_FILE = "data"
+
     private val hikariConfig = HikariConfig().apply {
-        jdbcUrl = "jdbc:h2:file:~/PowerSchedulerWorkerData/h2_data;DB_CLOSE_ON_EXIT=FALSE"
+        jdbcUrl = "jdbc:h2:file:${H2_DIR}/${DATA_FILE};DB_CLOSE_ON_EXIT=FALSE"
         username = "sa"
         password = ""
         driverClassName = "org.h2.Driver"
@@ -33,8 +36,7 @@ object DataSourceManager {
 
     fun closeDataSource() {
         dataSource.close()
-        val homeDir = System.getProperty("user.home")
-        val dbFilePath = "$homeDir/PowerSchedulerWorkerData/h2_data.mv.db"
+        val dbFilePath = "${H2_DIR}/${DATA_FILE}.mv.db"
         val dbFile = File(dbFilePath)
         dbFile.delete()
     }
