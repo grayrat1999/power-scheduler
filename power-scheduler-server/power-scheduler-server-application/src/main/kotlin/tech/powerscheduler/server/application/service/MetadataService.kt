@@ -29,7 +29,7 @@ class MetadataService {
     fun buildMetadata(metadataCode: String): MetadataDTO? {
         val metadataClass = metadataEnumMap[metadataCode] ?: return null
         val metadataAnnotation = metadataClass.findAnnotation<Metadata>()!!
-        val options = metadataClass.java.enumConstants.map { buildOption(it as BaseEnum) }
+        val options = metadataClass.java.enumConstants.mapNotNull { buildOption(it as BaseEnum) }
         return MetadataDTO(
             code = metadataCode,
             label = metadataAnnotation.label,
@@ -37,7 +37,13 @@ class MetadataService {
         )
     }
 
-    private fun buildOption(option: BaseEnum): MetadataDTO {
+    private fun buildOption(option: BaseEnum): MetadataDTO? {
+        // 未完成的功能暂时不展示给前端
+        if (option is ExecuteModeEnum) {
+            if (option in setOf(ExecuteModeEnum.BROADCAST, ExecuteModeEnum.MAP_REDUCE)) {
+                return null
+            }
+        }
         return MetadataDTO(
             code = option.code,
             label = option.label,
