@@ -55,7 +55,6 @@ class JobInfoAddRequestDTO {
     /**
      * 任务处理器
      */
-    @NotBlank
     var processor: String? = null
 
     /**

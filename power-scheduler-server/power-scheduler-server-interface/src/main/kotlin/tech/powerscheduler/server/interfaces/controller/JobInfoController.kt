@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.constraints.NotNull
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import tech.powerscheduler.common.enums.JobTypeEnum
+import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.dto.request.*
 import tech.powerscheduler.server.application.service.JobInfoService
 import tech.powerscheduler.server.application.service.JobInstanceService
@@ -37,12 +39,18 @@ internal class JobInfoController(
     @Operation(summary = "新增任务")
     @PostMapping("/add")
     fun addJobInfo(@Validated @RequestBody param: JobInfoAddRequestDTO) = wrapperResponse {
+        if (param.jobType != JobTypeEnum.SCRIPT && param.processor.isNullOrBlank()) {
+            throw BizException("任务处理器不能为空")
+        }
         return@wrapperResponse jobInfoService.add(param)
     }
 
     @Operation(summary = "编辑任务")
     @PostMapping("/edit")
     fun editJobInfo(@Validated @RequestBody param: JobInfoEditRequestDTO) = wrapperResponse {
+        if (param.jobType != JobTypeEnum.SCRIPT && param.processor.isNullOrBlank()) {
+            throw BizException("任务处理器不能为空")
+        }
         return@wrapperResponse jobInfoService.edit(param)
     }
 
