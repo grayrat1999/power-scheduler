@@ -12,4 +12,4 @@ if (-not [string]::IsNullOrEmpty($repo))
 docker build `
     -t ${repo}power-scheduler-server:${tag}  `
     -f ../power-scheduler-server/Dockerfile `
-    ../
+    ../power-scheduler-server

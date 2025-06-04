@@ -5,6 +5,7 @@ import tech.powerscheduler.worker.job.JobContext
 import tech.powerscheduler.worker.job.ScriptJobContext
 import tech.powerscheduler.worker.processor.ProcessResult.Companion.failure
 import tech.powerscheduler.worker.processor.ProcessResult.Companion.success
+import tech.powerscheduler.worker.util.SCRIPT_DIR
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStream
@@ -29,14 +30,13 @@ class ScriptProcessor : Processor {
     }
 
     fun doProcess(context: ScriptJobContext): ProcessResult {
-        val scriptFileDir = "PowerSchedulerWorkerData/scripts"
-        val dir = File(scriptFileDir)
+        val dir = File(SCRIPT_DIR)
         if (!dir.exists()) {
             dir.mkdir()
         }
 
         val scriptType = context.scriptType
-        val scriptFilePath = scriptFileDir + File.separator + context.jobInstanceId + scriptType!!.suffix
+        val scriptFilePath = SCRIPT_DIR + File.separator + context.jobInstanceId + scriptType!!.suffix
         val file = File(scriptFilePath)
         try {
             file.writeText(context.scriptCode.orEmpty(), Charsets.UTF_8)

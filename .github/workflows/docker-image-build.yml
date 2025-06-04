@@ -1,0 +1,95 @@
+name: Docker Image For Worker Sample CI
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Image tag'
+        required: true
+        default: 'latest'
+
+jobs:
+
+  build-and-push-docker-image:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set Tag variable
+        run: |
+          GIT_TAG=${GITHUB_REF#refs/tags/}
+          DOCKER_TAG=${GIT_TAG#v}
+          echo "GIT_TAG=$GIT_TAG" >> $GITHUB_ENV
+          echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
+
+      - name: Print Tag
+        run: echo "Git tag is $GIT_TAG, Docker tag is $DOCKER_TAG"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
+
+      - name: BuildJar with Gradle
+        run: ./gradlew bootJar shadowJar --no-daemon
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.PACKAGE_TOKEN }}
+
+      - name: Build and push multi-arch image for server
+        uses: docker/build-push-action@v4
+        with:
+          file: ./power-scheduler-server/Dockerfile
+          context: ./power-scheduler-server
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            771592594/power-scheduler-server:${{ env.DOCKER_TAG }}-postgres
+            ghcr.io/${{ github.actor }}/power-scheduler-server:${{ env.DOCKER_TAG }}-postgres
+
+      - name: Build and push multi-arch image for springboot sample
+        uses: docker/build-push-action@v4
+        with:
+          file: ./power-scheduler-worker-sample/power-scheduler-worker-sample-springboot/Dockerfile
+          context: ./power-scheduler-worker-sample/power-scheduler-worker-sample-springboot
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            771592594/power-scheduler-worker-sample-springboot:${{ env.DOCKER_TAG }}
+            ghcr.io/${{ github.actor }}/power-scheduler-worker-sample-springboot:${{ env.DOCKER_TAG }}
+
+      - name: Build and push multi-arch image for frameless sample
+        uses: docker/build-push-action@v4
+        with:
+          file: ./power-scheduler-worker-sample/power-scheduler-worker-sample-frameless/Dockerfile
+          context: ./power-scheduler-worker-sample/power-scheduler-worker-sample-frameless
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            771592594/power-scheduler-worker-sample-frameless:${{ env.DOCKER_TAG }}
+            ghcr.io/${{ github.actor }}/power-scheduler-worker-sample-frameless:${{ env.DOCKER_TAG }}
