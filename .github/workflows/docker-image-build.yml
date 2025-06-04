@@ -25,7 +25,11 @@ jobs:
       - name: Set Tag variable
         run: |
           GIT_TAG=${GITHUB_REF#refs/tags/}
-          DOCKER_TAG=${GIT_TAG#v}
+          if [ -n "${{ inputs.image_tag }}" ]; then
+            DOCKER_TAG=${{ inputs.image_tag }}
+          else
+            DOCKER_TAG=${GIT_TAG#v}
+          fi
           echo "GIT_TAG=$GIT_TAG" >> $GITHUB_ENV
           echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
 
