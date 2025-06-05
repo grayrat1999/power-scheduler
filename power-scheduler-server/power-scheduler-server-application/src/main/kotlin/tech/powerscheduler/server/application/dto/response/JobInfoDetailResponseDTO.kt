@@ -103,7 +103,7 @@ class JobInfoDetailResponseDTO {
     /**
      * 保留策略
      */
-    var retentionPolicy: RetentionPolicyEnum? = null
+    var retentionPolicy: RetentionPolicyDTO? = null
 
     /**
      * 保留值
