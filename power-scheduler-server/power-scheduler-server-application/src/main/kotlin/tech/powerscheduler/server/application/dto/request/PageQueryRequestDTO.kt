@@ -8,7 +8,7 @@ open class PageQueryRequestDTO(
     /**
      * 当前页号
      */
-    var pageNo: Int = 0,
+    var pageNo: Int = 1,
     /**
      * 每页条数
      */
