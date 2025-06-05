@@ -78,7 +78,9 @@ class JobInstanceCleanActor(
     }
 
     fun cleanJobInstance(jobInfos: Iterable<JobInfo>) {
-        val retentionPolicy2JobInfos = jobInfos.groupBy { it.retentionPolicy!! }
+        val retentionPolicy2JobInfos = jobInfos
+            .filter { it.retentionPolicy != null }
+            .groupBy { it.retentionPolicy }
         cleanByRetainRecentCountPolicy(retentionPolicy2JobInfos[RetentionPolicyEnum.RECENT_COUNT].orEmpty())
         cleanByRecentDayPolicy(retentionPolicy2JobInfos[RetentionPolicyEnum.RECENT_DAYS].orEmpty())
         context.log.info("clean jobJobInstance successfully")
