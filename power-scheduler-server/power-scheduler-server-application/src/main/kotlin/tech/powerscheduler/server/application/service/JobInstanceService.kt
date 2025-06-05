@@ -60,6 +60,12 @@ class JobInstanceService(
     fun terminate(jobInstanceId: Long) {
         val jobInstance = jobInstanceRepository.findById(JobInstanceId(jobInstanceId))
             ?: throw BizException(message = "终止任务失败: 任务实例不存在")
+        if (jobInstance.startAt == null) {
+            jobInstance.startAt = LocalDateTime.now()
+        }
+        if (jobInstance.endAt == null) {
+            jobInstance.endAt = LocalDateTime.now()
+        }
         when (jobInstance.jobStatus!!) {
             WAITING_DISPATCH -> {
                 jobInstance.jobStatus = CANCELED

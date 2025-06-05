@@ -1,12 +1,14 @@
 package tech.powerscheduler.server.application.dto.request
 
 
+import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.PositiveOrZero
 import tech.powerscheduler.common.enums.ExecuteModeEnum
 import tech.powerscheduler.common.enums.JobTypeEnum
+import tech.powerscheduler.common.enums.RetentionPolicyEnum
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
 import tech.powerscheduler.common.enums.ScriptTypeEnum
 
@@ -101,4 +103,17 @@ class JobInfoEditRequestDTO {
      */
     @PositiveOrZero
     var attemptInterval: Int? = null
+
+    /**
+     * 保留策略
+     */
+    @NotNull
+    var retentionPolicy: RetentionPolicyEnum? = RetentionPolicyEnum.RECENT_COUNT
+
+    /**
+     * 保留值
+     */
+    @NotNull
+    @Min(1)
+    var retentionValue: Int? = 300
 }

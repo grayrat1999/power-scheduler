@@ -1,6 +1,7 @@
 package tech.powerscheduler.server.infrastructure.persistence.repository.impl
 
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import tech.powerscheduler.common.enums.JobStatusEnum
+import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
 import tech.powerscheduler.server.infrastructure.persistence.model.JobInstanceEntity
 import java.time.LocalDateTime
 
@@ -42,8 +44,8 @@ interface JobInstanceJpaRepository :
         SELECT j.jobId, COUNT(j) 
         FROM JobInstanceEntity j 
         WHERE true 
-            AND j.jobId IN :jobIds 
-            AND j.jobStatus IN :jobStatuses 
+          AND j.jobId IN :jobIds 
+          AND j.jobStatus IN :jobStatuses 
         GROUP BY j.jobId
     """
     )
@@ -61,8 +63,8 @@ interface JobInstanceJpaRepository :
         JOIN JobInfoEntity AS jobInfo
             ON jobInfo.id = jobInstance.jobId
         WHERE true 
-        AND jobInstance.jobId IN :jobIds 
-        AND jobInstance.jobStatus IN :jobStatuses
+          AND jobInstance.jobId IN :jobIds 
+          AND jobInstance.jobStatus IN :jobStatuses
     """
     )
     fun listDispatchable(
@@ -71,4 +73,37 @@ interface JobInstanceJpaRepository :
         pageRequest: Pageable
     ): Page<JobInstanceEntity>
 
+    @Query(
+        """
+        SELECT 
+            jobInstance.id
+        FROM JobInstanceEntity AS jobInstance
+        WHERE true 
+          AND jobInstance.jobId = :jobId 
+          AND jobInstance.jobStatus IN :jobStatuses
+    """
+    )
+    fun listIdByJobIdAndJobStatus(
+        jobId: Long,
+        jobStatuses: Iterable<JobStatusEnum>,
+        pageable: Pageable
+    ): Page<Long>
+
+    @Query(
+        """
+        SELECT 
+            jobInstance.id
+        FROM JobInstanceEntity AS jobInstance
+        WHERE true 
+          AND jobInstance.jobId = :jobId 
+          AND jobInstance.jobStatus IN :jobStatuses
+          AND jobInstance.endAt < :endAt
+    """
+    )
+    fun listIdByJobIdAndJobStatusAndEndAtBefore(
+        jobId: Long,
+        jobStatuses: Set<JobStatusEnum>,
+        endAt: LocalDateTime,
+        pageable: Pageable
+    ): Page<Long>
 }

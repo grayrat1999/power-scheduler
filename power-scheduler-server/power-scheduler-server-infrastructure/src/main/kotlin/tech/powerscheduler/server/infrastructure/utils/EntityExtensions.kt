@@ -74,6 +74,8 @@ fun JobInfoEntity.toDomainModel(): JobInfo {
         it.priority = this.priority
         it.lastCompletedAt = this.lastCompletedAt
         it.schedulerAddress = this.schedulerAddress
+        it.retentionPolicy = this.retentionPolicy
+        it.retentionValue = this.retentionValue
 
         it.createdBy = this.createdBy
         it.createdAt = this.createdAt
@@ -106,6 +108,8 @@ fun JobInfo.toEntity(): JobInfoEntity {
         it.priority = this.priority
         it.lastCompletedAt = this.lastCompletedAt
         it.schedulerAddress = this.schedulerAddress
+        it.retentionPolicy = this.retentionPolicy
+        it.retentionValue = this.retentionValue
     }
 }
 
