@@ -74,6 +74,8 @@ class JobInfoAssembler {
             this.maxAttemptCnt = jobInfo.maxAttemptCnt
             this.attemptInterval = jobInfo.attemptInterval
             this.priority = jobInfo.priority
+            this.retentionPolicy = jobInfo.retentionPolicy.toDTO()
+            this.retentionValue = jobInfo.retentionValue
             this.createdBy = jobInfo.createdBy
             this.createdAt = jobInfo.createdAt
             this.updatedBy = jobInfo.updatedBy

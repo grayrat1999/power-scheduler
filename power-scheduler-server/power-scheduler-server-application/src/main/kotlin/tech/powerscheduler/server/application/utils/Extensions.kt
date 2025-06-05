@@ -67,3 +67,13 @@ fun JobStatusEnum?.toDTO(): JobStatusDTO {
         label = this.label,
     )
 }
+
+fun RetentionPolicyEnum?.toDTO(): RetentionPolicyDTO {
+    if (this == null) {
+        return RetentionPolicyDTO()
+    }
+    return RetentionPolicyDTO(
+        code = this.code,
+        label = this.label,
+    )
+}

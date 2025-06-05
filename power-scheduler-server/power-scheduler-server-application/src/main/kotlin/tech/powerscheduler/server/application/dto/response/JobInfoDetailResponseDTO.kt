@@ -1,5 +1,6 @@
 package tech.powerscheduler.server.application.dto.response
 
+import tech.powerscheduler.common.enums.RetentionPolicyEnum
 import java.time.LocalDateTime
 
 /**
@@ -98,6 +99,16 @@ class JobInfoDetailResponseDTO {
      * 优先级
      */
     var priority: Int? = null
+
+    /**
+     * 保留策略
+     */
+    var retentionPolicy: RetentionPolicyDTO? = null
+
+    /**
+     * 保留值
+     */
+    var retentionValue: Int? = null
 
     /**
      * 创建人
