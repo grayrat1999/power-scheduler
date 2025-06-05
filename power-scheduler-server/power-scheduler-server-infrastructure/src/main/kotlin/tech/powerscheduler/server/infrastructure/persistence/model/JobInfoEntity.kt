@@ -147,12 +147,12 @@ class JobInfoEntity : BaseEntity() {
      * 保留策略
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "retention_policy", nullable = false)
+    @Column(name = "retention_policy")
     var retentionPolicy: RetentionPolicyEnum? = null
 
     /**
      * 保留值
      */
-    @Column(name = "retention_value", nullable = false)
+    @Column(name = "retention_value")
     var retentionValue: Int? = null
 }
