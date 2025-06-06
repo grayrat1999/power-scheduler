@@ -1,6 +1,7 @@
 package tech.powerscheduler.server.application.service
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.JobInfoAssembler
 import tech.powerscheduler.server.application.dto.request.JobInfoAddRequestDTO
@@ -54,9 +55,10 @@ class JobInfoService(
         return jobId.value
     }
 
+    @Transactional
     fun edit(param: JobInfoEditRequestDTO) {
         val jobId = JobId(param.jobId!!)
-        val jobInfo = jobInfoRepository.findById(jobId)
+        val jobInfo = jobInfoRepository.lockById(jobId)
             ?: throw BizException(message = "任务保存失败: 任务不存在")
         val jobInfoToSave = jobInfoAssembler.toDomainModel4EditRequest(jobInfo, param).apply {
             validScheduleConfig()
@@ -64,9 +66,10 @@ class JobInfoService(
         jobInfoRepository.save(jobInfoToSave)
     }
 
+    @Transactional
     fun switch(param: JobSwitchRequestDTO) {
         val jobId = JobId(param.jobId!!)
-        val jobInfo = jobInfoRepository.findById(jobId)
+        val jobInfo = jobInfoRepository.lockById(jobId)
             ?: throw BizException("任务保存失败: 任务不存在")
         if (jobInfo.enabled == param.enabled) {
             return
@@ -76,7 +79,6 @@ class JobInfoService(
             jobInfo.updateNextScheduleTime()
         } else {
             jobInfo.nextScheduleAt = null
-            jobInfo.schedulerAddress = null
         }
         jobInfoRepository.save(jobInfo)
     }
