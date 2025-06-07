@@ -3,7 +3,6 @@ package tech.powerscheduler.server.domain.task
 import tech.powerscheduler.server.domain.common.Page
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.jobinfo.JobId
-import tech.powerscheduler.server.domain.jobinstance.JobInstance
 
 /**
  * @author grayrat
