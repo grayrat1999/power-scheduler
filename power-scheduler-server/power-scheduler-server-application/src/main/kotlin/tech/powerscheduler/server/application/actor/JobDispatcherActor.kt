@@ -122,7 +122,7 @@ class JobDispatcherActor(
         val appCode2WorkerRegistry = workerRegistryRepository.findAllByAppCodes(appCodes)
 
         // 使用管道限制最大并发数量, 为了避免并发大量的请求导致系统资源不足
-        val channel = Channel<Unit>(1)
+        val channel = Channel<Unit>(20)
         runBlocking {
             val asyncDispatchJobs = dispatchableList.map { jobInstance ->
                 async {
