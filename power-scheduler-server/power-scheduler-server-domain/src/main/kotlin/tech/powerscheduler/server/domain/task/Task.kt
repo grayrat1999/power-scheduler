@@ -135,4 +135,14 @@ class Task {
      */
     var workerAddress: String? = null
 
+    val canReattempt
+        get() = this.attemptCnt!! < this.maxAttemptCnt!!
+
+    fun resetStatusForReattempt() {
+        this.scheduleAt = LocalDateTime.now().plusSeconds(this.attemptInterval?.toLong() ?: 15)
+        this.startAt = null
+        this.endAt = null
+        this.attemptCnt = this.attemptCnt!! + 1
+        this.jobStatus = JobStatusEnum.WAITING_DISPATCH
+    }
 }

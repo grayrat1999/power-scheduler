@@ -3,18 +3,15 @@ package tech.powerscheduler.common.enums
 import tech.powerscheduler.common.annotation.Metadata
 
 /**
- * TODO: 枚举不再负责任务状态的运转，只用于对外展示（适当做模糊化）
- * 任务状态枚举
- *
  * @author grayrat
- * @since 2025/5/18
+ * @since 2025/6/7
  */
-@Metadata(label = "任务状态", code = "JobStatusEnum")
-enum class JobStatusEnum(
+@Metadata(label = "子任务状态", code = "TaskStatusEnum")
+enum class TaskStatusEnum (
     override val label: String
 ) : BaseEnum {
     /**
-     * 待调度(包括：调度中)
+     * 待调度
      */
     WAITING_DISPATCH("待调度"),
 

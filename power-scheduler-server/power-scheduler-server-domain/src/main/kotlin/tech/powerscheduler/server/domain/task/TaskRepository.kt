@@ -1,10 +1,22 @@
 package tech.powerscheduler.server.domain.task
 
+import tech.powerscheduler.server.domain.common.Page
+import tech.powerscheduler.server.domain.common.PageQuery
+import tech.powerscheduler.server.domain.jobinfo.JobId
+import tech.powerscheduler.server.domain.jobinstance.JobInstance
+
 /**
  * @author grayrat
  * @since 2025/6/6
  */
 interface TaskRepository {
+
+    fun listDispatchable(
+        jobIds: Iterable<JobId>,
+        pageQuery: PageQuery
+    ): Page<Task>
+
+    fun save(task: Task): TaskId
 
     fun saveAll(taskList: Iterable<Task>): List<TaskId>
 

@@ -8,6 +8,7 @@ import tech.powerscheduler.server.application.dto.response.JobInstanceQueryRespo
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.jobinstance.JobInstance
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceQuery
+import tech.powerscheduler.server.domain.task.Task
 
 /**
  * @author grayrat
@@ -105,4 +106,5 @@ class JobInstanceAssembler {
             it.priority = domainModel.priority ?: 0
         }
     }
+
 }
