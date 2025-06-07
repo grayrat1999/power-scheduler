@@ -176,23 +176,26 @@ class JobInfo {
         }
     }
 
-    fun updateNextScheduleTime() {
+    fun updateNextScheduleTime(
+        now: LocalDateTime,
+    ) {
         validScheduleConfig()
         this.nextScheduleAt = when (scheduleType!!) {
-            CRON -> CronUtils.nextExecution(scheduleConfig!!, LocalDateTime.now())
+            CRON -> CronUtils.nextExecution(scheduleConfig!!, now)
 
             FIX_RATE -> if (nextScheduleAt == null) {
-                LocalDateTime.now()
+                now
             } else {
-                LocalDateTime.now().plusSeconds(scheduleConfig!!.toLong())
+                now.plusSeconds(scheduleConfig!!.toLong())
             }
 
             FIX_DELAY -> if (nextScheduleAt == null) {
-                LocalDateTime.now()
+                now
             } else {
                 if (lastCompletedAt == null) {
-                    LocalDateTime.now()
+                    now
                 } else {
+                    // todo: 这里需要重新考虑一下
                     lastCompletedAt!!.plusSeconds(scheduleConfig!!.toLong())
                 }
             }
