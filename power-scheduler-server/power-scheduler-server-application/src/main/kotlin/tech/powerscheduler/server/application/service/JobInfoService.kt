@@ -16,6 +16,7 @@ import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
 import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.jobinfo.JobInfoQuery
 import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
+import java.time.LocalDateTime
 
 /**
  * 任务相关服务
@@ -76,7 +77,7 @@ class JobInfoService(
         }
         jobInfo.enabled = param.enabled
         if (jobInfo.enabled == true) {
-            jobInfo.updateNextScheduleTime()
+            jobInfo.updateNextScheduleTime(now = LocalDateTime.now())
         } else {
             jobInfo.nextScheduleAt = null
         }

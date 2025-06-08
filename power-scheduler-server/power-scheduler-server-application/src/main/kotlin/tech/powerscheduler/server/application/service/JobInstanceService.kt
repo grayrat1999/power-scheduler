@@ -140,7 +140,7 @@ class JobInstanceService(
                     jobInfo.enabled = false
                 }
                 if (jobInfo.scheduleType == ScheduleTypeEnum.FIX_DELAY) {
-                    jobInfo.updateNextScheduleTime()
+                    jobInfo.updateNextScheduleTime(now = LocalDateTime.now())
                 }
                 jobInfoRepository.save(jobInfo)
             }
