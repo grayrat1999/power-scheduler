@@ -11,7 +11,6 @@ import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.WorkerRegistryAssembler
 import tech.powerscheduler.server.application.dto.response.WorkerQueryResponseDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
 import tech.powerscheduler.server.domain.task.TaskRepository
 import tech.powerscheduler.server.domain.task.TaskStatusChangeEvent
 import tech.powerscheduler.server.domain.workerregistry.WorkerRegistry
@@ -29,7 +28,6 @@ import java.time.LocalDateTime
 class WorkerLifeCycleService(
     private val taskRepository: TaskRepository,
     private val appGroupRepository: AppGroupRepository,
-    private val jobInstanceRepository: JobInstanceRepository,
     private val workerRegistryRepository: WorkerRegistryRepository,
     private val workerRegistryAssembler: WorkerRegistryAssembler,
     private val transactionTemplate: TransactionTemplate,
