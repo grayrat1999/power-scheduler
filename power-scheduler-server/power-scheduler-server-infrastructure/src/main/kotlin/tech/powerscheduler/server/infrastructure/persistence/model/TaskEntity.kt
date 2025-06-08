@@ -10,11 +10,11 @@ import java.time.LocalDateTime
  */
 @Entity
 @Table(
-    name = "task_entity",
+    name = "task",
     indexes = [
-        Index(name = "job_instance_idx_job_id", columnList = "job_id"),
-        Index(name = "job_instance_idx_job_instance_id", columnList = "job_instance_id"),
-        Index(name = "job_instance_idx_worker_address", columnList = "worker_address"),
+        Index(name = "task_idx_job_id", columnList = "job_id"),
+        Index(name = "task_idx_job_instance_id", columnList = "job_instance_id"),
+        Index(name = "task_idx_worker_address", columnList = "worker_address"),
     ]
 )
 class TaskEntity {
