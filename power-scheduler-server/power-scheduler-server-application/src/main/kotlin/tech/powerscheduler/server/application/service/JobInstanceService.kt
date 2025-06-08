@@ -186,5 +186,6 @@ class JobInstanceService(
                 jobInfoRepository.save(jobInfo)
             }
         }
+        log.info("update jobInstance successfully: id={}, status={}", jobInstanceId.value, jobInstance.jobStatus)
     }
 }

@@ -72,6 +72,10 @@ class JobInfoRepositoryImpl(
         return list.map { it.toDomainModel() }
     }
 
+    override fun clearSchedulerAddress(schedulerAddress: String) {
+        jobInfoJpaRepository.clearSchedulerAddress(schedulerAddress)
+    }
+
     override fun save(jobInfo: JobInfo): JobId {
         val jobInfoEntity = jobInfo.toEntity()
         jobInfoJpaRepository.save(jobInfoEntity)

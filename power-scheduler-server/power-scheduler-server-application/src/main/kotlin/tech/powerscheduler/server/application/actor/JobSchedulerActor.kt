@@ -1,6 +1,7 @@
 package tech.powerscheduler.server.application.actor
 
 import akka.actor.typed.Behavior
+import akka.actor.typed.PostStop
 import akka.actor.typed.SupervisorStrategy
 import akka.actor.typed.javadsl.AbstractBehavior
 import akka.actor.typed.javadsl.ActorContext
@@ -86,6 +87,7 @@ class JobSchedulerActor(
     override fun createReceive(): Receive<Command> {
         return newReceiveBuilder()
             .onMessageEquals(Command.ScheduleJobs) { return@onMessageEquals handleScheduleDueJobs() }
+            .onSignal(PostStop::class.java) { signal -> onPostStop() }
             .build()
     }
 
@@ -222,4 +224,11 @@ class JobSchedulerActor(
         }
     }
 
+    private fun onPostStop(): Behavior<Command> {
+        log.info("start to reset jobs assigned to this server")
+        val currentServerAddress = context.system.hostPort()
+        jobInfoRepository.clearSchedulerAddress(currentServerAddress)
+        log.info("successfully reset jobs assigned to this server")
+        return this
+    }
 }
