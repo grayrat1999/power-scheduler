@@ -8,6 +8,7 @@ import tech.powerscheduler.server.domain.common.Page
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.jobinstance.JobInstance
+import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
 import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskId
 import tech.powerscheduler.server.domain.task.TaskRepository
@@ -26,18 +27,6 @@ class TaskRepositoryRepositoryImpl(
     private val taskRepositoryJpaRepository: TaskRepositoryJpaRepository,
 ) : TaskRepository {
 
-    override fun save(task: Task): TaskId {
-        val entity = task.toEntity()
-        taskRepositoryJpaRepository.save(entity)
-        return TaskId(entity.id!!)
-    }
-
-    override fun saveAll(taskList: Iterable<Task>): List<TaskId> {
-        val entities = taskList.map { it.toEntity() }
-        taskRepositoryJpaRepository.saveAll(entities)
-        return entities.map { TaskId(it.id!!) }
-    }
-
     override fun listDispatchable(
         jobIds: Iterable<JobId>,
         pageQuery: PageQuery
@@ -53,6 +42,22 @@ class TaskRepositoryRepositoryImpl(
             pageRequest = pageable,
         )
         return page.map { it.toDomainModel() }.toDomainPage()
+    }
+
+    override fun save(task: Task): TaskId {
+        val entity = task.toEntity()
+        taskRepositoryJpaRepository.save(entity)
+        return TaskId(entity.id!!)
+    }
+
+    override fun saveAll(taskList: Iterable<Task>): List<TaskId> {
+        val entities = taskList.map { it.toEntity() }
+        taskRepositoryJpaRepository.saveAll(entities)
+        return entities.map { TaskId(it.id!!) }
+    }
+
+    override fun deleteByJobInstanceId(jobInstanceIds: Iterable<JobInstanceId>) {
+        taskRepositoryJpaRepository.deleteByJobInstanceIdIn(jobInstanceIds.map { it.value })
     }
 
 }

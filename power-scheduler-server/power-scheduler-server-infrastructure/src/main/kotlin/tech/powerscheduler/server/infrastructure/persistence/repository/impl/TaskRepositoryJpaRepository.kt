@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import tech.powerscheduler.common.enums.JobStatusEnum
+import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
 import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.infrastructure.persistence.model.TaskEntity
 
@@ -37,5 +38,7 @@ interface TaskRepositoryJpaRepository
         jobStatuses: Iterable<JobStatusEnum>,
         pageRequest: Pageable
     ): Page<TaskEntity>
+
+    fun deleteByJobInstanceIdIn(jobInstanceIds: Iterable<Long>)
 
 }

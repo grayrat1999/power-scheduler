@@ -3,6 +3,7 @@ package tech.powerscheduler.server.domain.task
 import tech.powerscheduler.server.domain.common.Page
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.jobinfo.JobId
+import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
 
 /**
  * @author grayrat
@@ -18,5 +19,7 @@ interface TaskRepository {
     fun save(task: Task): TaskId
 
     fun saveAll(taskList: Iterable<Task>): List<TaskId>
+
+    fun deleteByJobInstanceId(jobInstanceIds: Iterable<JobInstanceId>)
 
 }
