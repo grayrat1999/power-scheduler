@@ -7,7 +7,6 @@ import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.common.dto.request.WorkerHeartbeatRequestDTO
 import tech.powerscheduler.common.dto.request.WorkerRegisterRequestDTO
 import tech.powerscheduler.common.dto.request.WorkerUnregisterRequestDTO
-import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.WorkerRegistryAssembler
 import tech.powerscheduler.server.application.dto.response.WorkerQueryResponseDTO
@@ -117,10 +116,7 @@ class WorkerLifeCycleService(
                 if (it.canReattempt) {
                     it.resetStatusForReattempt()
                 } else {
-                    it.jobStatus = JobStatusEnum.FAILED
-                    it.startAt = it.startAt ?: LocalDateTime.now()
-                    it.endAt = LocalDateTime.now()
-                    it.message = "worker is offline"
+                    it.markFailedWhenWorkerOffline()
                 }
             }
             workerRegistryRepository.delete(existWorkerRegistry.id!!)

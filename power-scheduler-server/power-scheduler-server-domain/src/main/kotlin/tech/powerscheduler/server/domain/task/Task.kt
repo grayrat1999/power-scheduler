@@ -1,10 +1,6 @@
 package tech.powerscheduler.server.domain.task
 
-import tech.powerscheduler.common.enums.ExecuteModeEnum
-import tech.powerscheduler.common.enums.JobStatusEnum
-import tech.powerscheduler.common.enums.JobTypeEnum
-import tech.powerscheduler.common.enums.ScheduleTypeEnum
-import tech.powerscheduler.common.enums.ScriptTypeEnum
+import tech.powerscheduler.common.enums.*
 import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
 import java.time.LocalDateTime
@@ -139,10 +135,17 @@ class Task {
         get() = this.attemptCnt!! < this.maxAttemptCnt!!
 
     fun resetStatusForReattempt() {
-        this.scheduleAt = LocalDateTime.now().plusSeconds(this.attemptInterval?.toLong() ?: 15)
+        this.jobStatus = JobStatusEnum.WAITING_DISPATCH
         this.startAt = null
         this.endAt = null
+        this.scheduleAt = LocalDateTime.now().plusSeconds(this.attemptInterval?.toLong() ?: 15)
         this.attemptCnt = this.attemptCnt!! + 1
-        this.jobStatus = JobStatusEnum.WAITING_DISPATCH
+    }
+
+    fun markFailedWhenWorkerOffline() {
+        this.jobStatus = JobStatusEnum.FAILED
+        this.startAt = this.startAt ?: LocalDateTime.now()
+        this.endAt = LocalDateTime.now()
+        this.message = "worker is offline"
     }
 }
