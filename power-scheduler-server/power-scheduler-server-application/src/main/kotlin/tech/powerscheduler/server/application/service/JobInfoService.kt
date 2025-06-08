@@ -76,7 +76,7 @@ class JobInfoService(
         }
         jobInfo.enabled = param.enabled
         if (jobInfo.enabled == true) {
-            jobInfo.updateNextScheduleTime()
+            jobInfo.initNextScheduleTime()
         } else {
             jobInfo.nextScheduleAt = null
         }

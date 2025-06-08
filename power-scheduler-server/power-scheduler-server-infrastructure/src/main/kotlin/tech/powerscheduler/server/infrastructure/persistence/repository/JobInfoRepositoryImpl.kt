@@ -114,14 +114,11 @@ class JobInfoRepositoryImpl(
         val specification = Specification<JobInfoEntity> { root, _, cb ->
             val idIn = root.get<Long>(JobInfoEntity::id.name).`in`(ids.map { it.value })
             val isEnabled = cb.equal(root.get<Boolean>(JobInfoEntity::enabled.name), true)
-            val nextScheduleAtIsNullOrGreatEquals = cb.or(
-                root.get<LocalDateTime>(JobInfoEntity::nextScheduleAt.name).isNull(),
-                cb.lessThanOrEqualTo(root.get(JobInfoEntity::nextScheduleAt.name), nextScheduleAt)
-            )
+            val nextScheduleAtGreatEquals = cb.lessThanOrEqualTo(root.get(JobInfoEntity::nextScheduleAt.name), nextScheduleAt)
             cb.and(
                 isEnabled,
                 idIn,
-                nextScheduleAtIsNullOrGreatEquals,
+                nextScheduleAtGreatEquals,
             )
         }
         val list = jobInfoJpaRepository.findAll(specification)

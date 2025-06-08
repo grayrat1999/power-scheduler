@@ -176,36 +176,41 @@ class JobInfo {
         }
     }
 
+    fun initNextScheduleTime() {
+        if (this.nextScheduleAt != null) {
+            return
+        }
+        val now = LocalDateTime.now()
+        when (scheduleType!!) {
+            CRON -> CronUtils.nextExecution(scheduleConfig!!, now)
+            FIX_RATE -> now
+            FIX_DELAY -> now
+            ONE_TIME -> parseLocalDateTime(scheduleConfig)
+        }
+    }
+
     fun updateNextScheduleTime(
         now: LocalDateTime = LocalDateTime.now(),
     ) {
         validScheduleConfig()
-        this.nextScheduleAt = when (scheduleType!!) {
-            CRON -> CronUtils.nextExecution(scheduleConfig!!, nextScheduleAt ?: now)
-
-            FIX_RATE -> if (nextScheduleAt == null) {
-                now
-            } else {
-                now.plusSeconds(scheduleConfig!!.toLong())
-            }
-
-            FIX_DELAY -> if (nextScheduleAt == null) {
-                now
-            } else {
-                if (lastCompletedAt == null) {
-                    now
-                } else {
-                    // todo: 这里需要重新考虑一下
-                    lastCompletedAt!!.plusSeconds(scheduleConfig!!.toLong())
-                }
-            }
-
-            ONE_TIME -> if (nextScheduleAt == null) {
-                parseLocalDateTime(scheduleConfig)
-            } else {
-                nextScheduleAt
-            }
+        if (this.nextScheduleAt == null) {
+            initNextScheduleTime()
+            return
         }
+        val nextScheduleTime = when (scheduleType!!) {
+            CRON -> CronUtils.nextExecution(scheduleConfig!!, nextScheduleAt!!)
+
+            FIX_RATE -> now.plusSeconds(scheduleConfig!!.toLong())
+
+            FIX_DELAY -> if (lastCompletedAt == null) {
+                now
+            } else {
+                lastCompletedAt!!.plusSeconds(scheduleConfig!!.toLong())
+            }
+
+            ONE_TIME -> nextScheduleAt
+        }
+        this.nextScheduleAt = nextScheduleTime
     }
 
     fun validScheduleConfig() {
