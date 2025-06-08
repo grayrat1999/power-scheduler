@@ -80,6 +80,7 @@ class JobExecutorService {
         jobContext.also {
             it.jobId = command.jobId
             it.jobInstanceId = jobInstanceId
+            it.taskId = command.taskId
             it.executeParams = command.executeParams
             it.dataTime = command.dataTime
         }
@@ -92,6 +93,7 @@ class JobExecutorService {
         val jobProgressEntity = JobProgressEntity().also {
             it.jobId = command.jobId
             it.jobInstanceId = command.jobInstanceId!!
+            it.taskId = command.taskId
         }
         if (jobQueue.offer(job).not()) {
             job.terminate()

@@ -14,7 +14,8 @@ class TaskAssembler {
     fun toDispatchTaskRequestDTO(domainModel: Task): JobDispatchRequestDTO {
         return JobDispatchRequestDTO().also {
             it.jobId = domainModel.jobId!!.value
-            it.jobInstanceId = domainModel.id!!.value
+            it.jobInstanceId = domainModel.jobInstanceId!!.value
+            it.taskId = domainModel.id!!.value
             it.appCode = domainModel.appCode
             it.jobName = domainModel.jobName
             it.jobType = domainModel.jobType

@@ -13,6 +13,7 @@ class JobProgressEntity {
     var id: Long? = null
     var jobId: Long? = null
     var jobInstanceId: Long? = null
+    var taskId: Long? = null
     var status: JobStatusEnum? = null
     var startAt: LocalDateTime? = null
     var endAt: LocalDateTime? = null

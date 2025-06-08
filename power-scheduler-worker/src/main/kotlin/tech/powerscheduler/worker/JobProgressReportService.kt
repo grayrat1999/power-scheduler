@@ -15,6 +15,10 @@ import tech.powerscheduler.worker.util.ExecutorCoroutineScope
  */
 class JobProgressReportService(
     /**
+     * worker注册服务
+     */
+    private val workerRegisterService: WorkerRegisterService,
+    /**
      * server发现服务
      */
     private val serverDiscoveryService: ServerDiscoveryService,
@@ -97,6 +101,8 @@ class JobProgressReportService(
             this.endAt = latestJobProgress.endAt
             this.jobStatus = latestJobProgress.status
             this.message = latestJobProgress.message
+            this.appCode = workerRegisterService.appCode
+            this.accessToken = workerRegisterService.accessToken
         }
         val result = httpClient.reportProgress(baseUrl = serverUrl, param = param)
         if (result.success && result.data == true) {

@@ -1,5 +1,6 @@
 package tech.powerscheduler.common.dto.request
 
+import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import tech.powerscheduler.common.enums.JobStatusEnum
 import java.time.LocalDateTime
@@ -37,4 +38,10 @@ class JobProgressReportRequestDTO {
      * 任务结果或者异常信息
      */
     var message: String? = null
+
+    @NotBlank
+    var appCode: String? = null
+
+    @NotBlank
+    var accessToken: String? = null
 }

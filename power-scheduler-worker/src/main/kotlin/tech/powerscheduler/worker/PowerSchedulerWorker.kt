@@ -73,6 +73,7 @@ class PowerSchedulerWorker(
 
     private val jobProgressReportService = JobProgressReportService(
         serverDiscoveryService = serverDiscoveryService,
+        workerRegisterService = workerRegisterService,
     )
 
     private val embedServer = EmbedServer(

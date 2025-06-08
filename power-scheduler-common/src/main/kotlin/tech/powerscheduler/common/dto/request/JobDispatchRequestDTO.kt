@@ -24,6 +24,11 @@ class JobDispatchRequestDTO {
     var jobInstanceId: Long? = null
 
     /**
+     * 子任务id
+     */
+    var taskId: Long? = null
+
+    /**
      * 应用编码
      */
     var appCode: String? = null
