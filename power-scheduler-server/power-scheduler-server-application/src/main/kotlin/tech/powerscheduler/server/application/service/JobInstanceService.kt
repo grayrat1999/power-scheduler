@@ -135,6 +135,8 @@ class JobInstanceService(
                     this.endAt = LocalDateTime.now()
                     this.jobStatus = FAILED
                 }
+            } else {
+                this.jobStatus = calculatedJobStatus
             }
         }
         transactionTemplate.executeWithoutResult {

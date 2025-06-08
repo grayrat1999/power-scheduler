@@ -157,6 +157,7 @@ class WorkerLifeCycleService(
             jobInstanceId = task.jobInstanceId!!,
             executeMode = task.executeMode!!,
         )
+        log.info("task update: id={}, status={}", taskId.value, task.jobStatus)
         transactionTemplate.executeWithoutResult {
             if (param.jobStatus == FAILED && task.canReattempt) {
                 task.resetStatusForReattempt()
