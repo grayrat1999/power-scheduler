@@ -20,8 +20,11 @@ interface TaskRepository {
         pageQuery: PageQuery
     ): Page<Task>
 
+    fun findAllUncompletedByWorkerAddress(workerAddress: String): List<Task>
+
     fun save(task: Task): TaskId
 
     fun saveAll(taskList: Iterable<Task>): List<TaskId>
+
     fun deleteByJobInstanceId(jobInstanceIds: Iterable<JobInstanceId>)
 }

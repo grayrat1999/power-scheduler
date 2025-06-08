@@ -3,6 +3,8 @@ package tech.powerscheduler.server.infrastructure.utils
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.appgroup.AppGroupId
 import tech.powerscheduler.server.domain.common.Page
+import tech.powerscheduler.server.domain.domainevent.DomainEvent
+import tech.powerscheduler.server.domain.domainevent.DomainEventId
 import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.jobinfo.JobInfo
 import tech.powerscheduler.server.domain.jobinstance.JobInstance
@@ -11,11 +13,7 @@ import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskId
 import tech.powerscheduler.server.domain.workerregistry.WorkerRegistry
 import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryId
-import tech.powerscheduler.server.infrastructure.persistence.model.AppGroupEntity
-import tech.powerscheduler.server.infrastructure.persistence.model.JobInfoEntity
-import tech.powerscheduler.server.infrastructure.persistence.model.JobInstanceEntity
-import tech.powerscheduler.server.infrastructure.persistence.model.TaskEntity
-import tech.powerscheduler.server.infrastructure.persistence.model.WorkerRegistryEntity
+import tech.powerscheduler.server.infrastructure.persistence.model.*
 
 /**
  * @author grayrat
@@ -249,5 +247,27 @@ fun TaskEntity.toDomainModel(): Task {
         it.attemptCnt = this.attemptCnt
         it.maxAttemptCnt = this.maxAttemptCnt
         it.priority = this.priority
+    }
+}
+
+fun DomainEvent.toEntity(): DomainEventEntity {
+    return DomainEventEntity().also {
+        it.id = this.id?.value
+        it.aggregateId= this.aggregateId
+        it.type = this.type
+        it.status = this.status
+        it.payload = this.payload
+        it.retryCnt = this.retryCnt
+    }
+}
+
+fun DomainEventEntity.toDomainModel(): DomainEvent {
+    return DomainEvent().also {
+        it.id = DomainEventId(this.id!!)
+        it.aggregateId= this.aggregateId
+        it.type = this.type
+        it.status = this.status
+        it.payload = this.payload
+        it.retryCnt = this.retryCnt
     }
 }

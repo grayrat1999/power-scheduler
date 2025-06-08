@@ -1,6 +1,7 @@
 package tech.powerscheduler.server.application.service
 
 import org.slf4j.LoggerFactory
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.common.dto.request.WorkerHeartbeatRequestDTO
@@ -12,6 +13,8 @@ import tech.powerscheduler.server.application.assembler.WorkerRegistryAssembler
 import tech.powerscheduler.server.application.dto.response.WorkerQueryResponseDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
+import tech.powerscheduler.server.domain.task.TaskRepository
+import tech.powerscheduler.server.domain.task.TaskStatusChangeEvent
 import tech.powerscheduler.server.domain.workerregistry.WorkerRegistry
 import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryRepository
 import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryUniqueKey
@@ -25,11 +28,13 @@ import java.time.LocalDateTime
  */
 @Service
 class WorkerLifeCycleService(
+    private val taskRepository: TaskRepository,
     private val appGroupRepository: AppGroupRepository,
     private val jobInstanceRepository: JobInstanceRepository,
     private val workerRegistryRepository: WorkerRegistryRepository,
     private val workerRegistryAssembler: WorkerRegistryAssembler,
     private val transactionTemplate: TransactionTemplate,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -106,22 +111,29 @@ class WorkerLifeCycleService(
                 return@executeWithoutResult
             }
             val workerAddress = existWorkerRegistry.address
-            val uncompletedJobInstanceList = jobInstanceRepository.findAllUncompletedByWorkerAddress(workerAddress)
-            uncompletedJobInstanceList.forEach {
-                if (it.attemptCnt!! >= it.maxAttemptCnt!!) {
+
+            val uncompletedTaskList = taskRepository.findAllUncompletedByWorkerAddress(workerAddress)
+            uncompletedTaskList.forEach {
+                if (it.canReattempt) {
+                    it.resetStatusForReattempt()
+                } else {
                     it.jobStatus = JobStatusEnum.FAILED
                     it.startAt = it.startAt ?: LocalDateTime.now()
                     it.endAt = LocalDateTime.now()
                     it.message = "worker is offline"
-                } else {
-                    it.attemptCnt = it.attemptCnt!! + 1
-                    it.jobStatus = JobStatusEnum.WAITING_DISPATCH
-                    it.startAt = null
-                    it.endAt = null
                 }
             }
             workerRegistryRepository.delete(existWorkerRegistry.id!!)
-            jobInstanceRepository.saveAll(uncompletedJobInstanceList)
+            taskRepository.saveAll(uncompletedTaskList)
+
+            uncompletedTaskList.forEach {
+                val taskStatusChangeEvent = TaskStatusChangeEvent(
+                    taskId = it.id!!,
+                    jobInstanceId = it.jobInstanceId!!,
+                    executeMode = it.executeMode!!,
+                )
+                applicationEventPublisher.publishEvent(taskStatusChangeEvent)
+            }
         }
     }
 

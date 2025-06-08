@@ -2,6 +2,7 @@ package tech.powerscheduler.server.infrastructure.persistence.repository
 
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 import tech.powerscheduler.common.enums.JobStatusEnum
@@ -13,6 +14,7 @@ import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskId
 import tech.powerscheduler.server.domain.task.TaskRepository
 import tech.powerscheduler.server.infrastructure.persistence.model.JobInstanceEntity
+import tech.powerscheduler.server.infrastructure.persistence.model.TaskEntity
 import tech.powerscheduler.server.infrastructure.persistence.repository.impl.TaskRepositoryJpaRepository
 import tech.powerscheduler.server.infrastructure.utils.toDomainModel
 import tech.powerscheduler.server.infrastructure.utils.toDomainPage
@@ -52,6 +54,19 @@ class TaskRepositoryRepositoryImpl(
             pageRequest = pageable,
         )
         return page.map { it.toDomainModel() }.toDomainPage()
+    }
+
+    override fun findAllUncompletedByWorkerAddress(workerAddress: String): List<Task> {
+        val specification = Specification<TaskEntity> { root, _, criteriaBuilder ->
+            val workerAddressEqual = criteriaBuilder.equal(
+                root.get<String>(TaskEntity::workerAddress.name), workerAddress
+            )
+            val jobStatusIn = root.get<String>(TaskEntity::jobStatus.name)
+                .`in`(JobStatusEnum.UNCOMPLETED_STATUSES)
+            criteriaBuilder.and(workerAddressEqual, jobStatusIn)
+        }
+        val list = taskRepositoryJpaRepository.findAll(specification)
+        return list.map { it.toDomainModel() }
     }
 
     override fun save(task: Task): TaskId {
