@@ -113,7 +113,10 @@ class JobInstanceService(
     fun updateProgress(param: JobProgressReportRequestDTO) {
         val jobInstanceId = JobInstanceId(param.jobInstanceId!!)
         val jobInstance = jobInstanceRepository.findById(jobInstanceId)
-            ?: throw BizException(message = "更新任务状态失败: 任务实例[$jobInstanceId]不存在")
+        if (jobInstance == null) {
+            log.warn("更新任务状态失败: 任务实例[$jobInstanceId]不存在")
+            return
+        }
         if (jobInstance.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
             log.info("updateProgress cancel, jobInstance [{}] is already completed", jobInstanceId)
             return

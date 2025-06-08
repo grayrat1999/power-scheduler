@@ -20,13 +20,11 @@ interface TaskRepositoryJpaRepository
     @Query(
         """
         SELECT 
-            jobInstance
-        FROM JobInstanceEntity AS jobInstance
-        JOIN JobInfoEntity AS jobInfo
-            ON jobInfo.id = jobInstance.jobId
+            task
+        FROM TaskEntity AS task
         WHERE true 
-          AND jobInstance.jobId IN :jobIds 
-          AND jobInstance.jobStatus IN :jobStatuses
+          AND task.jobId IN :jobIds 
+          AND task.jobStatus IN :jobStatuses
     """
     )
     fun listDispatchable(

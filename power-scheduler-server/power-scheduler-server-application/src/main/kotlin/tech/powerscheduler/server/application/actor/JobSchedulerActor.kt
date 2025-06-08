@@ -196,6 +196,9 @@ class JobSchedulerActor(
             jobInstance.schedulerAddress = currentServerAddress
             jobInfoToSchedule.updateNextScheduleTime(now = now)
 
+            val jobInstanceId = jobInstanceRepository.save(jobInstance)
+            jobInstance.id = jobInstanceId
+
             val tasks = when (jobInfoToSchedule.executeMode!!) {
                 // 单机模式创建1个task
                 // Map/MapReduce模式 先创建1个task，后续根据任务上报的结果持续创建子task(需要做好幂等)
@@ -209,12 +212,10 @@ class JobSchedulerActor(
                     availableWorkers.map { jobInstance.createTask(it.address) }
                 }
             }
-
-            taskRepository.saveAll(tasks)
-            jobInstanceRepository.save(jobInstance)
             jobInfoRepository.save(jobInfoToSchedule)
+            taskRepository.saveAll(tasks)
+            log.info("schedule job [{}] success", jobId.value)
         }
-        log.info("schedule job [{}] success", jobId.value)
     }
 
 }
