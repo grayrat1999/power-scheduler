@@ -98,7 +98,7 @@ class PowerSchedulerWorker(
         embedServer.start()
         jobExecutorService.start()
         serverDiscoveryService.start()
-//        jobProgressReportService.start()
+        jobProgressReportService.start()
         workerRegisterService.start()
 
         // 兼容非spring程序的优雅退出
