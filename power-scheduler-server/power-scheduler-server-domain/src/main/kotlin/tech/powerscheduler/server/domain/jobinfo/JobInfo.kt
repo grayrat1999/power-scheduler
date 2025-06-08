@@ -198,7 +198,14 @@ class JobInfo {
             return
         }
         val nextScheduleTime = when (scheduleType!!) {
-            CRON -> CronUtils.nextExecution(scheduleConfig!!, nextScheduleAt!!)
+            CRON -> {
+                val next = CronUtils.nextExecution(scheduleConfig!!, nextScheduleAt!!)
+                if (next < now) {
+                    CronUtils.nextExecution(scheduleConfig!!, now)
+                } else {
+                    next
+                }
+            }
 
             FIX_RATE -> now.plusSeconds(scheduleConfig!!.toLong())
 
