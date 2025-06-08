@@ -22,10 +22,11 @@ object JobProgressRepository {
             conn.prepareStatement(insertSql).use { stmt ->
                 stmt.setObject(1, entity.jobId)
                 stmt.setObject(2, entity.jobInstanceId)
-                stmt.setString(3, entity.status?.name)
-                stmt.setObject(4, entity.startAt)
-                stmt.setObject(5, entity.endAt)
-                stmt.setString(6, entity.message)
+                stmt.setObject(3, entity.taskId)
+                stmt.setString(4, entity.status?.name)
+                stmt.setObject(5, entity.startAt)
+                stmt.setObject(6, entity.endAt)
+                stmt.setString(7, entity.message)
                 stmt.executeUpdate()
             }
         }
@@ -54,6 +55,7 @@ object JobProgressRepository {
                                 this.id = rs.getLong("id")
                                 this.jobId = rs.getLong("job_id")
                                 this.jobInstanceId = rs.getLong("job_instance_id")
+                                this.taskId = rs.getLong("task_id")
                                 this.status = rs.getString("status")?.let { JobStatusEnum.valueOf(it) }
                                 this.startAt = rs.getObject("start_at", LocalDateTime::class.java)
                                 this.endAt = rs.getObject("end_at", LocalDateTime::class.java)

@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationContext
 import tech.powerscheduler.common.enums.ExecuteModeEnum
 import tech.powerscheduler.common.enums.JobStatusEnum
-import tech.powerscheduler.common.enums.ScheduleTypeEnum
-import tech.powerscheduler.server.application.assembler.JobInstanceAssembler
 import tech.powerscheduler.server.application.assembler.TaskAssembler
 import tech.powerscheduler.server.application.utils.hostPort
 import tech.powerscheduler.server.domain.common.PageQuery
@@ -139,7 +137,7 @@ class TaskDispatcherActor(
                     try {
                         dispatchOne(task, candidateWorkers)
                     } catch (e: Exception) {
-                        log.error("dispatch jobInstance [{}] failed: {}", task.id!!.value, e.message, e)
+                        log.error("dispatch task [{}] failed: {}", task.id!!.value, e.message, e)
                     } finally {
                         channel.receive()
                     }
@@ -199,11 +197,11 @@ class TaskDispatcherActor(
         val dispatchTaskRequestDTO = taskAssembler.toDispatchTaskRequestDTO(task)
         val result = workerRemoteService.dispatch(targetWorker, dispatchTaskRequestDTO)
         if (result.success && result.data == true) {
-            log.info("dispatch jobInstance [{}] to worker [{}] successfully", task.id!!.value, targetWorker)
+            log.info("dispatch task [{}] to worker [{}] successfully", task.id!!.value, targetWorker)
         } else {
             val exception = result.cause
             log.error(
-                "dispatch jobInstance [{}] to {} failed: {}",
+                "dispatch task [{}] to {} failed: {}",
                 task.id!!.value, targetWorker, exception?.message, exception
             )
             task.apply {
