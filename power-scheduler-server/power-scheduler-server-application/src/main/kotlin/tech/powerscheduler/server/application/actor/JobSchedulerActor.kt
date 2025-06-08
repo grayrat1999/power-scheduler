@@ -187,6 +187,10 @@ class JobSchedulerActor(
                     }
                 }
                 jobInfoRepository.save(jobInfoToSchedule)
+                log.info(
+                    "schedule job [{}] cancel for no available workers, nextScheduleTime={}",
+                    jobId.value, jobInfoToSchedule.nextScheduleAt
+                )
                 return@executeWithoutResult
             }
 
@@ -195,7 +199,6 @@ class JobSchedulerActor(
             jobInstance.jobStatus = JobStatusEnum.WAITING_DISPATCH
             jobInstance.schedulerAddress = currentServerAddress
             jobInfoToSchedule.updateNextScheduleTime(now = now)
-            log.info("updateNextScheduleTime for job [{}] success, nextTime={}", jobId.value, jobInfoToSchedule.nextScheduleAt)
 
             val jobInstanceId = jobInstanceRepository.save(jobInstance)
             jobInstance.id = jobInstanceId
@@ -215,8 +218,7 @@ class JobSchedulerActor(
             }
             jobInfoRepository.save(jobInfoToSchedule)
             taskRepository.saveAll(tasks)
-//            log.info("schedule job [{}] success", jobId.value)
-            log.info("schedule job [{}] success, nextTime={}", jobId.value, jobInfoToSchedule.nextScheduleAt)
+            log.info("schedule job [{}] success, nextScheduleTime={}", jobId.value, jobInfoToSchedule.nextScheduleAt)
         }
     }
 
