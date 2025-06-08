@@ -253,9 +253,9 @@ fun TaskEntity.toDomainModel(): Task {
 fun DomainEvent.toEntity(): DomainEventEntity {
     return DomainEventEntity().also {
         it.id = this.id?.value
-        it.aggregateId= this.aggregateId
-        it.type = this.type
-        it.status = this.status
+        it.aggregateId = this.aggregateId
+        it.eventType = this.eventType
+        it.eventStatus = this.eventStatus
         it.payload = this.payload
         it.retryCnt = this.retryCnt
     }
@@ -264,9 +264,9 @@ fun DomainEvent.toEntity(): DomainEventEntity {
 fun DomainEventEntity.toDomainModel(): DomainEvent {
     return DomainEvent().also {
         it.id = DomainEventId(this.id!!)
-        it.aggregateId= this.aggregateId
-        it.type = this.type
-        it.status = this.status
+        it.aggregateId = this.aggregateId
+        it.eventType = this.eventType
+        it.eventStatus = this.eventStatus
         it.payload = this.payload
         it.retryCnt = this.retryCnt
     }

@@ -30,9 +30,9 @@ class TaskStatusChangeEventListener(
 
     fun persistentTask(event: TaskStatusChangeEvent) {
         val domainEvent = DomainEvent().apply {
-            this.status = DomainEventStatusEnum.PENDING
+            this.eventStatus = DomainEventStatusEnum.PENDING
             this.aggregateId = "Task-${event.taskId}"
-            this.type = DomainEventTypeEnum.TASK_STATUS_CHANGED
+            this.eventType = DomainEventTypeEnum.TASK_STATUS_CHANGED
             this.payload = ""
             this.retryCnt = 0
         }

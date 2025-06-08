@@ -32,18 +32,18 @@ class DomainEventEntity : BaseEntity() {
      * 事件类型
      */
     @Column(name = "event_type", nullable = false, updatable = false)
-    var type: DomainEventTypeEnum? = null
+    var eventType: DomainEventTypeEnum? = null
 
     /**
      * 事件状态
      */
-    @Column(name = "event_type", nullable = false, updatable = false)
-    var status: DomainEventStatusEnum? = null
+    @Column(name = "event_status", nullable = false, updatable = false)
+    var eventStatus: DomainEventStatusEnum? = null
 
     /**
      * 事件内容
      */
-    @Column(name = "event_type", updatable = false)
+    @Column(name = "payload", updatable = false)
     var payload: String? = null
 
     /**

@@ -18,12 +18,12 @@ class DomainEvent {
     /**
      * 事件类型
      */
-    var type: DomainEventTypeEnum? = null
+    var eventType: DomainEventTypeEnum? = null
 
     /**
      * 事件状态
      */
-    var status: DomainEventStatusEnum? = null
+    var eventStatus: DomainEventStatusEnum? = null
 
     /**
      * 事件内容
