@@ -177,7 +177,7 @@ class JobInfo {
     }
 
     fun updateNextScheduleTime(
-        now: LocalDateTime,
+        now: LocalDateTime = LocalDateTime.now(),
     ) {
         validScheduleConfig()
         this.nextScheduleAt = when (scheduleType!!) {

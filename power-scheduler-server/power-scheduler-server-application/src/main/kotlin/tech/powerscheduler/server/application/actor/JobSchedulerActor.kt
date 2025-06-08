@@ -159,11 +159,9 @@ class JobSchedulerActor(
             }
             // 对于第一次调度的任务, 初始化下次调度时间
             if (jobInfoToSchedule.nextScheduleAt == null) {
-                jobInfoToSchedule.updateNextScheduleTime(now = now)
+                jobInfoToSchedule.updateNextScheduleTime()
                 jobInfoRepository.save(jobInfoToSchedule)
-                if (jobInfoToSchedule.nextScheduleAt!! < now) {
-                    return@executeWithoutResult
-                }
+                return@executeWithoutResult
             }
 
             // 检查任务实例并发数量
@@ -182,7 +180,7 @@ class JobSchedulerActor(
             val availableWorkers = workerRegistryRepository.findAllByAppCode(appCode!!)
             if (availableWorkers.isEmpty()) {
                 jobInfoToSchedule.apply {
-                    this.updateNextScheduleTime(now = now)
+                    this.updateNextScheduleTime()
                     // 如果是固定延迟的调度模式, 以当前时间为基准设置下次调度时间
                     if (scheduleType == ScheduleTypeEnum.FIX_DELAY) {
                         this.nextScheduleAt = now.plusSeconds(this.scheduleConfig!!.toLong())
@@ -200,7 +198,7 @@ class JobSchedulerActor(
             val jobInstance = jobInfoToSchedule.createInstance()
             jobInstance.jobStatus = JobStatusEnum.WAITING_DISPATCH
             jobInstance.schedulerAddress = currentServerAddress
-            jobInfoToSchedule.updateNextScheduleTime(now = now)
+            jobInfoToSchedule.updateNextScheduleTime()
 
             val jobInstanceId = jobInstanceRepository.save(jobInstance)
             jobInstance.id = jobInstanceId
