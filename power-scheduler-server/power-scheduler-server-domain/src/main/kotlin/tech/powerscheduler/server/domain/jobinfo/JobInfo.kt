@@ -181,7 +181,7 @@ class JobInfo {
     ) {
         validScheduleConfig()
         this.nextScheduleAt = when (scheduleType!!) {
-            CRON -> CronUtils.nextExecution(scheduleConfig!!, now)
+            CRON -> CronUtils.nextExecution(scheduleConfig!!, nextScheduleAt ?: now)
 
             FIX_RATE -> if (nextScheduleAt == null) {
                 now

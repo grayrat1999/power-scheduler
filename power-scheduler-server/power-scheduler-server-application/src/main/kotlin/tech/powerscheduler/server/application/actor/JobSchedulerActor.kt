@@ -195,6 +195,7 @@ class JobSchedulerActor(
             jobInstance.jobStatus = JobStatusEnum.WAITING_DISPATCH
             jobInstance.schedulerAddress = currentServerAddress
             jobInfoToSchedule.updateNextScheduleTime(now = now)
+            log.info("updateNextScheduleTime for job [{}] success, nextTime={}", jobId.value, jobInfoToSchedule.nextScheduleAt)
 
             val jobInstanceId = jobInstanceRepository.save(jobInstance)
             jobInstance.id = jobInstanceId
@@ -214,7 +215,8 @@ class JobSchedulerActor(
             }
             jobInfoRepository.save(jobInfoToSchedule)
             taskRepository.saveAll(tasks)
-            log.info("schedule job [{}] success", jobId.value)
+//            log.info("schedule job [{}] success", jobId.value)
+            log.info("schedule job [{}] success, nextTime={}", jobId.value, jobInfoToSchedule.nextScheduleAt)
         }
     }
 
