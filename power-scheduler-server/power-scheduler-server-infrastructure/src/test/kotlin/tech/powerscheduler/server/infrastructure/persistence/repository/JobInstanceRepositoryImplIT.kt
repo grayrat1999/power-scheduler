@@ -9,7 +9,6 @@ import jakarta.persistence.EntityManager
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.transaction.annotation.Transactional
 import tech.powerscheduler.common.enums.*
-import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
 import tech.powerscheduler.server.infrastructure.Bootstrap
@@ -26,7 +25,7 @@ import java.time.temporal.ChronoUnit
  */
 @Transactional
 @SpringBootTest(classes = [Bootstrap::class])
-class JobInstanceRepositoryImplTest(
+class JobInstanceRepositoryImplIT(
     val appGroupJpaRepository: AppGroupJpaRepository,
     val jobInstanceJpaRepository: JobInstanceJpaRepository,
     val jobInstanceRepositoryImpl: JobInstanceRepositoryImpl,
@@ -124,15 +123,6 @@ class JobInstanceRepositoryImplTest(
             val result = jobInstanceRepositoryImpl.findById(JobInstanceId(entityToSave.id!!))
             result.shouldNotBeNull()
             result.id!!.value shouldBe entityToSave.id
-        }
-    }
-
-    context("test ${JobInstanceRepositoryImpl::listDispatchable}") {
-        test("return entity when id exist") {
-            jobInstanceRepositoryImpl.listDispatchable(
-                jobIds = listOf(1L, 2L, 3L).map { JobId(it) },
-                pageQuery = PageQuery(1, 20),
-            )
         }
     }
 

@@ -143,23 +143,6 @@ class JobInstanceRepositoryImpl(
         return page.map { JobInstanceId(it) }.toDomainPage()
     }
 
-    override fun listDispatchable(
-        jobIds: Iterable<JobId>,
-        pageQuery: PageQuery
-    ): Page<JobInstance> {
-        val pageable = PageRequest.of(
-            pageQuery.pageNo - 1,
-            pageQuery.pageSize,
-            Sort.by(JobInstanceEntity::scheduleAt.name).ascending()
-        )
-        val page = jobInstanceJpaRepository.listDispatchable(
-            jobIds = jobIds.map { it.value },
-            jobStatuses = listOf(JobStatusEnum.WAITING_DISPATCH),
-            pageRequest = pageable,
-        )
-        return page.map { it.toDomainModel() }.toDomainPage()
-    }
-
     override fun findAllUncompletedByWorkerAddress(workerAddress: String): List<JobInstance> {
         val specification = Specification<JobInstanceEntity> { root, _, criteriaBuilder ->
             root.join<JobInstanceEntity, AppGroupEntity>(JobInstanceEntity::appGroupEntity.name, JoinType.LEFT)
