@@ -131,11 +131,6 @@ class JobInstance {
     var schedulerAddress: String? = null
 
     /**
-     * 执行器地址
-     */
-    var workerAddress: String? = null
-
-    /**
      * 创建人
      */
     var createdBy: String? = null
@@ -190,7 +185,7 @@ class JobInstance {
         return newInstance
     }
 
-    fun createTask(workerAddress: String): Task {
+    fun createTask(workerAddress: String?): Task {
         val task = Task().also {
             it.jobId = this.jobId
             it.jobInstanceId = this.id

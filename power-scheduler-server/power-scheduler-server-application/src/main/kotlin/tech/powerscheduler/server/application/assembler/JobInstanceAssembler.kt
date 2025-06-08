@@ -8,7 +8,6 @@ import tech.powerscheduler.server.application.dto.response.JobInstanceQueryRespo
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.jobinstance.JobInstance
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceQuery
-import tech.powerscheduler.server.domain.task.Task
 
 /**
  * @author grayrat
@@ -36,7 +35,6 @@ class JobInstanceAssembler {
             this.jobId = domainModel.jobId?.value
             this.appCode = domainModel.appGroup?.code
             this.appName = domainModel.appGroup?.name
-            this.workerAddress = domainModel.workerAddress
             this.jobName = domainModel.jobName
             this.jobType = domainModel.jobType.toDTO()
             this.processor = domainModel.processor
@@ -67,7 +65,6 @@ class JobInstanceAssembler {
             this.appCode = domainModel.appGroup?.code
             this.appName = domainModel.appGroup?.name
             this.schedulerAddress = domainModel.schedulerAddress
-            this.workerAddress = domainModel.workerAddress
             this.jobName = domainModel.jobName
             this.jobType = domainModel.jobType.toDTO()
             this.processor = domainModel.processor

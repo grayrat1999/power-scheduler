@@ -3,7 +3,6 @@ package tech.powerscheduler.common.enums
 import tech.powerscheduler.common.annotation.Metadata
 
 /**
- * TODO: 枚举不再负责任务状态的运转，只用于对外展示（适当做模糊化）
  * 任务状态枚举
  *
  * @author grayrat

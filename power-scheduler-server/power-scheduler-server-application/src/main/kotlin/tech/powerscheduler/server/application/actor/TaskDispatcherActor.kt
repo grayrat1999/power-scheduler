@@ -191,7 +191,7 @@ class TaskDispatcherActor(
 
         if (jobInstance.jobStatus == JobStatusEnum.WAITING_DISPATCH) {
             jobInstance.jobStatus = JobStatusEnum.DISPATCHING
-            jobInstanceRepository.save(jobInstance)  // TODO: 需要考虑到并发修改的情况
+            jobInstanceRepository.save(jobInstance)
         }
 
         val dispatchTaskRequestDTO = taskAssembler.toDispatchTaskRequestDTO(task)

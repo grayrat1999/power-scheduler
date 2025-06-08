@@ -45,7 +45,6 @@ class JobInstanceAssemblerTest : FunSpec({
                 it.id = JobInstanceId(1L)
                 it.jobId = JobId(2L)
                 it.appCode = "appCode"
-                it.workerAddress = "workerAddress"
                 it.jobName = "jobName"
                 it.jobType = JobTypeEnum.JAVA
                 it.processor = "processor"
@@ -69,7 +68,6 @@ class JobInstanceAssemblerTest : FunSpec({
             result.id shouldBe jobInstance.id!!.value
             result.jobId shouldBe jobInstance.jobId?.value
             result.appCode shouldBe appGroup.code
-            result.workerAddress shouldBe jobInstance.workerAddress
             result.jobName shouldBe jobInstance.jobName
             result.jobType?.code shouldBe jobInstance.jobType?.name
             result.processor shouldBe jobInstance.processor
@@ -105,7 +103,6 @@ class JobInstanceAssemblerTest : FunSpec({
                 it.id = JobInstanceId(1L)
                 it.jobId = JobId(2L)
                 it.appCode = "appCode"
-                it.workerAddress = "workerAddress"
                 it.jobName = "jobName"
                 it.jobType = JobTypeEnum.JAVA
                 it.processor = "processor"
@@ -129,7 +126,6 @@ class JobInstanceAssemblerTest : FunSpec({
             result.id shouldBe jobInstance.id!!.value
             result.jobId shouldBe jobInstance.jobId?.value
             result.appCode shouldBe appGroup.code
-            result.workerAddress shouldBe jobInstance.workerAddress
             result.jobName shouldBe jobInstance.jobName
             result.jobType?.code shouldBe jobInstance.jobType?.name
             result.processor shouldBe jobInstance.processor
