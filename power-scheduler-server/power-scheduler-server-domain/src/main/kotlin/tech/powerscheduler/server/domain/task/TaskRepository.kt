@@ -11,6 +11,10 @@ import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
  */
 interface TaskRepository {
 
+    fun findById(taskId: TaskId): Task?
+
+    fun findAllByJobInstanceId(jobInstanceId: JobInstanceId): List<Task>
+
     fun listDispatchable(
         jobIds: Iterable<JobId>,
         pageQuery: PageQuery
@@ -19,7 +23,5 @@ interface TaskRepository {
     fun save(task: Task): TaskId
 
     fun saveAll(taskList: Iterable<Task>): List<TaskId>
-
     fun deleteByJobInstanceId(jobInstanceIds: Iterable<JobInstanceId>)
-
 }

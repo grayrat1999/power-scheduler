@@ -1,3 +1,3 @@
 SELECT *
 FROM job_progress
-WHERE job_instance_id = ?;
+WHERE task_id = ?;

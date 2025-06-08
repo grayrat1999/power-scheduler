@@ -62,8 +62,8 @@ class JobProgressReportService(
     }
 
     suspend fun CoroutineScope.reportProgress() {
-        val jobInstanceIdSet = JobProgressRepository.listDistinctJobInstanceIds()
-        if (jobInstanceIdSet.isEmpty()) {
+        val taskIdSet = JobProgressRepository.listDistinctJobInstanceIds()
+        if (taskIdSet.isEmpty()) {
             delay(300)
             return
         }
@@ -72,11 +72,11 @@ class JobProgressReportService(
             return
         }
         val channel = Channel<Unit>(10)
-        val deferredList = jobInstanceIdSet.map { jobInstanceId ->
+        val deferredList = taskIdSet.map { taskId ->
             async {
                 try {
                     channel.send(Unit)
-                    doReportProgress(jobInstanceId)
+                    doReportProgress(taskId)
                 } catch (e: Exception) {
                     log.warn("[Powerscheduler] reportProgress failed: {}", e.message, e)
                 } finally {
@@ -87,16 +87,17 @@ class JobProgressReportService(
         deferredList.awaitAll()
     }
 
-    fun doReportProgress(jobInstanceId: Long) {
+    fun doReportProgress(taskId: Long) {
         val serverUrl = serverDiscoveryService.availableServerUrls.randomOrNull()
         if (serverUrl == null) {
             log.warn("[Powerscheduler] reportProgress failed: no available server]")
             return
         }
-        val jobProgressList = JobProgressRepository.listByJobInstanceId(jobInstanceId)
+        val jobProgressList = JobProgressRepository.listByTaskId(taskId)
         val latestJobProgress = jobProgressList.sortedByDescending { it.id }.first()
         val param = JobProgressReportRequestDTO().apply {
             this.jobInstanceId = latestJobProgress.jobInstanceId
+            this.taskId = latestJobProgress.taskId
             this.startAt = latestJobProgress.startAt
             this.endAt = latestJobProgress.endAt
             this.jobStatus = latestJobProgress.status
@@ -108,7 +109,7 @@ class JobProgressReportService(
         if (result.success && result.data == true) {
             log.debug(
                 "[Powerscheduler] reportProgress successful: jobInstanceId={}, jobStatus={}",
-                jobInstanceId, latestJobProgress.status
+                taskId, latestJobProgress.status
             )
             val ids = jobProgressList.mapNotNull { it.id }
             JobProgressRepository.deleteByIds(ids)

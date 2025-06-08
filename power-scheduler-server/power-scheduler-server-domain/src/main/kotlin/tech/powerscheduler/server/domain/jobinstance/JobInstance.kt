@@ -1,6 +1,7 @@
 package tech.powerscheduler.server.domain.jobinstance
 
 import tech.powerscheduler.common.enums.*
+import tech.powerscheduler.common.enums.ExecuteModeEnum.*
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.task.Task
@@ -218,4 +219,15 @@ class JobInstance {
         return task
     }
 
+    fun calculateJobStatus(tasks: Iterable<Task>): JobStatusEnum {
+        if (this.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
+            return this.jobStatus!!
+        }
+        return when (this.executeMode) {
+            SINGLE -> tasks.first().jobStatus!!
+            BROADCAST -> TODO()
+            MAP_REDUCE -> TODO()
+            null -> TODO()
+        }
+    }
 }

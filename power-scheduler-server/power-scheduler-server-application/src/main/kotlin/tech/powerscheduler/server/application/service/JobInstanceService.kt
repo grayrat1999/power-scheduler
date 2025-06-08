@@ -20,6 +20,8 @@ import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
+import tech.powerscheduler.server.domain.task.TaskId
+import tech.powerscheduler.server.domain.task.TaskRepository
 import tech.powerscheduler.server.domain.worker.WorkerRemoteService
 import java.time.LocalDateTime
 
@@ -31,6 +33,7 @@ import java.time.LocalDateTime
  */
 @Service
 class JobInstanceService(
+    private val taskRepository: TaskRepository,
     private val jobInfoRepository: JobInfoRepository,
     private val jobInstanceRepository: JobInstanceRepository,
     private val jobInstanceAssembler: JobInstanceAssembler,
@@ -111,34 +114,69 @@ class JobInstanceService(
     }
 
     fun updateProgress(param: JobProgressReportRequestDTO) {
-        val jobInstanceId = JobInstanceId(param.jobInstanceId!!)
-        val jobInstance = jobInstanceRepository.findById(jobInstanceId)
-        if (jobInstance == null) {
-            log.warn("更新任务状态失败: 任务实例[$jobInstanceId]不存在")
+        val taskId = TaskId(param.taskId!!)
+        val task = taskRepository.findById(taskId)
+        if (task == null) {
+            log.warn("更新任务状态失败: 子任务[${taskId.value}]不存在")
             return
         }
-        if (jobInstance.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
-            log.info("updateProgress cancel, jobInstance [{}] is already completed", jobInstanceId)
+        if (task.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
+            log.info("updateProgress cancel, jobInstance [{}] is already completed", taskId.value)
             return
         }
-        jobInstance.apply {
+        task.apply {
             this.jobStatus = param.jobStatus
             this.startAt = param.startAt
             this.endAt = param.endAt
             this.message = param.message?.take(5000)
         }
-        transactionTemplate.executeWithoutResult {
-            if (param.jobStatus == FAILED && jobInstance.canReattempt) {
-                jobInstance.resetStatusForReattempt()
-            }
-            jobInstanceRepository.save(jobInstance)
 
-            if (param.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
+        transactionTemplate.executeWithoutResult {
+            if (param.jobStatus == FAILED && task.canReattempt) {
+                task.resetStatusForReattempt()
+            }
+            taskRepository.save(task)
+
+            if (task.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
+                updateJobInstanceProgress(task.jobInstanceId!!)
+            }
+        }
+    }
+
+    fun updateJobInstanceProgress(jobInstanceId: JobInstanceId) {
+        val jobInstance = jobInstanceRepository.findById(jobInstanceId)
+        if (jobInstance == null) {
+            log.warn("更新任务状态失败: 任务实例[${jobInstanceId.value}]不存在")
+            return
+        }
+        if (jobInstance.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
+            log.info("updateProgress cancel, jobInstance [{}] is already completed", jobInstanceId.value)
+            return
+        }
+        val tasks = taskRepository.findAllByJobInstanceId(jobInstanceId)
+        val calculatedJobStatus = jobInstance.calculateJobStatus(tasks)
+        // 如果计算出的任务状态与当前一样, 则不需要更新状态
+        if (jobInstance.jobStatus == calculatedJobStatus) {
+            return
+        }
+        jobInstance.apply {
+            if (calculatedJobStatus == FAILED) {
+                if (this.canReattempt) {
+                    this.resetStatusForReattempt()
+                } else {
+                    this.endAt = LocalDateTime.now()
+                    this.jobStatus = FAILED
+                }
+            }
+        }
+        transactionTemplate.executeWithoutResult {
+            jobInstanceRepository.save(jobInstance)
+            if (jobInstance.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
                 val jobInfo = jobInfoRepository.lockById(jobInstance.jobId!!)
                 if (jobInfo == null) {
                     return@executeWithoutResult
                 }
-                jobInfo.lastCompletedAt = param.endAt
+                jobInfo.lastCompletedAt = jobInstance.endAt
                 if (jobInstance.scheduleType == ScheduleTypeEnum.ONE_TIME) {
                     jobInfo.enabled = false
                 }

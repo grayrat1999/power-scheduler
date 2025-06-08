@@ -18,6 +18,9 @@ class JobProgressReportRequestDTO {
     @NotNull
     var jobInstanceId: Long? = null
 
+    @NotNull
+    var taskId: Long? = null
+
     /**
      * 任务状态
      */

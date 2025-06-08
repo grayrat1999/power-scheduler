@@ -2,12 +2,12 @@ package tech.powerscheduler.server.infrastructure.persistence.repository
 
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.server.domain.common.Page
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.jobinfo.JobId
-import tech.powerscheduler.server.domain.jobinstance.JobInstance
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
 import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskId
@@ -26,6 +26,16 @@ import tech.powerscheduler.server.infrastructure.utils.toEntity
 class TaskRepositoryRepositoryImpl(
     private val taskRepositoryJpaRepository: TaskRepositoryJpaRepository,
 ) : TaskRepository {
+
+    override fun findById(taskId: TaskId): Task? {
+        val entity = taskRepositoryJpaRepository.findByIdOrNull(taskId.value)
+        return entity?.toDomainModel()
+    }
+
+    override fun findAllByJobInstanceId(jobInstanceId: JobInstanceId): List<Task> {
+        val entities = taskRepositoryJpaRepository.findByJobInstanceId(jobInstanceId.value)
+        return entities.map { it.toDomainModel() }
+    }
 
     override fun listDispatchable(
         jobIds: Iterable<JobId>,
