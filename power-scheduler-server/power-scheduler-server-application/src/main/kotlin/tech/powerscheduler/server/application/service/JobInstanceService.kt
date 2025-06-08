@@ -3,7 +3,6 @@ package tech.powerscheduler.server.application.service
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import tech.powerscheduler.common.dto.request.JobProgressReportRequestDTO
 import tech.powerscheduler.common.dto.request.JobTerminateRequestDTO
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobStatusEnum.*
@@ -20,7 +19,6 @@ import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
-import tech.powerscheduler.server.domain.task.TaskId
 import tech.powerscheduler.server.domain.task.TaskRepository
 import tech.powerscheduler.server.domain.worker.WorkerRemoteService
 import java.time.LocalDateTime
@@ -111,36 +109,6 @@ class JobInstanceService(
         val jobInstanceToReattempt = jobInstance.cloneForReattempt()
         val jobInstanceId = jobInstanceRepository.save(jobInstanceToReattempt)
         return jobInstanceId.value
-    }
-
-    fun updateProgress(param: JobProgressReportRequestDTO) {
-        val taskId = TaskId(param.taskId!!)
-        val task = taskRepository.findById(taskId)
-        if (task == null) {
-            log.warn("更新任务状态失败: 子任务[${taskId.value}]不存在")
-            return
-        }
-        if (task.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
-            log.info("updateProgress cancel, jobInstance [{}] is already completed", taskId.value)
-            return
-        }
-        task.apply {
-            this.jobStatus = param.jobStatus
-            this.startAt = param.startAt
-            this.endAt = param.endAt
-            this.message = param.message?.take(5000)
-        }
-
-        transactionTemplate.executeWithoutResult {
-            if (param.jobStatus == FAILED && task.canReattempt) {
-                task.resetStatusForReattempt()
-            }
-            taskRepository.save(task)
-
-            if (task.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
-                updateJobInstanceProgress(task.jobInstanceId!!)
-            }
-        }
     }
 
     fun updateJobInstanceProgress(jobInstanceId: JobInstanceId) {
