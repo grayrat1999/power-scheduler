@@ -91,7 +91,7 @@ class Job(
                 null -> throw PowerSchedulerWorkerException("[Powerscheduler] ProcessResult can not be null")
             }
         } catch (_: InterruptedException) {
-            log.error("[Powerscheduler] execution of jobInstance [{}] is canceled", context.jobInstanceId)
+            log.info("[Powerscheduler] execution of jobInstance [{}] is canceled", context.jobInstanceId)
             updateProgress(jobStatus = JobStatusEnum.FAILED)
         } catch (e: PowerSchedulerWorkerException) {
             log.error(
