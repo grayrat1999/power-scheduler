@@ -17,7 +17,7 @@ import java.time.LocalDateTime
         Index(name = "task_idx_worker_address", columnList = "worker_address"),
     ]
 )
-class TaskEntity {
+class TaskEntity : BaseEntity() {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
