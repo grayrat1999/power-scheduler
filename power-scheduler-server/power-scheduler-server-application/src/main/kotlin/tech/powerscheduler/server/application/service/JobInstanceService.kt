@@ -126,6 +126,11 @@ class JobInstanceService(
             return
         }
         jobInstance.apply {
+            this.jobStatus = calculatedJobStatus
+            this.startAt = this.calculateStartAt(tasks)
+            if (calculatedJobStatus in JobStatusEnum.COMPLETED_STATUSES) {
+                this.endAt = this.calculateEndAt(tasks)
+            }
             if (calculatedJobStatus == FAILED) {
                 if (this.canReattempt) {
                     this.resetStatusForReattempt()
@@ -133,11 +138,7 @@ class JobInstanceService(
                     if (this.executeMode == ExecuteModeEnum.SINGLE) {
                         this.message = tasks.mapNotNull { it.message }.firstOrNull { it.isNotBlank() }
                     }
-                    this.endAt = LocalDateTime.now()
-                    this.jobStatus = FAILED
                 }
-            } else {
-                this.jobStatus = calculatedJobStatus
             }
         }
         transactionTemplate.executeWithoutResult {

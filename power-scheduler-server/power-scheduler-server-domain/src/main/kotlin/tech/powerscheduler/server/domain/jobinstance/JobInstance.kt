@@ -226,6 +226,14 @@ class JobInstance {
         }
     }
 
+    fun calculateStartAt(tasks: Iterable<Task>): LocalDateTime? {
+        return tasks.mapNotNull { it.startAt }.minOrNull()
+    }
+
+    fun calculateEndAt(tasks: Iterable<Task>): LocalDateTime? {
+        return tasks.mapNotNull { it.endAt }.maxOrNull()
+    }
+
     fun terminate() {
         if (this.startAt == null) {
             this.startAt = LocalDateTime.now()
