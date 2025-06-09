@@ -20,6 +20,11 @@ open class JobContext {
     var jobInstanceId: Long? = null
 
     /**
+     * 子任务id
+     */
+    var taskId:Long? = null
+
+    /**
      * 任务执行参数
      */
     var executeParams: String? = null

@@ -68,7 +68,6 @@ class JobExecutorService {
     }
 
     fun schedule(command: JobDispatchRequestDTO) {
-        val jobInstanceId = command.jobInstanceId!!
         val jobContext = if (command.jobType == JobTypeEnum.SCRIPT) {
             ScriptJobContext().apply {
                 this.scriptType = command.scriptType
@@ -79,7 +78,8 @@ class JobExecutorService {
         }
         jobContext.also {
             it.jobId = command.jobId
-            it.jobInstanceId = jobInstanceId
+            it.jobInstanceId = command.jobInstanceId!!
+            it.taskId = command.taskId
             it.executeParams = command.executeParams
             it.dataTime = command.dataTime
         }
@@ -92,6 +92,7 @@ class JobExecutorService {
         val jobProgressEntity = JobProgressEntity().also {
             it.jobId = command.jobId
             it.jobInstanceId = command.jobInstanceId!!
+            it.taskId = command.taskId
         }
         if (jobQueue.offer(job).not()) {
             job.terminate()
@@ -102,7 +103,7 @@ class JobExecutorService {
                 it.message = "job queue is full"
             }
         } else {
-            jobRegistry.put(jobInstanceId, job)
+            jobRegistry.put(command.jobInstanceId!!, job)
             jobProgressEntity.status = JobStatusEnum.PENDING
         }
         JobProgressRepository.save(jobProgressEntity)

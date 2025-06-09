@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/power-scheduler-worker/src/main/resources/sql/job_progress/delete_by_id.sql" dialect="H2" />
+    <file url="file://$PROJECT_DIR$/power-scheduler-worker/src/main/resources/sql/job_progress/insert.sql" dialect="H2" />
+    <file url="file://$PROJECT_DIR$/power-scheduler-worker/src/main/resources/sql/job_progress/list_by_job_instance_id.sql" dialect="H2" />
+    <file url="file://$PROJECT_DIR$/power-scheduler-worker/src/main/resources/sql/job_progress/list_distinct_task_id.sql" dialect="H2" />
+    <file url="file://$PROJECT_DIR$/power-scheduler-worker/src/main/resources/sql/power-scheduler-worker-init.sql" dialect="H2" />
+  </component>
+</project>

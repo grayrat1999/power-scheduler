@@ -17,7 +17,7 @@ class WorkerRegisterService(
     /**
      * 应用编码
      */
-    private val appCode: String,
+    val appCode: String,
     /**
      * 应用密钥
      */
@@ -41,7 +41,7 @@ class WorkerRegisterService(
      * 后续发送心跳和上报任务进度时，请求需要携带该访问凭证
      */
     @Volatile
-    private var accessToken: String = ""
+    var accessToken: String = ""
 
     /**
      * 注册标志
