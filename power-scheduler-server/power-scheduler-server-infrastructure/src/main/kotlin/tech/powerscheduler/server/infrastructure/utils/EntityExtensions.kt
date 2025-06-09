@@ -7,12 +7,11 @@ import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.jobinfo.JobInfo
 import tech.powerscheduler.server.domain.jobinstance.JobInstance
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
+import tech.powerscheduler.server.domain.task.Task
+import tech.powerscheduler.server.domain.task.TaskId
 import tech.powerscheduler.server.domain.workerregistry.WorkerRegistry
 import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryId
-import tech.powerscheduler.server.infrastructure.persistence.model.AppGroupEntity
-import tech.powerscheduler.server.infrastructure.persistence.model.JobInfoEntity
-import tech.powerscheduler.server.infrastructure.persistence.model.JobInstanceEntity
-import tech.powerscheduler.server.infrastructure.persistence.model.WorkerRegistryEntity
+import tech.powerscheduler.server.infrastructure.persistence.model.*
 
 /**
  * @author grayrat
@@ -190,5 +189,61 @@ fun WorkerRegistryEntity.toDomainModel(): WorkerRegistry {
         it.accessToken = this.accessToken
         it.lastHeartbeatAt = this.lastHeartbeatAt
         it.version = this.version
+    }
+}
+
+fun Task.toEntity(): TaskEntity {
+    return TaskEntity().also {
+        it.id = this.id?.value
+        it.jobId = this.jobId!!.value
+        it.jobInstanceId = this.jobInstanceId!!.value
+        it.appCode = this.appCode
+        it.schedulerAddress = this.schedulerAddress
+        it.workerAddress = this.workerAddress
+        it.jobName = this.jobName
+        it.jobType = this.jobType
+        it.processor = this.processor
+        it.jobStatus = this.jobStatus
+        it.scheduleAt = this.scheduleAt
+        it.startAt = this.startAt
+        it.endAt = this.endAt
+        it.executeParams = this.executeParams
+        it.executeMode = this.executeMode
+        it.scheduleType = this.scheduleType
+        it.message = this.message
+        it.dataTime = this.dataTime
+        it.scriptType = this.scriptType
+        it.scriptCode = this.scriptCode
+        it.attemptCnt = this.attemptCnt
+        it.maxAttemptCnt = this.maxAttemptCnt
+        it.priority = this.priority
+    }
+}
+
+fun TaskEntity.toDomainModel(): Task {
+    return Task().also {
+        it.id = TaskId(this.id!!)
+        it.jobId = JobId(this.jobId!!)
+        it.jobInstanceId = JobInstanceId(this.jobInstanceId!!)
+        it.appCode = this.appCode
+        it.schedulerAddress = this.schedulerAddress
+        it.workerAddress = this.workerAddress
+        it.jobName = this.jobName
+        it.jobType = this.jobType
+        it.processor = this.processor
+        it.jobStatus = this.jobStatus
+        it.scheduleAt = this.scheduleAt
+        it.startAt = this.startAt
+        it.endAt = this.endAt
+        it.executeParams = this.executeParams
+        it.executeMode = this.executeMode
+        it.scheduleType = this.scheduleType
+        it.message = this.message
+        it.dataTime = this.dataTime
+        it.scriptType = this.scriptType
+        it.scriptCode = this.scriptCode
+        it.attemptCnt = this.attemptCnt
+        it.maxAttemptCnt = this.maxAttemptCnt
+        it.priority = this.priority
     }
 }

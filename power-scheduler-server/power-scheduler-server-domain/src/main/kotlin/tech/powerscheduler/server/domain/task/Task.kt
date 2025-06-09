@@ -1,0 +1,164 @@
+package tech.powerscheduler.server.domain.task
+
+import tech.powerscheduler.common.enums.*
+import tech.powerscheduler.server.domain.jobinfo.JobId
+import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
+import java.time.LocalDateTime
+
+/**
+ * @author grayrat
+ * @since 2025/6/6
+ */
+class Task {
+
+    /**
+     * 主键
+     */
+    var id: TaskId? = null
+
+    /**
+     * 任务id
+     */
+    var jobId: JobId? = null
+
+    /**
+     * 任务实例id
+     */
+    var jobInstanceId: JobInstanceId? = null
+
+    /**
+     * 应用编码
+     */
+    var appCode: String? = null
+
+    /**
+     * 任务名称
+     */
+    var jobName: String? = null
+
+    /**
+     * 任务类型
+     */
+    var jobType: JobTypeEnum? = null
+
+    /**
+     * 任务处理器
+     */
+    var processor: String? = null
+
+    /**
+     * 任务状态
+     */
+    var jobStatus: JobStatusEnum? = null
+
+    /**
+     * 调度时间
+     */
+    var scheduleAt: LocalDateTime? = null
+
+    /**
+     * 开始时间
+     */
+    var startAt: LocalDateTime? = null
+
+    /**
+     * 结束时间
+     */
+    var endAt: LocalDateTime? = null
+
+    /**
+     * 任务参数
+     */
+    var executeParams: String? = null
+
+    /**
+     * 执行模式
+     */
+    var executeMode: ExecuteModeEnum? = null
+
+    /**
+     * 调度类型
+     */
+    var scheduleType: ScheduleTypeEnum? = null
+
+    /**
+     * 任务信息
+     */
+    var message: String? = null
+
+    /**
+     * 数据时间
+     */
+    var dataTime: LocalDateTime? = null
+
+    /**
+     * 脚本类型
+     */
+    var scriptType: ScriptTypeEnum? = null
+
+    /**
+     * 脚本源代码
+     */
+    var scriptCode: String? = null
+
+    /**
+     * 当前重试次数
+     */
+    var attemptCnt: Int? = null
+
+    /**
+     * 最大重试次数
+     */
+    var maxAttemptCnt: Int? = null
+
+    /**
+     * 重试间隔(s)
+     */
+    var attemptInterval: Int? = null
+
+    /**
+     * 优先级
+     */
+    var priority: Int? = null
+
+    /**
+     * 调度器地址
+     */
+    var schedulerAddress: String? = null
+
+    /**
+     * 执行器地址
+     */
+    var workerAddress: String? = null
+
+    val canReattempt
+        get() = this.attemptCnt!! < this.maxAttemptCnt!!
+
+    val isCompleted
+        get() = JobStatusEnum.COMPLETED_STATUSES.contains(this.jobStatus)
+
+    fun resetStatusForReattempt() {
+        this.jobStatus = JobStatusEnum.WAITING_DISPATCH
+        this.startAt = null
+        this.endAt = null
+        this.scheduleAt = LocalDateTime.now().plusSeconds(this.attemptInterval?.toLong() ?: 15)
+        this.attemptCnt = this.attemptCnt!! + 1
+    }
+
+    fun markFailedWhenWorkerOffline() {
+        this.jobStatus = JobStatusEnum.FAILED
+        this.startAt = this.startAt ?: LocalDateTime.now()
+        this.endAt = LocalDateTime.now()
+        this.message = "worker is offline"
+    }
+
+    fun terminate() {
+        if (this.startAt == null) {
+            this.startAt = LocalDateTime.now()
+        }
+        if (this.endAt == null) {
+            this.endAt = LocalDateTime.now()
+        }
+        this.jobStatus = JobStatusEnum.CANCELED
+    }
+}
