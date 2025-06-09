@@ -215,6 +215,9 @@ class JobSchedulerActor(
             jobInfoRepository.save(jobInfoToSchedule)
             jobInstanceRepository.save(jobInstance)
             log.info("schedule job [{}] success, nextScheduleTime={}", jobId.value, jobInfoToSchedule.nextScheduleAt)
+
+            val jobInfoAfterSave = jobInfoRepository.lockById(jobId)
+            log.info("debug: schedulerOne end, nextScheduleAt={}", jobInfoAfterSave?.nextScheduleAt)
         }
     }
 
