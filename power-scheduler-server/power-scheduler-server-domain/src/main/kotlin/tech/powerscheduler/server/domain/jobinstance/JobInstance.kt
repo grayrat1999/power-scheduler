@@ -158,7 +158,7 @@ class JobInstance {
         this.startAt = null
         this.endAt = null
         this.attemptCnt = this.attemptCnt!! + 1
-        this.jobStatus = JobStatusEnum.WAITING_DISPATCH
+        this.jobStatus = JobStatusEnum.WAITING_SCHEDULE
     }
 
     fun cloneForReattempt(): JobInstance {
@@ -169,7 +169,7 @@ class JobInstance {
             it.jobName = this.jobName
             it.jobType = this.jobType
             it.processor = this.processor
-            it.jobStatus = JobStatusEnum.WAITING_DISPATCH
+            it.jobStatus = JobStatusEnum.WAITING_SCHEDULE
             it.scheduleAt = LocalDateTime.now()
             it.executeParams = this.executeParams
             it.executeMode = this.executeMode
@@ -193,7 +193,7 @@ class JobInstance {
             it.jobName = this.jobName
             it.jobType = this.jobType
             it.processor = this.processor
-            it.jobStatus = this.jobStatus
+            it.jobStatus = JobStatusEnum.WAITING_DISPATCH
             it.scheduleAt = this.scheduleAt
             it.startAt = this.startAt
             it.endAt = this.endAt

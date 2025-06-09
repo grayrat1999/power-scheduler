@@ -63,7 +63,7 @@ class JobInstanceService(
         val jobInstance = jobInstanceRepository.findById(JobInstanceId(jobInstanceId))
             ?: throw BizException(message = "终止任务失败: 任务实例不存在")
         when (jobInstance.jobStatus!!) {
-            WAITING_DISPATCH, DISPATCHING, PENDING, PROCESSING -> {
+            WAITING_SCHEDULE, WAITING_DISPATCH, DISPATCHING, PENDING, PROCESSING -> {
                 jobInstance.terminate()
                 jobInstanceRepository.save(jobInstance)
                 val terminatedEvent = JobInstanceTerminatedEvent(
@@ -85,13 +85,7 @@ class JobInstanceService(
             this.maxAttemptCnt = 0
             this.scheduleAt = LocalDateTime.now()
         }
-        val task = jobInstance.createTask(param.workerAddress)
-        val jobInstanceId = transactionTemplate.execute {
-            val jobInstanceId = jobInstanceRepository.save(jobInstance)
-            task.jobInstanceId = jobInstanceId
-            taskRepository.save(task)
-            return@execute jobInstanceId
-        }!!
+        val jobInstanceId = jobInstanceRepository.save(jobInstance)
         return jobInstanceId.value
     }
 
@@ -99,13 +93,7 @@ class JobInstanceService(
         val jobInstance = jobInstanceRepository.findById(JobInstanceId(jobInstanceId))
             ?: throw BizException(message = "重跑任务失败: 任务实例不存在")
         val jobInstanceToReattempt = jobInstance.cloneForReattempt()
-        val task = jobInstanceToReattempt.createTask(workerAddress = null)
-        val jobInstanceId = transactionTemplate.execute {
-            val jobInstanceId = jobInstanceRepository.save(jobInstanceToReattempt)
-            task.jobInstanceId = jobInstanceId
-            taskRepository.save(task)
-            return@execute jobInstanceId
-        }!!
+        val jobInstanceId = jobInstanceRepository.save(jobInstanceToReattempt)
         return jobInstanceId.value
     }
 
