@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
+import tech.powerscheduler.common.enums.ExecuteModeEnum
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobStatusEnum.*
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
@@ -129,6 +130,9 @@ class JobInstanceService(
                 if (this.canReattempt) {
                     this.resetStatusForReattempt()
                 } else {
+                    if (this.executeMode == ExecuteModeEnum.SINGLE) {
+                        this.message = tasks.mapNotNull { it.message }.firstOrNull { it.isNotBlank() }
+                    }
                     this.endAt = LocalDateTime.now()
                     this.jobStatus = FAILED
                 }
