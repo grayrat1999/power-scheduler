@@ -107,8 +107,8 @@ class AppGuardian(
                 Props.empty().withDispatcherFromConfig("job-scheduler-dispatcher")
             )
             context.spawn(
-                JobDispatcherActor.create(applicationContext),
-                JobDispatcherActor::class.simpleName,
+                TaskDispatcherActor.create(applicationContext),
+                TaskDispatcherActor::class.simpleName,
                 Props.empty().withDispatcherFromConfig("job-dispatcher-dispatcher")
             )
             Behaviors.empty()

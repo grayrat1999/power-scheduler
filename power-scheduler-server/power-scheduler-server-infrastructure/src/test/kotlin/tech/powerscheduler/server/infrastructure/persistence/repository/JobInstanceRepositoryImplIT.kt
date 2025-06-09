@@ -9,7 +9,6 @@ import jakarta.persistence.EntityManager
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.transaction.annotation.Transactional
 import tech.powerscheduler.common.enums.*
-import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
 import tech.powerscheduler.server.infrastructure.Bootstrap
@@ -26,7 +25,7 @@ import java.time.temporal.ChronoUnit
  */
 @Transactional
 @SpringBootTest(classes = [Bootstrap::class])
-class JobInstanceRepositoryImplTest(
+class JobInstanceRepositoryImplIT(
     val appGroupJpaRepository: AppGroupJpaRepository,
     val jobInstanceJpaRepository: JobInstanceJpaRepository,
     val jobInstanceRepositoryImpl: JobInstanceRepositoryImpl,
@@ -49,7 +48,6 @@ class JobInstanceRepositoryImplTest(
                         it.jobId = (1L..10L).random()
                         it.appCode = "appCode"
                         it.schedulerAddress = "schedulerIp"
-                        it.workerAddress = "workerAddress"
                         it.jobName = "jobName"
                         it.jobType = JobTypeEnum.entries.random()
                         it.processor = "processor"
@@ -102,7 +100,6 @@ class JobInstanceRepositoryImplTest(
                 it.jobId = (1L..10L).random()
                 it.appCode = "appCode"
                 it.schedulerAddress = "schedulerIp"
-                it.workerAddress = "workerAddress"
                 it.jobName = "jobName"
                 it.jobType = JobTypeEnum.entries.random()
                 it.processor = "processor"
@@ -124,54 +121,6 @@ class JobInstanceRepositoryImplTest(
             val result = jobInstanceRepositoryImpl.findById(JobInstanceId(entityToSave.id!!))
             result.shouldNotBeNull()
             result.id!!.value shouldBe entityToSave.id
-        }
-    }
-
-    context("test ${JobInstanceRepositoryImpl::listDispatchable}") {
-        test("return entity when id exist") {
-            jobInstanceRepositoryImpl.listDispatchable(
-                jobIds = listOf(1L, 2L, 3L).map { JobId(it) },
-                pageQuery = PageQuery(1, 20),
-            )
-        }
-    }
-
-    context("test ${JobInstanceRepositoryImpl::findAllUncompletedByWorkerAddress}") {
-        test("return entity when id exist") {
-            val appGroupEntity = AppGroupEntity().also {
-                it.code = "code"
-                it.name = "name"
-                it.secret = "secret"
-            }
-            appGroupJpaRepository.save(appGroupEntity)
-            val entityToSave = JobInstanceEntity().also {
-                it.appGroupEntity = appGroupEntity
-                it.jobId = (1L..10L).random()
-                it.appCode = "appCode"
-                it.schedulerAddress = "schedulerIp"
-                it.workerAddress = "workerAddress"
-                it.jobName = "jobName"
-                it.jobType = JobTypeEnum.entries.random()
-                it.processor = "processor"
-                it.jobStatus = JobStatusEnum.WAITING_DISPATCH
-                it.scheduleAt = LocalDateTime.now()
-                it.endAt = null
-                it.executeParams = "executeParams"
-                it.executeMode = ExecuteModeEnum.entries.random()
-                it.scheduleType = ScheduleTypeEnum.entries.random()
-                it.message = "message"
-                it.dataTime = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS)
-                it.scriptType = ScriptTypeEnum.entries.random()
-                it.scriptCode = "scriptCode"
-                it.maxAttemptCnt = 0
-                it.attemptCnt = 0
-                it.workerAddress = "workerAddress"
-            }
-            jobInstanceJpaRepository.save(entityToSave)
-            entityManager.clear()
-            jobInstanceRepositoryImpl.findAllUncompletedByWorkerAddress(
-                workerAddress = "workerAddress",
-            )
         }
     }
 

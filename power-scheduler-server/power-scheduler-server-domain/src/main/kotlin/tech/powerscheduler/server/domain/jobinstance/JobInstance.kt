@@ -1,8 +1,10 @@
 package tech.powerscheduler.server.domain.jobinstance
 
 import tech.powerscheduler.common.enums.*
+import tech.powerscheduler.common.enums.ExecuteModeEnum.*
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.jobinfo.JobId
+import tech.powerscheduler.server.domain.task.Task
 import java.time.LocalDateTime
 
 /**
@@ -129,11 +131,6 @@ class JobInstance {
     var schedulerAddress: String? = null
 
     /**
-     * 执行器地址
-     */
-    var workerAddress: String? = null
-
-    /**
      * 创建人
      */
     var createdBy: String? = null
@@ -185,8 +182,57 @@ class JobInstance {
             it.attemptInterval = this.attemptInterval
             it.priority = this.priority
         }
-
         return newInstance
     }
 
+    fun createTask(workerAddress: String?): Task {
+        val task = Task().also {
+            it.jobId = this.jobId
+            it.jobInstanceId = this.id
+            it.appCode = this.appCode
+            it.jobName = this.jobName
+            it.jobType = this.jobType
+            it.processor = this.processor
+            it.jobStatus = this.jobStatus
+            it.scheduleAt = this.scheduleAt
+            it.startAt = this.startAt
+            it.endAt = this.endAt
+            it.executeParams = this.executeParams
+            it.executeMode = this.executeMode
+            it.scheduleType = this.scheduleType
+            it.message = this.message
+            it.dataTime = this.dataTime
+            it.scriptType = this.scriptType
+            it.scriptCode = this.scriptCode
+            it.attemptCnt = this.attemptCnt
+            it.maxAttemptCnt = this.maxAttemptCnt
+            it.attemptInterval = this.attemptInterval
+            it.priority = this.priority
+            it.schedulerAddress = this.schedulerAddress
+            it.workerAddress = workerAddress
+        }
+        return task
+    }
+
+    fun calculateJobStatus(tasks: Iterable<Task>): JobStatusEnum {
+        if (this.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
+            return this.jobStatus!!
+        }
+        return when (this.executeMode) {
+            SINGLE -> tasks.first().jobStatus!!
+            BROADCAST -> TODO()
+            MAP_REDUCE -> TODO()
+            null -> TODO()
+        }
+    }
+
+    fun terminate() {
+        if (this.startAt == null) {
+            this.startAt = LocalDateTime.now()
+        }
+        if (this.endAt == null) {
+            this.endAt = LocalDateTime.now()
+        }
+        this.jobStatus = JobStatusEnum.CANCELED
+    }
 }

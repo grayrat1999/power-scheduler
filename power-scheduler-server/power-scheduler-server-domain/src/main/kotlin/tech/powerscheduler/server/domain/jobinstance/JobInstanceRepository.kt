@@ -45,12 +45,5 @@ interface JobInstanceRepository {
         pageQuery: PageQuery
     ): Page<JobInstanceId>
 
-    fun listDispatchable(
-        jobIds: Iterable<JobId>,
-        pageQuery: PageQuery
-    ): Page<JobInstance>
-
-    fun findAllUncompletedByWorkerAddress(workerAddress: String): List<JobInstance>
-
     fun deleteByIds(ids: Iterable<JobInstanceId>)
 }
