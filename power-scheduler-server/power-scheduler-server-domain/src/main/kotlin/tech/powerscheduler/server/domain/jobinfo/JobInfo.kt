@@ -176,33 +176,48 @@ class JobInfo {
         }
     }
 
-    fun updateNextScheduleTime() {
+    fun initNextScheduleTime() {
+        if (this.nextScheduleAt != null) {
+            return
+        }
+        val now = LocalDateTime.now()
+        when (scheduleType!!) {
+            CRON -> CronUtils.nextExecution(scheduleConfig!!, now)
+            FIX_RATE -> now
+            FIX_DELAY -> now
+            ONE_TIME -> parseLocalDateTime(scheduleConfig)
+        }
+    }
+
+    fun updateNextScheduleTime(
+        now: LocalDateTime = LocalDateTime.now(),
+    ) {
         validScheduleConfig()
-        this.nextScheduleAt = when (scheduleType!!) {
-            CRON -> CronUtils.nextExecution(scheduleConfig!!, LocalDateTime.now())
-
-            FIX_RATE -> if (nextScheduleAt == null) {
-                LocalDateTime.now()
-            } else {
-                LocalDateTime.now().plusSeconds(scheduleConfig!!.toLong())
-            }
-
-            FIX_DELAY -> if (nextScheduleAt == null) {
-                LocalDateTime.now()
-            } else {
-                if (lastCompletedAt == null) {
-                    LocalDateTime.now()
+        if (this.nextScheduleAt == null) {
+            initNextScheduleTime()
+            return
+        }
+        val nextScheduleTime = when (scheduleType!!) {
+            CRON -> {
+                val next = CronUtils.nextExecution(scheduleConfig!!, nextScheduleAt!!)
+                if (next < now) {
+                    CronUtils.nextExecution(scheduleConfig!!, now)
                 } else {
-                    lastCompletedAt!!.plusSeconds(scheduleConfig!!.toLong())
+                    next
                 }
             }
 
-            ONE_TIME -> if (nextScheduleAt == null) {
-                parseLocalDateTime(scheduleConfig)
+            FIX_RATE -> now.plusSeconds(scheduleConfig!!.toLong())
+
+            FIX_DELAY -> if (lastCompletedAt == null) {
+                now
             } else {
-                nextScheduleAt
+                lastCompletedAt!!.plusSeconds(scheduleConfig!!.toLong())
             }
+
+            ONE_TIME -> nextScheduleAt
         }
+        this.nextScheduleAt = nextScheduleTime
     }
 
     fun validScheduleConfig() {
