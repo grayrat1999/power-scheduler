@@ -1,17 +1,22 @@
 package tech.powerscheduler.server.application.service
 
 import org.slf4j.LoggerFactory
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
+import tech.powerscheduler.common.dto.request.JobProgressReportRequestDTO
 import tech.powerscheduler.common.dto.request.WorkerHeartbeatRequestDTO
 import tech.powerscheduler.common.dto.request.WorkerRegisterRequestDTO
 import tech.powerscheduler.common.dto.request.WorkerUnregisterRequestDTO
 import tech.powerscheduler.common.enums.JobStatusEnum
+import tech.powerscheduler.common.enums.JobStatusEnum.FAILED
 import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.WorkerRegistryAssembler
 import tech.powerscheduler.server.application.dto.response.WorkerQueryResponseDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
+import tech.powerscheduler.server.domain.task.TaskId
+import tech.powerscheduler.server.domain.task.TaskRepository
+import tech.powerscheduler.server.domain.task.TaskStatusChangeEvent
 import tech.powerscheduler.server.domain.workerregistry.WorkerRegistry
 import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryRepository
 import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryUniqueKey
@@ -25,11 +30,12 @@ import java.time.LocalDateTime
  */
 @Service
 class WorkerLifeCycleService(
+    private val taskRepository: TaskRepository,
     private val appGroupRepository: AppGroupRepository,
-    private val jobInstanceRepository: JobInstanceRepository,
     private val workerRegistryRepository: WorkerRegistryRepository,
     private val workerRegistryAssembler: WorkerRegistryAssembler,
     private val transactionTemplate: TransactionTemplate,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -97,6 +103,38 @@ class WorkerLifeCycleService(
         } else {
             log.warn("worker [{}:{}] has not registered", uk.host, uk.port)
         }
+    }
+
+    fun updateProgress(param: JobProgressReportRequestDTO) {
+        val taskId = TaskId(param.taskId!!)
+        val task = taskRepository.findById(taskId)
+        if (task == null) {
+            log.warn("更新任务状态失败: 子任务[${taskId.value}]不存在")
+            return
+        }
+        if (task.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
+            log.info("updateProgress cancel, jobInstance [{}] is already completed", taskId.value)
+            return
+        }
+        task.apply {
+            this.jobStatus = param.jobStatus
+            this.startAt = param.startAt
+            this.endAt = param.endAt
+            this.message = param.message?.take(5000)
+        }
+        val taskStatusChangeEvent = TaskStatusChangeEvent(
+            taskId = task.id!!,
+            jobInstanceId = task.jobInstanceId!!,
+            executeMode = task.executeMode!!,
+        )
+        transactionTemplate.executeWithoutResult {
+            if (param.jobStatus == FAILED && task.canReattempt) {
+                task.resetStatusForReattempt()
+            }
+            taskRepository.save(task)
+            applicationEventPublisher.publishEvent(taskStatusChangeEvent)
+        }
+        log.info("task update: id={}, status={}", taskId.value, task.jobStatus)
     }
 
     fun removeWorkerRegistry(workerRegistry: WorkerRegistry) {
