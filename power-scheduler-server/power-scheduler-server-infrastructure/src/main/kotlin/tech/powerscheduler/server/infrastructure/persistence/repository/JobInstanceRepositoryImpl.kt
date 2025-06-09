@@ -143,6 +143,23 @@ class JobInstanceRepositoryImpl(
         return page.map { JobInstanceId(it) }.toDomainPage()
     }
 
+    override fun listDispatchable(
+        jobIds: Iterable<JobId>,
+        pageQuery: PageQuery
+    ): Page<JobInstance> {
+        val pageable = PageRequest.of(
+            pageQuery.pageNo - 1,
+            pageQuery.pageSize,
+            Sort.by(JobInstanceEntity::scheduleAt.name).ascending()
+        )
+        val page = jobInstanceJpaRepository.listDispatchable(
+            jobIds = jobIds.map { it.value },
+            jobStatuses = listOf(JobStatusEnum.WAITING_SCHEDULE),
+            pageRequest = pageable,
+        )
+        return page.map { it.toDomainModel() }.toDomainPage()
+    }
+
     override fun deleteByIds(ids: Iterable<JobInstanceId>) {
         jobInstanceJpaRepository.deleteAllByIdInBatch(ids.map { it.value })
     }

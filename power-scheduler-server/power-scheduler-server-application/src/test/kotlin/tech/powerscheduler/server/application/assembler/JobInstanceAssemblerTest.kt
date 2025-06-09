@@ -48,7 +48,7 @@ class JobInstanceAssemblerTest : FunSpec({
                 it.jobName = "jobName"
                 it.jobType = JobTypeEnum.JAVA
                 it.processor = "processor"
-                it.jobStatus = JobStatusEnum.WAITING_DISPATCH
+                it.jobStatus = JobStatusEnum.entries.random()
                 it.scheduleAt = LocalDateTime.now().minusMinutes(10)
                 it.startAt = LocalDateTime.now().minusMinutes(8)
                 it.endAt = LocalDateTime.now().minusMinutes(5)
@@ -106,7 +106,7 @@ class JobInstanceAssemblerTest : FunSpec({
                 it.jobName = "jobName"
                 it.jobType = JobTypeEnum.JAVA
                 it.processor = "processor"
-                it.jobStatus = JobStatusEnum.WAITING_DISPATCH
+                it.jobStatus = JobStatusEnum.entries.random()
                 it.scheduleAt = LocalDateTime.now().minusMinutes(30)
                 it.startAt = LocalDateTime.now().minusMinutes(20)
                 it.endAt = LocalDateTime.now().minusMinutes(10)

@@ -23,8 +23,11 @@ import tech.powerscheduler.server.application.utils.registerSelfAsService
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
+import tech.powerscheduler.server.domain.jobinstance.JobInstance
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
+import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskRepository
+import tech.powerscheduler.server.domain.workerregistry.WorkerRegistry
 import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryRepository
 import java.time.Duration
 import java.time.LocalDateTime
@@ -42,6 +45,8 @@ class JobSchedulerActor(
 
     sealed interface Command {
         object ScheduleJobs : Command
+
+        object CreateTasks : Command
     }
 
     companion object {
@@ -63,6 +68,10 @@ class JobSchedulerActor(
                 return@setup Behaviors.withTimers { timer ->
                     timer.startTimerAtFixedRate(
                         Command.ScheduleJobs,
+                        Duration.ofSeconds(1)
+                    )
+                    timer.startTimerAtFixedRate(
+                        Command.CreateTasks,
                         Duration.ofSeconds(1)
                     )
                     val jobSchedulerActor = JobSchedulerActor(
@@ -87,6 +96,7 @@ class JobSchedulerActor(
     override fun createReceive(): Receive<Command> {
         return newReceiveBuilder()
             .onMessageEquals(Command.ScheduleJobs) { return@onMessageEquals handleScheduleDueJobs() }
+            .onMessageEquals(Command.CreateTasks) { return@onMessageEquals handleCreateTasks() }
             .onSignal(PostStop::class.java) { signal -> onPostStop() }
             .build()
     }
@@ -196,30 +206,77 @@ class JobSchedulerActor(
 
             // 前置检查全部通过后, 正式开始调度
             val jobInstance = jobInfoToSchedule.createInstance()
-            jobInstance.jobStatus = JobStatusEnum.WAITING_DISPATCH
+            jobInstance.jobStatus = JobStatusEnum.WAITING_SCHEDULE
             jobInstance.schedulerAddress = currentServerAddress
             jobInfoToSchedule.updateNextScheduleTime()
 
-            val jobInstanceId = jobInstanceRepository.save(jobInstance)
-            jobInstance.id = jobInstanceId
-
-            val tasks = when (jobInfoToSchedule.executeMode!!) {
-                // 单机模式创建1个task
-                // Map/MapReduce模式 先创建1个task，后续根据任务上报的结果持续创建子task(需要做好幂等)
-                SINGLE, MAP_REDUCE -> {
-                    val targetWorker = availableWorkers.random()
-                    val task = jobInstance.createTask(targetWorker.address)
-                    listOf(task)
-                }
-                // 广播模式 有多少台在线的worker就创建多少个task
-                BROADCAST -> {
-                    availableWorkers.map { jobInstance.createTask(it.address) }
-                }
-            }
             jobInfoRepository.save(jobInfoToSchedule)
-            taskRepository.saveAll(tasks)
+            jobInstanceRepository.save(jobInstance)
             log.info("schedule job [{}] success, nextScheduleTime={}", jobId.value, jobInfoToSchedule.nextScheduleAt)
         }
+    }
+
+    private fun handleCreateTasks(): Behavior<Command> {
+        var pageNo = 1
+        val currentServerAddress = context.system.hostPort()
+        do {
+            val pageQuery = PageQuery(pageNo = pageNo++, pageSize = 200)
+            val jobIdPage = jobInfoRepository.listIdsByEnabledAndSchedulerAddress(
+                enabled = null,
+                schedulerAddress = currentServerAddress,
+                pageQuery = pageQuery
+            )
+            if (jobIdPage.isEmpty()) {
+                break
+            }
+            val jobIds = jobIdPage.content
+            createTasks(jobIds)
+        } while (jobIdPage.isNotEmpty())
+        return this
+    }
+
+    private fun createTasks(jobIds: List<JobId>) {
+        var pageNo = 1
+        do {
+            val pageQuery = PageQuery(pageNo = pageNo++, pageSize = 200)
+            val jobInstancePage = jobInstanceRepository.listDispatchable(
+                jobIds = jobIds,
+                pageQuery = pageQuery
+            )
+            if (jobInstancePage.isEmpty()) {
+                break
+            }
+            val jobInstances = jobInstancePage.content
+            val appCodes = jobInstances.mapNotNull { it.appCode }
+            val appCode2AvailableWorkers = workerRegistryRepository.findAllByAppCodes(appCodes)
+
+            jobInstances.forEach { jobInstance ->
+                val workerRegistries = appCode2AvailableWorkers[jobInstance.appCode!!].orEmpty()
+                val tasks = doCreateTasks(jobInstance, workerRegistries)
+                jobInstance.jobStatus = JobStatusEnum.WAITING_DISPATCH
+                transactionTemplate.executeWithoutResult {
+                    jobInstanceRepository.save(jobInstance)
+                    taskRepository.saveAll(tasks)
+                }
+            }
+        } while (jobInstancePage.isNotEmpty())
+    }
+
+    private fun doCreateTasks(jobInstance: JobInstance, availableWorkers: List<WorkerRegistry>): List<Task> {
+        val tasks = when (jobInstance.executeMode!!) {
+            // 单机模式创建1个task
+            // Map/MapReduce模式 先创建1个task，后续根据任务上报的结果持续创建子task(需要做好幂等)
+            SINGLE, MAP_REDUCE -> {
+                val targetWorker = availableWorkers.random()
+                val task = jobInstance.createTask(targetWorker.address)
+                listOf(task)
+            }
+            // 广播模式 有多少台在线的worker就创建多少个task
+            BROADCAST -> {
+                availableWorkers.map { jobInstance.createTask(it.address) }
+            }
+        }
+        return tasks
     }
 
     private fun onPostStop(): Behavior<Command> {

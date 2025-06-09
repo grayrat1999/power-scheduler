@@ -12,15 +12,21 @@ import tech.powerscheduler.common.annotation.Metadata
 enum class JobStatusEnum(
     override val label: String
 ) : BaseEnum {
+
     /**
      * 待调度
      */
-    WAITING_DISPATCH("待调度"),
+    WAITING_SCHEDULE("待调度"),
 
     /**
-     * 调度中
+     * 待分发
      */
-    DISPATCHING("调度中"),
+    WAITING_DISPATCH("待分发"),
+
+    /**
+     * 分发中
+     */
+    DISPATCHING("分发中"),
 
     /**
      * 排队中
@@ -55,6 +61,7 @@ enum class JobStatusEnum(
          * 未完成状态集合
          */
         val UNCOMPLETED_STATUSES = setOf(
+            WAITING_SCHEDULE,
             WAITING_DISPATCH,
             PENDING,
             PROCESSING,

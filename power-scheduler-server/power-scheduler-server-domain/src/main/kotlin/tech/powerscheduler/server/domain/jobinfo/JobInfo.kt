@@ -166,7 +166,7 @@ class JobInfo {
             it.scriptType = this.scriptType
             it.scriptCode = this.scriptCode
 
-            it.jobStatus = JobStatusEnum.WAITING_DISPATCH
+            it.jobStatus = JobStatusEnum.WAITING_SCHEDULE
             it.dataTime = LocalDateTime.now()
             it.attemptCnt = 0
             it.maxAttemptCnt = this.maxAttemptCnt ?: 1
@@ -181,7 +181,7 @@ class JobInfo {
             return
         }
         val now = LocalDateTime.now()
-        when (scheduleType!!) {
+        this.nextScheduleAt = when (scheduleType!!) {
             CRON -> CronUtils.nextExecution(scheduleConfig!!, now)
             FIX_RATE -> now
             FIX_DELAY -> now

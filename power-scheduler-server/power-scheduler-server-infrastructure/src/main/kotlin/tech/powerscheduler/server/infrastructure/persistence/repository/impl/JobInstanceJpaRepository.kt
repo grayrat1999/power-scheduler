@@ -84,4 +84,20 @@ interface JobInstanceJpaRepository :
         endAt: LocalDateTime,
         pageable: Pageable
     ): Page<Long>
+
+    @Query(
+        """
+        SELECT 
+            jobInstance
+        FROM JobInstanceEntity AS jobInstance
+        WHERE true 
+          AND jobInstance.jobId IN :jobIds
+          AND jobInstance.jobStatus IN :jobStatuses
+    """
+    )
+    fun listDispatchable(
+        jobIds: Iterable<Long>,
+        jobStatuses: Iterable<JobStatusEnum>,
+        pageRequest: Pageable
+    ): Page<JobInstanceEntity>
 }
