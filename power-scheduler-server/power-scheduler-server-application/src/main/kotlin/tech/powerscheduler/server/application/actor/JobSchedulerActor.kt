@@ -102,6 +102,7 @@ class JobSchedulerActor(
     }
 
     private fun handleScheduleDueJobs(): Behavior<Command> {
+        log.info("debug: handleScheduleDueJobs...")
         var pageNo = 1
         val currentServerAddress = context.system.hostPort()
         do {
@@ -161,6 +162,7 @@ class JobSchedulerActor(
         val now = LocalDateTime.now()
         transactionTemplate.executeWithoutResult {
             val jobInfoToSchedule = jobInfoRepository.lockById(jobId)
+            log.info("debug: schedulerOne start, nextScheduleAt={}", jobInfoToSchedule?.nextScheduleAt)
             if (jobInfoToSchedule == null) {
                 return@executeWithoutResult
             }
