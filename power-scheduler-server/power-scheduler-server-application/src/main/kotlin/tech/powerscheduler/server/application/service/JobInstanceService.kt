@@ -98,7 +98,13 @@ class JobInstanceService(
         val jobInstance = jobInstanceRepository.findById(JobInstanceId(jobInstanceId))
             ?: throw BizException(message = "重跑任务失败: 任务实例不存在")
         val jobInstanceToReattempt = jobInstance.cloneForReattempt()
-        val jobInstanceId = jobInstanceRepository.save(jobInstanceToReattempt)
+        val task = jobInstanceToReattempt.createTask(workerAddress = null)
+        val jobInstanceId = transactionTemplate.execute {
+            val jobInstanceId = jobInstanceRepository.save(jobInstanceToReattempt)
+            task.jobInstanceId = jobInstanceId
+            taskRepository.save(task)
+            return@execute jobInstanceId
+        }!!
         return jobInstanceId.value
     }
 
