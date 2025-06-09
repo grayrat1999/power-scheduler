@@ -10,6 +10,12 @@ import java.time.LocalDateTime
  * @since 2025/4/16
  */
 class JobInstanceQueryRequestDTO : PageQueryRequestDTO() {
+
+    /**
+     * 任务id
+     */
+    var jobId: Long? = null
+
     /**
      * 任务实例id
      */

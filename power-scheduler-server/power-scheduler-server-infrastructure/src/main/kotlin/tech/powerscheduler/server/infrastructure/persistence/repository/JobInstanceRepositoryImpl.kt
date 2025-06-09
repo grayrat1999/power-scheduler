@@ -54,6 +54,9 @@ class JobInstanceRepositoryImpl(
         )
         val specification = Specification<JobInstanceEntity> { root, _, criteriaBuilder ->
             root.join<JobInstanceEntity, AppGroupEntity>(JobInstanceEntity::appGroupEntity.name, JoinType.LEFT)
+            val jobIdEqual = query.jobId?.let {
+                criteriaBuilder.equal(root.get<Long>(JobInstanceEntity::jobId.name), it)
+            }
             val jobInstanceIdEqual = query.jobInstanceId?.let {
                 criteriaBuilder.equal(root.get<Long>(JobInstanceEntity::id.name), it)
             }
@@ -73,7 +76,7 @@ class JobInstanceRepositoryImpl(
                 criteriaBuilder.between(root.get(JobInstanceEntity::endAt.name), it[0], it[1])
             }
             val predicates = listOfNotNull(
-                jobInstanceIdEqual, appGroupEqual, jobNameLike,
+                jobIdEqual, jobInstanceIdEqual, appGroupEqual, jobNameLike,
                 jobStatusEquals, startAtBetween, endAtBetween,
             )
             criteriaBuilder.and(*predicates.toTypedArray())

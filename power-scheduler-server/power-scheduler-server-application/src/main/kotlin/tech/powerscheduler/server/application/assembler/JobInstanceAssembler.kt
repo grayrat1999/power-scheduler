@@ -20,6 +20,7 @@ class JobInstanceAssembler {
         return JobInstanceQuery().apply {
             this.pageNo = param.pageNo
             this.pageSize = param.pageSize
+            this.jobId = param.jobId
             this.jobInstanceId = param.jobInstanceId
             this.appCode = param.appCode
             this.jobName = param.jobName
