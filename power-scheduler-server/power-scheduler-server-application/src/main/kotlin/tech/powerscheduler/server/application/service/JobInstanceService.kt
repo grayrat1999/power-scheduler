@@ -1,10 +1,9 @@
 package tech.powerscheduler.server.application.service
 
 import org.slf4j.LoggerFactory
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import tech.powerscheduler.common.dto.request.JobProgressReportRequestDTO
-import tech.powerscheduler.common.dto.request.JobTerminateRequestDTO
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobStatusEnum.*
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
@@ -20,7 +19,8 @@ import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
-import tech.powerscheduler.server.domain.worker.WorkerRemoteService
+import tech.powerscheduler.server.domain.jobinstance.JobInstanceTerminatedEvent
+import tech.powerscheduler.server.domain.task.TaskRepository
 import java.time.LocalDateTime
 
 /**
@@ -31,11 +31,12 @@ import java.time.LocalDateTime
  */
 @Service
 class JobInstanceService(
+    private val taskRepository: TaskRepository,
     private val jobInfoRepository: JobInfoRepository,
     private val jobInstanceRepository: JobInstanceRepository,
     private val jobInstanceAssembler: JobInstanceAssembler,
     private val transactionTemplate: TransactionTemplate,
-    private val workerRemoteService: WorkerRemoteService,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -110,32 +111,42 @@ class JobInstanceService(
         return jobInstanceId.value
     }
 
-    fun updateProgress(param: JobProgressReportRequestDTO) {
-        val jobInstanceId = JobInstanceId(param.jobInstanceId!!)
+    fun updateJobInstanceProgress(jobInstanceId: JobInstanceId) {
         val jobInstance = jobInstanceRepository.findById(jobInstanceId)
-            ?: throw BizException(message = "更新任务状态失败: 任务实例[$jobInstanceId]不存在")
+        if (jobInstance == null) {
+            log.warn("更新任务状态失败: 任务实例[${jobInstanceId.value}]不存在")
+            return
+        }
         if (jobInstance.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
-            log.info("updateProgress cancel, jobInstance [{}] is already completed", jobInstanceId)
+            log.info("updateProgress cancel, jobInstance [{}] is already completed", jobInstanceId.value)
+            return
+        }
+        val tasks = taskRepository.findAllByJobInstanceId(jobInstanceId)
+        val calculatedJobStatus = jobInstance.calculateJobStatus(tasks)
+        // 如果计算出的任务状态与当前一样, 则不需要更新状态
+        if (jobInstance.jobStatus == calculatedJobStatus) {
             return
         }
         jobInstance.apply {
-            this.jobStatus = param.jobStatus
-            this.startAt = param.startAt
-            this.endAt = param.endAt
-            this.message = param.message?.take(5000)
+            if (calculatedJobStatus == FAILED) {
+                if (this.canReattempt) {
+                    this.resetStatusForReattempt()
+                } else {
+                    this.endAt = LocalDateTime.now()
+                    this.jobStatus = FAILED
+                }
+            } else {
+                this.jobStatus = calculatedJobStatus
+            }
         }
         transactionTemplate.executeWithoutResult {
-            if (param.jobStatus == FAILED && jobInstance.canReattempt) {
-                jobInstance.resetStatusForReattempt()
-            }
             jobInstanceRepository.save(jobInstance)
-
-            if (param.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
+            if (jobInstance.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
                 val jobInfo = jobInfoRepository.lockById(jobInstance.jobId!!)
                 if (jobInfo == null) {
                     return@executeWithoutResult
                 }
-                jobInfo.lastCompletedAt = param.endAt
+                jobInfo.lastCompletedAt = jobInstance.endAt
                 if (jobInstance.scheduleType == ScheduleTypeEnum.ONE_TIME) {
                     jobInfo.enabled = false
                 }
@@ -145,5 +156,6 @@ class JobInstanceService(
                 jobInfoRepository.save(jobInfo)
             }
         }
+        log.info("update jobInstance successfully: id={}, status={}", jobInstanceId.value, jobInstance.jobStatus)
     }
 }

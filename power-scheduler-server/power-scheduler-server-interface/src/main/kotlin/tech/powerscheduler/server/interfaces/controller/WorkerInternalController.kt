@@ -11,7 +11,6 @@ import tech.powerscheduler.common.dto.request.JobProgressReportRequestDTO
 import tech.powerscheduler.common.dto.request.WorkerHeartbeatRequestDTO
 import tech.powerscheduler.common.dto.request.WorkerRegisterRequestDTO
 import tech.powerscheduler.common.dto.request.WorkerUnregisterRequestDTO
-import tech.powerscheduler.server.application.service.JobInstanceService
 import tech.powerscheduler.server.application.service.WorkerLifeCycleService
 
 /**
@@ -24,7 +23,6 @@ import tech.powerscheduler.server.application.service.WorkerLifeCycleService
 @RestController
 @RequestMapping(SERVER_API_PREFIX)
 internal class WorkerInternalController(
-    private val jobInstanceService: JobInstanceService,
     private val workerLifeCycleService: WorkerLifeCycleService,
 ) : BaseController() {
 
@@ -70,7 +68,7 @@ internal class WorkerInternalController(
 
     @PostMapping(REPORT_PROGRESS_API)
     fun reportProgress(@RequestBody @NotNull param: JobProgressReportRequestDTO?) = wrapperResponse {
-        jobInstanceService.updateProgress(param!!)
+        workerLifeCycleService.updateProgress(param!!)
         return@wrapperResponse true
     }
 }
