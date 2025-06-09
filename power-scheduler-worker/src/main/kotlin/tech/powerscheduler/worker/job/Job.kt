@@ -129,6 +129,7 @@ class Job(
         val jobProgressEntity = JobProgressEntity().also {
             it.jobId = this.context.jobId!!
             it.jobInstanceId = this.context.jobInstanceId!!
+            it.taskId = this.context.taskId!!
             it.status = this.jobStatus
             it.startAt = this.startAt
             it.endAt = this.endAt

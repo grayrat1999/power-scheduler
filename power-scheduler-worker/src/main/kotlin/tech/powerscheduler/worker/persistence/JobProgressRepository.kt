@@ -14,18 +14,19 @@ object JobProgressRepository {
 
     private val insertSql = readTextFrom("sql/job_progress/insert.sql")
     private val deleteByIdSql = readTextFrom("sql/job_progress/delete_by_id.sql")
-    private val listByJobInstanceIdSql = readTextFrom("sql/job_progress/list_by_job_instance_id.sql")
-    private val listDistinctJobInstanceIdSql = readTextFrom("sql/job_progress/list_distinct_job_instance_id.sql")
+    private val listByTaskIdSql = readTextFrom("sql/job_progress/list_by_job_instance_id.sql")
+    private val listDistinctTaskIdSql = readTextFrom("sql/job_progress/list_distinct_task_id.sql")
 
     fun save(entity: JobProgressEntity) {
         DataSourceManager.getConnection().use { conn ->
             conn.prepareStatement(insertSql).use { stmt ->
                 stmt.setObject(1, entity.jobId)
                 stmt.setObject(2, entity.jobInstanceId)
-                stmt.setString(3, entity.status?.name)
-                stmt.setObject(4, entity.startAt)
-                stmt.setObject(5, entity.endAt)
-                stmt.setString(6, entity.message)
+                stmt.setObject(3, entity.taskId)
+                stmt.setString(4, entity.status?.name)
+                stmt.setObject(5, entity.startAt)
+                stmt.setObject(6, entity.endAt)
+                stmt.setString(7, entity.message)
                 stmt.executeUpdate()
             }
         }
@@ -33,20 +34,20 @@ object JobProgressRepository {
 
     fun listDistinctJobInstanceIds(): Set<Long> {
         return DataSourceManager.getConnection().use { conn ->
-            return@use conn.prepareStatement(listDistinctJobInstanceIdSql).use { stmt ->
+            return@use conn.prepareStatement(listDistinctTaskIdSql).use { stmt ->
                 return@use stmt.executeQuery().use { rs ->
                     return@use generateSequence {
-                        rs.takeIf { it.next() }?.getLong("job_instance_id")
+                        rs.takeIf { it.next() }?.getLong("task_id")
                     }.toSet()
                 }
             }
         }
     }
 
-    fun listByJobInstanceId(jobInstanceId: Long): List<JobProgressEntity> {
+    fun listByTaskId(taskId: Long): List<JobProgressEntity> {
         return DataSourceManager.getConnection().use { conn ->
-            conn.prepareStatement(listByJobInstanceIdSql).use { stmt ->
-                stmt.setLong(1, jobInstanceId)
+            conn.prepareStatement(listByTaskIdSql).use { stmt ->
+                stmt.setLong(1, taskId)
                 stmt.executeQuery().use { rs ->
                     generateSequence {
                         if (rs.next()) {
@@ -54,6 +55,7 @@ object JobProgressRepository {
                                 this.id = rs.getLong("id")
                                 this.jobId = rs.getLong("job_id")
                                 this.jobInstanceId = rs.getLong("job_instance_id")
+                                this.taskId = rs.getLong("task_id")
                                 this.status = rs.getString("status")?.let { JobStatusEnum.valueOf(it) }
                                 this.startAt = rs.getObject("start_at", LocalDateTime::class.java)
                                 this.endAt = rs.getObject("end_at", LocalDateTime::class.java)
