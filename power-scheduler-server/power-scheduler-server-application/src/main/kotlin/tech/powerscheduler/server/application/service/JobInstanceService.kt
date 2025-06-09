@@ -81,11 +81,16 @@ class JobInstanceService(
         val jobInstance = jobInfo.createInstance().apply {
             this.dataTime = param.dataTime
             this.executeParams = param.executeParams
-            this.workerAddress = param.workerAddress
-            this.maxAttemptCnt = 1
+            this.maxAttemptCnt = 0
             this.scheduleAt = LocalDateTime.now()
         }
-        val jobInstanceId = jobInstanceRepository.save(jobInstance)
+        val task = jobInstance.createTask(param.workerAddress)
+        val jobInstanceId = transactionTemplate.execute {
+            val jobInstanceId = jobInstanceRepository.save(jobInstance)
+            task.jobInstanceId = jobInstanceId
+            taskRepository.save(task)
+            return@execute jobInstanceId
+        }!!
         return jobInstanceId.value
     }
 
