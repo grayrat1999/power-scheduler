@@ -61,28 +61,14 @@ class JobInstanceService(
     fun terminate(jobInstanceId: Long) {
         val jobInstance = jobInstanceRepository.findById(JobInstanceId(jobInstanceId))
             ?: throw BizException(message = "终止任务失败: 任务实例不存在")
-        if (jobInstance.startAt == null) {
-            jobInstance.startAt = LocalDateTime.now()
-        }
-        if (jobInstance.endAt == null) {
-            jobInstance.endAt = LocalDateTime.now()
-        }
         when (jobInstance.jobStatus!!) {
-            WAITING_DISPATCH -> {
-                jobInstance.jobStatus = CANCELED
+            WAITING_DISPATCH, DISPATCHING, PENDING, PROCESSING -> {
+                jobInstance.terminate()
                 jobInstanceRepository.save(jobInstance)
-            }
-
-            DISPATCHING, PENDING, PROCESSING -> {
-                jobInstance.jobStatus = CANCELED
-                jobInstanceRepository.save(jobInstance)
-                val terminateParam = JobTerminateRequestDTO().apply {
-                    this.jobInstanceId = jobInstanceId
-                }
-                workerRemoteService.terminate(
-                    baseUrl = jobInstance.workerAddress!!,
-                    param = terminateParam
+                val terminatedEvent = JobInstanceTerminatedEvent(
+                    jobInstanceId = jobInstanceId,
                 )
+                applicationEventPublisher.publishEvent(terminatedEvent)
             }
 
             FAILED, SUCCESS, CANCELED -> throw BizException("终止任务失败: 任务已经完成")
