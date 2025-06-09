@@ -135,6 +135,7 @@ class JobInfoAssembler {
             this.maxAttemptCnt = param.maxAttemptCnt
             this.priority = param.priority
             this.schedulerAddress = null
+            this.nextScheduleAt = null
             this.retentionPolicy = param.retentionPolicy
             this.retentionValue = param.retentionValue
         }
