@@ -144,22 +144,26 @@ class WorkerLifeCycleService(
                 return@executeWithoutResult
             }
             val workerAddress = existWorkerRegistry.address
-            val uncompletedJobInstanceList = jobInstanceRepository.findAllUncompletedByWorkerAddress(workerAddress)
-            uncompletedJobInstanceList.forEach {
-                if (it.attemptCnt!! >= it.maxAttemptCnt!!) {
-                    it.jobStatus = JobStatusEnum.FAILED
-                    it.startAt = it.startAt ?: LocalDateTime.now()
-                    it.endAt = LocalDateTime.now()
-                    it.message = "worker is offline"
+
+            val uncompletedTaskList = taskRepository.findAllUncompletedByWorkerAddress(workerAddress)
+            uncompletedTaskList.forEach {
+                if (it.canReattempt) {
+                    it.resetStatusForReattempt()
                 } else {
-                    it.attemptCnt = it.attemptCnt!! + 1
-                    it.jobStatus = JobStatusEnum.WAITING_DISPATCH
-                    it.startAt = null
-                    it.endAt = null
+                    it.markFailedWhenWorkerOffline()
                 }
             }
             workerRegistryRepository.delete(existWorkerRegistry.id!!)
-            jobInstanceRepository.saveAll(uncompletedJobInstanceList)
+            taskRepository.saveAll(uncompletedTaskList)
+
+            uncompletedTaskList.forEach {
+                val taskStatusChangeEvent = TaskStatusChangeEvent(
+                    taskId = it.id!!,
+                    jobInstanceId = it.jobInstanceId!!,
+                    executeMode = it.executeMode!!,
+                )
+                applicationEventPublisher.publishEvent(taskStatusChangeEvent)
+            }
         }
     }
 

@@ -7,6 +7,7 @@ import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.*
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.JobInstanceAssembler
@@ -22,22 +23,24 @@ import tech.powerscheduler.server.domain.jobinstance.JobInstance
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceQuery
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
-import tech.powerscheduler.server.domain.worker.WorkerRemoteService
+import tech.powerscheduler.server.domain.task.TaskRepository
 
 class JobInstanceServiceTest : FunSpec({
 
+    val taskRepository = mockk<TaskRepository>()
     val jobInfoRepository = mockk<JobInfoRepository>()
     val jobInstanceRepository = mockk<JobInstanceRepository>()
     val jobInstanceAssembler = mockk<JobInstanceAssembler>()
     val transactionTemplate = mockk<TransactionTemplate>()
-    val workerRemoteService = mockk<WorkerRemoteService>()
+    val applicationEventPublisher = mockk<ApplicationEventPublisher>()
 
     val jobInstanceService = JobInstanceService(
+        taskRepository = taskRepository,
         jobInfoRepository = jobInfoRepository,
         jobInstanceRepository = jobInstanceRepository,
         jobInstanceAssembler = jobInstanceAssembler,
         transactionTemplate = transactionTemplate,
-        workerRemoteService = workerRemoteService,
+        applicationEventPublisher = applicationEventPublisher,
     )
 
     context("test ${JobInstanceService::list}") {
