@@ -102,7 +102,7 @@ class JobSchedulerActor(
     }
 
     private fun handleScheduleDueJobs(): Behavior<Command> {
-        log.info("debug: handleScheduleDueJobs...")
+        log.info("debug: handleScheduleDueJobs start...")
         var pageNo = 1
         val currentServerAddress = context.system.hostPort()
         do {
@@ -126,6 +126,7 @@ class JobSchedulerActor(
             val jobIds = schedulableList.mapNotNull { it.id }
             scheduleJobs(jobIds, currentServerAddress)
         } while (assignedJobIdPage.isNotEmpty())
+        log.info("debug: handleScheduleDueJobs end...")
         return this
     }
 
@@ -162,7 +163,7 @@ class JobSchedulerActor(
         val now = LocalDateTime.now()
         transactionTemplate.executeWithoutResult {
             val jobInfoToSchedule = jobInfoRepository.lockById(jobId)
-            log.info("debug: schedulerOne start, nextScheduleAt={}", jobInfoToSchedule?.nextScheduleAt)
+            log.info("debug: schedulerOne start, jobId={}, nextScheduleAt={}", jobId, jobInfoToSchedule?.nextScheduleAt)
             if (jobInfoToSchedule == null) {
                 return@executeWithoutResult
             }
@@ -217,7 +218,7 @@ class JobSchedulerActor(
             log.info("schedule job [{}] success, nextScheduleTime={}", jobId.value, jobInfoToSchedule.nextScheduleAt)
 
             val jobInfoAfterSave = jobInfoRepository.lockById(jobId)
-            log.info("debug: schedulerOne end, nextScheduleAt={}", jobInfoAfterSave?.nextScheduleAt)
+            log.info("debug: schedulerOne end, jobId={}, nextScheduleAt={}", jobId, jobInfoAfterSave?.nextScheduleAt)
         }
     }
 
