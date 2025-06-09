@@ -3,6 +3,8 @@ package tech.powerscheduler.server.infrastructure.utils
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.appgroup.AppGroupId
 import tech.powerscheduler.server.domain.common.Page
+import tech.powerscheduler.server.domain.domainevent.DomainEvent
+import tech.powerscheduler.server.domain.domainevent.DomainEventId
 import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.jobinfo.JobInfo
 import tech.powerscheduler.server.domain.jobinstance.JobInstance
@@ -119,7 +121,6 @@ fun JobInstance.toEntity(): JobInstanceEntity {
         it.jobId = this.jobId?.value
         it.appCode = this.appCode
         it.schedulerAddress = this.schedulerAddress
-        it.workerAddress = this.workerAddress
         it.jobName = this.jobName
         it.jobType = this.jobType
         it.processor = this.processor
@@ -147,7 +148,6 @@ fun JobInstanceEntity.toDomainModel(): JobInstance {
         it.jobId = JobId(this.jobId!!)
         it.appCode = this.appCode
         it.schedulerAddress = this.schedulerAddress
-        it.workerAddress = this.workerAddress
         it.jobName = this.jobName
         it.jobType = this.jobType
         it.processor = this.processor
@@ -245,5 +245,27 @@ fun TaskEntity.toDomainModel(): Task {
         it.attemptCnt = this.attemptCnt
         it.maxAttemptCnt = this.maxAttemptCnt
         it.priority = this.priority
+    }
+}
+
+fun DomainEvent.toEntity(): DomainEventEntity {
+    return DomainEventEntity().also {
+        it.id = this.id?.value
+        it.aggregateId = this.aggregateId
+        it.eventType = this.eventType
+        it.eventStatus = this.eventStatus
+        it.payload = this.payload
+        it.retryCnt = this.retryCnt
+    }
+}
+
+fun DomainEventEntity.toDomainModel(): DomainEvent {
+    return DomainEvent().also {
+        it.id = DomainEventId(this.id!!)
+        it.aggregateId = this.aggregateId
+        it.eventType = this.eventType
+        it.eventStatus = this.eventStatus
+        it.payload = this.payload
+        it.retryCnt = this.retryCnt
     }
 }
