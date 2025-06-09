@@ -126,43 +126,4 @@ class JobInstanceRepositoryImplIT(
         }
     }
 
-    context("test ${JobInstanceRepositoryImpl::findAllUncompletedByWorkerAddress}") {
-        test("return entity when id exist") {
-            val appGroupEntity = AppGroupEntity().also {
-                it.code = "code"
-                it.name = "name"
-                it.secret = "secret"
-            }
-            appGroupJpaRepository.save(appGroupEntity)
-            val entityToSave = JobInstanceEntity().also {
-                it.appGroupEntity = appGroupEntity
-                it.jobId = (1L..10L).random()
-                it.appCode = "appCode"
-                it.schedulerAddress = "schedulerIp"
-                it.workerAddress = "workerAddress"
-                it.jobName = "jobName"
-                it.jobType = JobTypeEnum.entries.random()
-                it.processor = "processor"
-                it.jobStatus = JobStatusEnum.WAITING_DISPATCH
-                it.scheduleAt = LocalDateTime.now()
-                it.endAt = null
-                it.executeParams = "executeParams"
-                it.executeMode = ExecuteModeEnum.entries.random()
-                it.scheduleType = ScheduleTypeEnum.entries.random()
-                it.message = "message"
-                it.dataTime = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS)
-                it.scriptType = ScriptTypeEnum.entries.random()
-                it.scriptCode = "scriptCode"
-                it.maxAttemptCnt = 0
-                it.attemptCnt = 0
-                it.workerAddress = "workerAddress"
-            }
-            jobInstanceJpaRepository.save(entityToSave)
-            entityManager.clear()
-            jobInstanceRepositoryImpl.findAllUncompletedByWorkerAddress(
-                workerAddress = "workerAddress",
-            )
-        }
-    }
-
 })

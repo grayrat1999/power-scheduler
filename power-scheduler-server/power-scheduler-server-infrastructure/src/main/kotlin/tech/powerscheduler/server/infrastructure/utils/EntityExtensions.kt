@@ -121,7 +121,6 @@ fun JobInstance.toEntity(): JobInstanceEntity {
         it.jobId = this.jobId?.value
         it.appCode = this.appCode
         it.schedulerAddress = this.schedulerAddress
-        it.workerAddress = this.workerAddress
         it.jobName = this.jobName
         it.jobType = this.jobType
         it.processor = this.processor
@@ -149,7 +148,6 @@ fun JobInstanceEntity.toDomainModel(): JobInstance {
         it.jobId = JobId(this.jobId!!)
         it.appCode = this.appCode
         it.schedulerAddress = this.schedulerAddress
-        it.workerAddress = this.workerAddress
         it.jobName = this.jobName
         it.jobType = this.jobType
         it.processor = this.processor

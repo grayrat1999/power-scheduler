@@ -143,20 +143,6 @@ class JobInstanceRepositoryImpl(
         return page.map { JobInstanceId(it) }.toDomainPage()
     }
 
-    override fun findAllUncompletedByWorkerAddress(workerAddress: String): List<JobInstance> {
-        val specification = Specification<JobInstanceEntity> { root, _, criteriaBuilder ->
-            root.join<JobInstanceEntity, AppGroupEntity>(JobInstanceEntity::appGroupEntity.name, JoinType.LEFT)
-            val workerAddressEqual = criteriaBuilder.equal(
-                root.get<String>(JobInstanceEntity::workerAddress.name), workerAddress
-            )
-            val jobStatusIn = root.get<String>(JobInstanceEntity::jobStatus.name)
-                .`in`(JobStatusEnum.UNCOMPLETED_STATUSES)
-            criteriaBuilder.and(workerAddressEqual, jobStatusIn)
-        }
-        val list = jobInstanceJpaRepository.findAll(specification)
-        return list.map { it.toDomainModel() }
-    }
-
     override fun deleteByIds(ids: Iterable<JobInstanceId>) {
         jobInstanceJpaRepository.deleteAllByIdInBatch(ids.map { it.value })
     }
