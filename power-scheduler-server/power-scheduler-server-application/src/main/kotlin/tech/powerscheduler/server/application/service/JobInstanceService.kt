@@ -84,7 +84,6 @@ class JobInstanceService(
             this.maxAttemptCnt = 1
             this.scheduleAt = LocalDateTime.now()
         }
-        // todo: 运行操作需要重构
         val task = jobInstance.createTask(param.workerAddress)
         val jobInstanceId = transactionTemplate.execute {
             taskRepository.save(task)
