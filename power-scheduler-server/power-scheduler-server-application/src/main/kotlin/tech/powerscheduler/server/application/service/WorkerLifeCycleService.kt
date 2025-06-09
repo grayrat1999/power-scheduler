@@ -134,7 +134,7 @@ class WorkerLifeCycleService(
             taskRepository.save(task)
             applicationEventPublisher.publishEvent(taskStatusChangeEvent)
         }
-        log.info("task update: id={}, status={}", taskId.value, task.jobStatus)
+        log.info("task update successfully: id={}, status={}", taskId.value, task.jobStatus)
     }
 
     fun removeWorkerRegistry(workerRegistry: WorkerRegistry) {

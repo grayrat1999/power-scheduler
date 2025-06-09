@@ -116,7 +116,7 @@ class JobInstanceService(
             return
         }
         if (jobInstance.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
-            log.info("updateProgress cancel, jobInstance [{}] is already completed", jobInstanceId.value)
+            log.info("updateProgress cancel, jobInstance [{}] is [{}]", jobInstanceId.value, jobInstance.jobStatus)
             return
         }
         val tasks = taskRepository.findAllByJobInstanceId(jobInstanceId)
@@ -157,6 +157,6 @@ class JobInstanceService(
                 jobInfoRepository.save(jobInfo)
             }
         }
-        log.info("update jobInstance successfully: id={}, status={}", jobInstanceId.value, jobInstance.jobStatus)
+        log.info("jobInstance update successfully: id={}, status={}", jobInstanceId.value, jobInstance.jobStatus)
     }
 }
