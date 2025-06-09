@@ -48,12 +48,6 @@ class JobInstanceEntity() : BaseEntity() {
     var schedulerAddress: String? = null
 
     /**
-     * 执行器地址
-     */
-    @Column(name = "worker_address")
-    var workerAddress: String? = null
-
-    /**
      * 任务名称
      */
     @Column(name = "job_name", nullable = false, updatable = false)
