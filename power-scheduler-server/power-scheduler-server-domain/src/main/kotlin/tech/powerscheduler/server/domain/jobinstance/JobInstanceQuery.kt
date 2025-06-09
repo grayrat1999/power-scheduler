@@ -11,6 +11,12 @@ import java.time.LocalDateTime
  * @since 2025/4/19
  */
 class JobInstanceQuery : PageQuery() {
+
+    /**
+     * 任务id
+     */
+    var jobId: Long? = null
+
     /**
      * 任务实例id
      */
