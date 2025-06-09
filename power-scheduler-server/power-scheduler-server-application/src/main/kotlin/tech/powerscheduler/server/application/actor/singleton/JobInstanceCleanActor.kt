@@ -14,6 +14,7 @@ import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.jobinfo.JobInfo
 import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
+import tech.powerscheduler.server.domain.task.TaskRepository
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -26,6 +27,7 @@ class JobInstanceCleanActor(
     context: ActorContext<Command>,
     val jobInfoRepository: JobInfoRepository,
     val jobInstanceRepository: JobInstanceRepository,
+    val taskRepository: TaskRepository,
 ) : AbstractBehavior<JobInstanceCleanActor.Command>(context) {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -38,12 +40,14 @@ class JobInstanceCleanActor(
         fun create(applicationContext: ApplicationContext): Behavior<Command> {
             val jobInfoRepository = applicationContext.getBean(JobInfoRepository::class.java)
             val jobInstanceRepository = applicationContext.getBean(JobInstanceRepository::class.java)
+            val taskRepository = applicationContext.getBean(TaskRepository::class.java)
             return Behaviors.setup { context ->
                 Behaviors.withTimers { timer ->
                     val actor = JobInstanceCleanActor(
                         context = context,
                         jobInfoRepository = jobInfoRepository,
                         jobInstanceRepository = jobInstanceRepository,
+                        taskRepository = taskRepository,
                     )
                     timer.startTimerWithFixedDelay(
                         Command.CleanJobInstance,
@@ -154,7 +158,9 @@ class JobInstanceCleanActor(
                     break
                 }
                 totalCount += page.size
-                jobInstanceRepository.deleteByIds(page.content)
+                val jobInstanceIds = page.content
+                taskRepository.deleteByJobInstanceId(jobInstanceIds = jobInstanceIds)
+                jobInstanceRepository.deleteByIds(jobInstanceIds)
             }
             log.info("clean [{}] jobInstance, jobId=[{}], expireTime={}", totalCount, jobId.value, expireTime)
         }
