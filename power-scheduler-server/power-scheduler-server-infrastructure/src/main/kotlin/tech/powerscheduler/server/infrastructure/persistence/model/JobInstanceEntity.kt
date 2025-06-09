@@ -15,7 +15,6 @@ import java.time.LocalDateTime
         Index(name = "job_instance_idx_job_id", columnList = "job_id"),
         Index(name = "job_instance_idx_start_at", columnList = "start_at"),
         Index(name = "job_instance_idx_end_at", columnList = "end_at"),
-        Index(name = "job_instance_idx_worker_address", columnList = "worker_address"),
     ]
 )
 class JobInstanceEntity() : BaseEntity() {
