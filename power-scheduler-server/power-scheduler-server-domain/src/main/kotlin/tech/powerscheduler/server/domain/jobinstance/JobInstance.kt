@@ -225,4 +225,14 @@ class JobInstance {
             null -> TODO()
         }
     }
+
+    fun terminate() {
+        if (this.startAt == null) {
+            this.startAt = LocalDateTime.now()
+        }
+        if (this.endAt == null) {
+            this.endAt = LocalDateTime.now()
+        }
+        this.jobStatus = JobStatusEnum.CANCELED
+    }
 }

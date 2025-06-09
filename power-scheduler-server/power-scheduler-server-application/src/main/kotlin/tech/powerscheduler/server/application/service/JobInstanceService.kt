@@ -1,9 +1,9 @@
 package tech.powerscheduler.server.application.service
 
 import org.slf4j.LoggerFactory
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import tech.powerscheduler.common.dto.request.JobTerminateRequestDTO
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobStatusEnum.*
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
@@ -19,8 +19,8 @@ import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
+import tech.powerscheduler.server.domain.jobinstance.JobInstanceTerminatedEvent
 import tech.powerscheduler.server.domain.task.TaskRepository
-import tech.powerscheduler.server.domain.worker.WorkerRemoteService
 import java.time.LocalDateTime
 
 /**
@@ -36,7 +36,7 @@ class JobInstanceService(
     private val jobInstanceRepository: JobInstanceRepository,
     private val jobInstanceAssembler: JobInstanceAssembler,
     private val transactionTemplate: TransactionTemplate,
-    private val workerRemoteService: WorkerRemoteService,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -61,28 +61,14 @@ class JobInstanceService(
     fun terminate(jobInstanceId: Long) {
         val jobInstance = jobInstanceRepository.findById(JobInstanceId(jobInstanceId))
             ?: throw BizException(message = "终止任务失败: 任务实例不存在")
-        if (jobInstance.startAt == null) {
-            jobInstance.startAt = LocalDateTime.now()
-        }
-        if (jobInstance.endAt == null) {
-            jobInstance.endAt = LocalDateTime.now()
-        }
         when (jobInstance.jobStatus!!) {
-            WAITING_DISPATCH -> {
-                jobInstance.jobStatus = CANCELED
+            WAITING_DISPATCH, DISPATCHING, PENDING, PROCESSING -> {
+                jobInstance.terminate()
                 jobInstanceRepository.save(jobInstance)
-            }
-
-            DISPATCHING, PENDING, PROCESSING -> {
-                jobInstance.jobStatus = CANCELED
-                jobInstanceRepository.save(jobInstance)
-                val terminateParam = JobTerminateRequestDTO().apply {
-                    this.jobInstanceId = jobInstanceId
-                }
-                workerRemoteService.terminate(
-                    baseUrl = jobInstance.workerAddress!!,
-                    param = terminateParam
+                val terminatedEvent = JobInstanceTerminatedEvent(
+                    jobInstanceId = jobInstanceId,
                 )
+                applicationEventPublisher.publishEvent(terminatedEvent)
             }
 
             FAILED, SUCCESS, CANCELED -> throw BizException("终止任务失败: 任务已经完成")
@@ -95,11 +81,15 @@ class JobInstanceService(
         val jobInstance = jobInfo.createInstance().apply {
             this.dataTime = param.dataTime
             this.executeParams = param.executeParams
-            this.workerAddress = param.workerAddress
             this.maxAttemptCnt = 1
             this.scheduleAt = LocalDateTime.now()
         }
-        val jobInstanceId = jobInstanceRepository.save(jobInstance)
+        // todo: 运行操作需要重构
+        val task = jobInstance.createTask(param.workerAddress)
+        val jobInstanceId = transactionTemplate.execute {
+            taskRepository.save(task)
+            jobInstanceRepository.save(jobInstance)
+        }!!
         return jobInstanceId.value
     }
 

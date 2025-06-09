@@ -134,6 +134,9 @@ class Task {
     val canReattempt
         get() = this.attemptCnt!! < this.maxAttemptCnt!!
 
+    val isCompleted
+        get() = JobStatusEnum.COMPLETED_STATUSES.contains(this.jobStatus)
+
     fun resetStatusForReattempt() {
         this.jobStatus = JobStatusEnum.WAITING_DISPATCH
         this.startAt = null
@@ -147,5 +150,15 @@ class Task {
         this.startAt = this.startAt ?: LocalDateTime.now()
         this.endAt = LocalDateTime.now()
         this.message = "worker is offline"
+    }
+
+    fun terminate() {
+        if (this.startAt == null) {
+            this.startAt = LocalDateTime.now()
+        }
+        if (this.endAt == null) {
+            this.endAt = LocalDateTime.now()
+        }
+        this.jobStatus = JobStatusEnum.CANCELED
     }
 }

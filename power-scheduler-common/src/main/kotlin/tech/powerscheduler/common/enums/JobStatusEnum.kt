@@ -52,15 +52,6 @@ enum class JobStatusEnum(
 
     companion object {
         /**
-         * 未完成状态集合
-         */
-        val UNCOMPLETED_STATUSES = setOf(
-            WAITING_DISPATCH,
-            PENDING,
-            PROCESSING,
-        )
-
-        /**
          * 已完成状态集合
          */
         val COMPLETED_STATUSES = setOf(
@@ -68,5 +59,10 @@ enum class JobStatusEnum(
             FAILED,
             CANCELED,
         )
+
+        /**
+         * 未完成状态集合
+         */
+        val UNCOMPLETED_STATUSES = entries - COMPLETED_STATUSES
     }
 }
