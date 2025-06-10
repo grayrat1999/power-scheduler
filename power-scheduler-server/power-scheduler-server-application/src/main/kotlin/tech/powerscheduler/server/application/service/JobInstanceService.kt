@@ -115,7 +115,10 @@ class JobInstanceService(
         }
         jobInstance.apply {
             this.jobStatus = calculatedJobStatus
-            this.startAt = this.calculateStartAt(tasks)
+            // task可能会失败重试, 开始时间只取第一个task的开始时间
+            if (this.startAt == null) {
+                this.startAt = this.calculateStartAt(tasks)
+            }
             if (calculatedJobStatus in JobStatusEnum.COMPLETED_STATUSES) {
                 this.endAt = this.calculateEndAt(tasks)
             }
