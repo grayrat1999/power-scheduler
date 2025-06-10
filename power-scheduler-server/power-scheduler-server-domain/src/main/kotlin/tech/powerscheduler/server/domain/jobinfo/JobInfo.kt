@@ -167,7 +167,7 @@ class JobInfo {
             it.scriptCode = this.scriptCode
 
             it.jobStatus = JobStatusEnum.WAITING_SCHEDULE
-            it.dataTime = LocalDateTime.now()
+            it.dataTime = this.nextScheduleAt
             it.attemptCnt = 0
             it.maxAttemptCnt = this.maxAttemptCnt ?: 1
             it.attemptInterval = this.attemptInterval
