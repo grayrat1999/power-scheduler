@@ -200,6 +200,7 @@ class JobInfo {
         val nextScheduleTime = when (scheduleType!!) {
             CRON -> {
                 val next = CronUtils.nextExecution(scheduleConfig!!, nextScheduleAt!!)
+                // 如果服务下线了一段时间, 需要以当前时间来修正下次执行时间
                 if (next < now) {
                     CronUtils.nextExecution(scheduleConfig!!, now)
                 } else {
@@ -207,7 +208,15 @@ class JobInfo {
                 }
             }
 
-            FIX_RATE -> now.plusSeconds(scheduleConfig!!.toLong())
+            FIX_RATE -> {
+                val next = nextScheduleAt!!.plusSeconds(scheduleConfig!!.toLong())
+                // 如果服务下线了一段时间, 需要以当前时间来修正下次执行时间
+                if (next < now) {
+                    now
+                } else {
+                    next
+                }
+            }
 
             FIX_DELAY -> if (lastCompletedAt == null) {
                 now
