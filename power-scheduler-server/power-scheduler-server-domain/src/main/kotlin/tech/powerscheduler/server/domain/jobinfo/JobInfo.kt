@@ -207,7 +207,7 @@ class JobInfo {
                 }
             }
 
-            FIX_RATE -> now.plusSeconds(scheduleConfig!!.toLong())
+            FIX_RATE -> nextScheduleAt!!.plusSeconds(scheduleConfig!!.toLong())
 
             FIX_DELAY -> if (lastCompletedAt == null) {
                 now
