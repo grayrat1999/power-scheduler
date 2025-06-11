@@ -160,4 +160,10 @@ class TaskEntity : BaseEntity() {
      */
     @Column(name = "priority")
     var priority: Int? = null
+
+    /**
+     * 批次
+     */
+    @Column(name = "batch", updatable = false)
+    var batch: Int? = null
 }

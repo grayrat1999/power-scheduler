@@ -131,6 +131,11 @@ class Task {
      */
     var workerAddress: String? = null
 
+    /**
+     * 批次
+     */
+    var batch: Int? = null
+
     val canReattempt
         get() = this.attemptCnt!! < this.maxAttemptCnt!!
 
