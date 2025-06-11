@@ -19,6 +19,8 @@ interface JobInstanceRepository {
         scheduleAtRange: Array<LocalDateTime>
     ): Map<JobStatusEnum, Long>
 
+    fun lockById(jobInstanceId: JobInstanceId): JobInstance?
+
     fun findById(jobInstanceId: JobInstanceId): JobInstance?
 
     fun pageQuery(query: JobInstanceQuery): Page<JobInstance>
@@ -48,7 +50,7 @@ interface JobInstanceRepository {
     fun listDispatchable(
         jobIds: Iterable<JobId>,
         pageQuery: PageQuery
-    ): Page<JobInstance>
+    ): Page<JobInstanceId>
 
     fun deleteByIds(ids: Iterable<JobInstanceId>)
 }

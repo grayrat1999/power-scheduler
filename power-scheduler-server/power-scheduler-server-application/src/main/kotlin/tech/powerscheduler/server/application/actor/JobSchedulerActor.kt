@@ -158,7 +158,6 @@ class JobSchedulerActor(
         jobId: JobId,
         currentServerAddress: String,
     ) {
-        val now = LocalDateTime.now()
         transactionTemplate.executeWithoutResult {
             val jobInfoToSchedule = jobInfoRepository.lockById(jobId)
             if (jobInfoToSchedule == null) {
@@ -173,7 +172,6 @@ class JobSchedulerActor(
                 jobInfoRepository.save(jobInfoToSchedule)
                 return@executeWithoutResult
             }
-
             // 检查任务实例并发数量
             val jobId2UnfinishedJobInstanceCount = jobInstanceRepository.countByJobIdAndJobStatus(
                 jobIds = listOf(jobId),
@@ -184,7 +182,6 @@ class JobSchedulerActor(
             if (existUnfinishedJobInstanceCount >= maxConcurrentNum) {
                 return@executeWithoutResult
             }
-
             // 检查当前可用机器, 如果没有可用机器，则跳过本次调度(TODO: 系统告警)
             val appCode = jobInfoToSchedule.appCode
             val availableWorkers = workerRegistryRepository.findAllByAppCode(appCode!!)
@@ -204,7 +201,6 @@ class JobSchedulerActor(
                 )
                 return@executeWithoutResult
             }
-
             // 前置检查全部通过后, 正式开始调度
             val jobInstance = jobInfoToSchedule.createInstance()
             jobInstance.jobStatus = JobStatusEnum.WAITING_SCHEDULE
@@ -220,7 +216,6 @@ class JobSchedulerActor(
                     updateNextScheduleTime()
                 }
             }
-
             jobInfoRepository.save(jobInfoToSchedule)
             jobInstanceRepository.save(jobInstance)
             log.info("schedule job [{}] success, nextScheduleTime={}", jobId.value, jobInfoToSchedule.nextScheduleAt)
@@ -250,27 +245,35 @@ class JobSchedulerActor(
         var pageNo = 1
         do {
             val pageQuery = PageQuery(pageNo = pageNo++, pageSize = 200)
-            val jobInstancePage = jobInstanceRepository.listDispatchable(
+            val jobInstanceIdPage = jobInstanceRepository.listDispatchable(
                 jobIds = jobIds,
                 pageQuery = pageQuery
             )
-            if (jobInstancePage.isEmpty()) {
+            if (jobInstanceIdPage.isEmpty()) {
                 break
             }
-            val jobInstances = jobInstancePage.content
-            val appCodes = jobInstances.mapNotNull { it.appCode }
-            val appCode2AvailableWorkers = workerRegistryRepository.findAllByAppCodes(appCodes)
-
-            jobInstances.forEach { jobInstance ->
-                val workerRegistries = appCode2AvailableWorkers[jobInstance.appCode!!].orEmpty()
-                val tasks = doCreateTasks(jobInstance, workerRegistries)
-                jobInstance.jobStatus = JobStatusEnum.WAITING_DISPATCH
+            val jobInstanceIds = jobInstanceIdPage.content
+            val appCode2AvailableWorkers = mutableMapOf<String, List<WorkerRegistry>>()
+            jobInstanceIds.forEach { jobInstanceId ->
                 transactionTemplate.executeWithoutResult {
+                    val jobInstance = jobInstanceRepository.lockById(jobInstanceId)
+                    if (jobInstance == null) {
+                        return@executeWithoutResult
+                    }
+                    if (jobInstance.jobStatus != JobStatusEnum.WAITING_SCHEDULE) {
+                        return@executeWithoutResult
+                    }
+                    val appCode = jobInstance.appCode!!
+                    val workerRegistries = appCode2AvailableWorkers.computeIfAbsent(appCode) { appCode ->
+                        workerRegistryRepository.findAllByAppCode(appCode)
+                    }
+                    jobInstance.jobStatus = JobStatusEnum.WAITING_DISPATCH
+                    val tasks = doCreateTasks(jobInstance, workerRegistries)
                     jobInstanceRepository.save(jobInstance)
                     taskRepository.saveAll(tasks)
                 }
             }
-        } while (jobInstancePage.isNotEmpty())
+        } while (jobInstanceIdPage.isNotEmpty())
     }
 
     private fun doCreateTasks(jobInstance: JobInstance, availableWorkers: List<WorkerRegistry>): List<Task> {

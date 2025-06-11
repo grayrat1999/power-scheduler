@@ -43,6 +43,11 @@ class JobInstanceRepositoryImpl(
         return countResult.associate { it[0] as JobStatusEnum to it[1] as Long }
     }
 
+    override fun lockById(jobInstanceId: JobInstanceId): JobInstance? {
+        val entity = jobInstanceJpaRepository.lockById(jobInstanceId.value)
+        return entity?.toDomainModel()
+    }
+
     override fun findById(jobInstanceId: JobInstanceId): JobInstance? {
         val entity = jobInstanceJpaRepository.findByIdOrNull(jobInstanceId.value)
         return entity?.toDomainModel()
@@ -149,7 +154,7 @@ class JobInstanceRepositoryImpl(
     override fun listDispatchable(
         jobIds: Iterable<JobId>,
         pageQuery: PageQuery
-    ): Page<JobInstance> {
+    ): Page<JobInstanceId> {
         val pageable = PageRequest.of(
             pageQuery.pageNo - 1,
             pageQuery.pageSize,
@@ -160,7 +165,7 @@ class JobInstanceRepositoryImpl(
             jobStatuses = listOf(JobStatusEnum.WAITING_SCHEDULE),
             pageRequest = pageable,
         )
-        return page.map { it.toDomainModel() }.toDomainPage()
+        return page.map { JobInstanceId(it) }.toDomainPage()
     }
 
     override fun deleteByIds(ids: Iterable<JobInstanceId>) {
