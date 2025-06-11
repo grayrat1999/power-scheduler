@@ -121,6 +121,16 @@ class JobInstance {
     var attemptInterval: Int? = null
 
     /**
+     * 子任务最大重试次数
+     */
+    var taskMaxAttemptCnt: Int? = null
+
+    /**
+     * 子任务重试间隔(s)
+     */
+    var taskAttemptInterval: Int? = null
+
+    /**
      * 优先级
      */
     var priority: Int? = null
@@ -206,15 +216,17 @@ class JobInstance {
             it.schedulerAddress = this.schedulerAddress
             it.workerAddress = workerAddress
             it.batch = this.attemptCnt
+            it.attemptCnt = 0
             when (this.executeMode!!) {
                 SINGLE -> {
-                    it.attemptCnt = 0
                     it.maxAttemptCnt = 0
                     it.attemptInterval = 0
                 }
 
-                BROADCAST -> TODO()
-                MAP_REDUCE -> TODO()
+                BROADCAST, MAP_REDUCE -> {
+                    it.maxAttemptCnt = this.taskMaxAttemptCnt
+                    it.attemptInterval = this.taskAttemptInterval
+                }
             }
         }
         return task
@@ -227,7 +239,26 @@ class JobInstance {
         val maxBatch = tasks.maxOfOrNull { it.batch!! }
         return when (this.executeMode!!) {
             SINGLE -> tasks.first { it.batch == maxBatch }.jobStatus!!
-            BROADCAST -> TODO()
+            BROADCAST -> {
+                val currentTasks = tasks.filter { it.batch == maxBatch }
+                val jobStatusSet = currentTasks.map { it.jobStatus!! }.toSet()
+                if ((jobStatusSet - JobStatusEnum.COMPLETED_STATUSES).isEmpty()) {
+                    if (jobStatusSet.all { it == JobStatusEnum.SUCCESS }) {
+                        return JobStatusEnum.SUCCESS
+                    }
+                    if (jobStatusSet.any { it == JobStatusEnum.FAILED }) {
+                        return JobStatusEnum.FAILED
+                    }
+                    return JobStatusEnum.UNKNOWN
+                } else {
+                    return if (jobStatusSet.intersect(JobStatusEnum.COMPLETED_STATUSES).isNotEmpty()) {
+                        JobStatusEnum.PROCESSING
+                    } else {
+                        jobStatusSet.maxBy { it.ordinal }
+                    }
+                }
+            }
+
             MAP_REDUCE -> TODO()
         }
     }

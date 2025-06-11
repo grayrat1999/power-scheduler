@@ -142,6 +142,15 @@ class Task {
     val isCompleted
         get() = JobStatusEnum.COMPLETED_STATUSES.contains(this.jobStatus)
 
+    fun markFailed(message: String? = null) {
+        if (this.startAt == null) {
+            this.startAt = LocalDateTime.now()
+        }
+        this.endAt = LocalDateTime.now()
+        this.jobStatus = JobStatusEnum.FAILED
+        this.message = message?.take(2000)
+    }
+
     fun resetStatusForReattempt() {
         this.jobStatus = JobStatusEnum.WAITING_DISPATCH
         this.startAt = null

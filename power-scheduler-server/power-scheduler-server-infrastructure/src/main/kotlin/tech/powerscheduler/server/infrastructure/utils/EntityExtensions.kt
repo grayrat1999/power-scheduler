@@ -72,6 +72,8 @@ fun JobInfoEntity.toDomainModel(): JobInfo {
         it.scriptCode = this.scriptCode
         it.maxAttemptCnt = this.maxAttemptCnt
         it.attemptInterval = this.attemptInterval
+        it.taskMaxAttemptCnt = this.taskMaxAttemptCnt
+        it.taskAttemptInterval = this.taskAttemptInterval
         it.priority = this.priority
         it.lastCompletedAt = this.lastCompletedAt
         it.schedulerAddress = this.schedulerAddress
@@ -106,6 +108,8 @@ fun JobInfo.toEntity(): JobInfoEntity {
         it.scriptCode = this.scriptCode
         it.maxAttemptCnt = this.maxAttemptCnt
         it.attemptInterval = this.attemptInterval
+        it.taskMaxAttemptCnt = this.taskMaxAttemptCnt
+        it.taskAttemptInterval = this.taskAttemptInterval
         it.priority = this.priority
         it.lastCompletedAt = this.lastCompletedAt
         it.schedulerAddress = this.schedulerAddress
@@ -137,6 +141,8 @@ fun JobInstance.toEntity(): JobInstanceEntity {
         it.scriptCode = this.scriptCode
         it.attemptCnt = this.attemptCnt
         it.maxAttemptCnt = this.maxAttemptCnt
+        it.taskMaxAttemptCnt = this.taskMaxAttemptCnt
+        it.taskAttemptInterval = this.taskAttemptInterval
         it.priority = this.priority
     }
 }
@@ -164,6 +170,8 @@ fun JobInstanceEntity.toDomainModel(): JobInstance {
         it.scriptCode = this.scriptCode
         it.attemptCnt = this.attemptCnt
         it.maxAttemptCnt = this.maxAttemptCnt
+        it.taskMaxAttemptCnt = this.taskMaxAttemptCnt
+        it.taskAttemptInterval = this.taskAttemptInterval
         it.priority = this.priority
     }
 }
