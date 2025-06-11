@@ -1,9 +1,11 @@
 package tech.powerscheduler.server.infrastructure.persistence.repository.impl
 
+import jakarta.persistence.LockModeType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
+import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
@@ -51,6 +53,10 @@ interface JobInstanceJpaRepository :
         @Param("jobStatuses") jobStatuses: Iterable<JobStatusEnum>
     ): List<Array<Any>>
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT t FROM JobInstanceEntity t WHERE t.id = :id")
+    fun lockById(id: Long): JobInstanceEntity?
+
     @Query(
         """
         SELECT 
@@ -88,7 +94,7 @@ interface JobInstanceJpaRepository :
     @Query(
         """
         SELECT 
-            jobInstance
+            jobInstance.id
         FROM JobInstanceEntity AS jobInstance
         WHERE true 
           AND jobInstance.jobId IN :jobIds
@@ -99,5 +105,6 @@ interface JobInstanceJpaRepository :
         jobIds: Iterable<Long>,
         jobStatuses: Iterable<JobStatusEnum>,
         pageRequest: Pageable
-    ): Page<JobInstanceEntity>
+    ): Page<Long>
+
 }

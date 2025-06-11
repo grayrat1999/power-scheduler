@@ -245,27 +245,35 @@ class JobSchedulerActor(
         var pageNo = 1
         do {
             val pageQuery = PageQuery(pageNo = pageNo++, pageSize = 200)
-            val jobInstancePage = jobInstanceRepository.listDispatchable(
+            val jobInstanceIdPage = jobInstanceRepository.listDispatchable(
                 jobIds = jobIds,
                 pageQuery = pageQuery
             )
-            if (jobInstancePage.isEmpty()) {
+            if (jobInstanceIdPage.isEmpty()) {
                 break
             }
-            val jobInstances = jobInstancePage.content
-            val appCodes = jobInstances.mapNotNull { it.appCode }
-            val appCode2AvailableWorkers = workerRegistryRepository.findAllByAppCodes(appCodes)
-
-            jobInstances.forEach { jobInstance ->
-                val workerRegistries = appCode2AvailableWorkers[jobInstance.appCode!!].orEmpty()
-                val tasks = doCreateTasks(jobInstance, workerRegistries)
-                jobInstance.jobStatus = JobStatusEnum.WAITING_DISPATCH
+            val jobInstanceIds = jobInstanceIdPage.content
+            val appCode2AvailableWorkers = mutableMapOf<String, List<WorkerRegistry>>()
+            jobInstanceIds.forEach { jobInstanceId ->
                 transactionTemplate.executeWithoutResult {
+                    val jobInstance = jobInstanceRepository.lockById(jobInstanceId)
+                    if (jobInstance == null) {
+                        return@executeWithoutResult
+                    }
+                    if (jobInstance.jobStatus != JobStatusEnum.WAITING_SCHEDULE) {
+                        return@executeWithoutResult
+                    }
+                    val appCode = jobInstance.appCode!!
+                    val workerRegistries = appCode2AvailableWorkers.computeIfAbsent(appCode) { appCode ->
+                        workerRegistryRepository.findAllByAppCode(appCode)
+                    }
+                    jobInstance.jobStatus = JobStatusEnum.WAITING_DISPATCH
+                    val tasks = doCreateTasks(jobInstance, workerRegistries)
                     jobInstanceRepository.save(jobInstance)
                     taskRepository.saveAll(tasks)
                 }
             }
-        } while (jobInstancePage.isNotEmpty())
+        } while (jobInstanceIdPage.isNotEmpty())
     }
 
     private fun doCreateTasks(jobInstance: JobInstance, availableWorkers: List<WorkerRegistry>): List<Task> {
