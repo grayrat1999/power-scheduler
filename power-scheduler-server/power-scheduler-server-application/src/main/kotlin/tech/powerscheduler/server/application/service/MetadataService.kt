@@ -41,7 +41,7 @@ class MetadataService {
     private fun buildOption(option: BaseEnum): MetadataDTO? {
         // 未完成的功能暂时不展示给前端
         if (option is ExecuteModeEnum) {
-            if (option in setOf(ExecuteModeEnum.BROADCAST, ExecuteModeEnum.MAP_REDUCE)) {
+            if (option in setOf(ExecuteModeEnum.MAP_REDUCE)) {
                 return null
             }
         }

@@ -1,6 +1,7 @@
 package tech.powerscheduler.server.domain.jobinfo
 
 import tech.powerscheduler.common.enums.*
+import tech.powerscheduler.common.enums.ExecuteModeEnum.*
 import tech.powerscheduler.common.enums.ScheduleTypeEnum.*
 import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.domain.appgroup.AppGroup
@@ -108,6 +109,16 @@ class JobInfo {
     var attemptInterval: Int? = null
 
     /**
+     * 子任务最大重试次数
+     */
+    var taskMaxAttemptCnt: Int? = null
+
+    /**
+     * 子任务重试间隔(s)
+     */
+    var taskAttemptInterval: Int? = null
+
+    /**
      * 优先级
      */
     var priority: Int? = null
@@ -171,6 +182,8 @@ class JobInfo {
             it.attemptCnt = 0
             it.maxAttemptCnt = this.maxAttemptCnt ?: 1
             it.attemptInterval = this.attemptInterval
+            it.taskMaxAttemptCnt = this.taskMaxAttemptCnt
+            it.taskAttemptInterval = this.taskAttemptInterval
             it.priority = this.priority
             it.scheduleAt = this.nextScheduleAt
         }
@@ -253,6 +266,21 @@ class JobInfo {
             }
 
             null -> throw BizException("调度类型不能为null")
+        }
+
+        when (executeMode) {
+            SINGLE -> {}
+
+            BROADCAST, MAP_REDUCE -> {
+                if (taskMaxAttemptCnt == null || taskMaxAttemptCnt!! < 0) {
+                    throw BizException("子任务最大重试次数必须为非负数")
+                }
+                if (taskAttemptInterval == null || taskAttemptInterval!! < 0) {
+                    throw BizException("子任务重试间隔必须为非负数")
+                }
+            }
+
+            null -> throw BizException("执行模式不能为null")
         }
     }
 

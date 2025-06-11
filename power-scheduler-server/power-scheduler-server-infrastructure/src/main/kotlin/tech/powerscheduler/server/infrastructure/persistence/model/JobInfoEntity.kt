@@ -1,11 +1,7 @@
 package tech.powerscheduler.server.infrastructure.persistence.model
 
 import jakarta.persistence.*
-import tech.powerscheduler.common.enums.ExecuteModeEnum
-import tech.powerscheduler.common.enums.JobTypeEnum
-import tech.powerscheduler.common.enums.RetentionPolicyEnum
-import tech.powerscheduler.common.enums.ScheduleTypeEnum
-import tech.powerscheduler.common.enums.ScriptTypeEnum
+import tech.powerscheduler.common.enums.*
 import java.time.LocalDateTime
 
 /**
@@ -120,6 +116,24 @@ class JobInfoEntity : BaseEntity() {
     var maxAttemptCnt: Int? = null
 
     /**
+     * 重试间隔(s)
+     */
+    @Column(name = "attempt_interval")
+    var attemptInterval: Int? = null
+
+    /**
+     * 子任务最大重试次数
+     */
+    @Column(name = "task_max_attempt_cnt")
+    var taskMaxAttemptCnt: Int? = null
+
+    /**
+     * 子任务重试间隔(s)
+     */
+    @Column(name = "task_attempt_interval")
+    var taskAttemptInterval: Int? = null
+
+    /**
      * 优先级
      */
     @Column(name = "priority")
@@ -130,12 +144,6 @@ class JobInfoEntity : BaseEntity() {
      */
     @Column(name = "last_completed_at", insertable = false)
     var lastCompletedAt: LocalDateTime? = null
-
-    /**
-     * 重试间隔(s)
-     */
-    @Column(name = "attempt_interval")
-    var attemptInterval: Int? = null
 
     /**
      * 调度器地址

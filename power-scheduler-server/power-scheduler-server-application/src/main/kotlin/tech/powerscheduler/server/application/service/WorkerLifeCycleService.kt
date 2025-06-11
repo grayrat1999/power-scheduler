@@ -113,7 +113,7 @@ class WorkerLifeCycleService(
             return
         }
         if (task.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
-            log.info("updateProgress cancel, jobInstance [{}] is already completed", taskId.value)
+            log.info("updateProgress cancel, task [{}] is already completed", taskId.value)
             return
         }
         task.apply {
@@ -132,9 +132,9 @@ class WorkerLifeCycleService(
                 task.resetStatusForReattempt()
             }
             taskRepository.save(task)
+            log.info("task update successfully: id={}, status={}", taskId.value, task.jobStatus)
             applicationEventPublisher.publishEvent(taskStatusChangeEvent)
         }
-        log.info("task update successfully: id={}, status={}", taskId.value, task.jobStatus)
     }
 
     fun removeWorkerRegistry(workerRegistry: WorkerRegistry) {

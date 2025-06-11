@@ -148,6 +148,18 @@ class JobInstanceEntity() : BaseEntity() {
     var maxAttemptCnt: Int? = null
 
     /**
+     * 子任务最大重试次数
+     */
+    @Column(name = "task_max_attempt_cnt")
+    var taskMaxAttemptCnt: Int? = null
+
+    /**
+     * 子任务重试间隔(s)
+     */
+    @Column(name = "task_attempt_interval")
+    var taskAttemptInterval: Int? = null
+
+    /**
      * 优先级
      */
     @Column(name = "priority", updatable = false)

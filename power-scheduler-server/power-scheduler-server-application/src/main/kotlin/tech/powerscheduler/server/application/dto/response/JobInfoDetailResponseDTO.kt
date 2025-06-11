@@ -1,6 +1,5 @@
 package tech.powerscheduler.server.application.dto.response
 
-import tech.powerscheduler.common.enums.RetentionPolicyEnum
 import java.time.LocalDateTime
 
 /**
@@ -94,6 +93,16 @@ class JobInfoDetailResponseDTO {
      * 重试间隔(s)
      */
     var attemptInterval: Int? = null
+
+    /**
+     * 子任务最大重试次数
+     */
+    var taskMaxAttemptCnt: Int? = null
+
+    /**
+     * 子任务重试间隔(s)
+     */
+    var taskAttemptInterval: Int? = null
 
     /**
      * 优先级

@@ -73,6 +73,7 @@ class JobInstanceService(
             }
 
             FAILED, SUCCESS, CANCELED -> throw BizException("终止任务失败: 任务已经完成")
+            UNKNOWN -> throw BizException("出现未知状态")
         }
     }
 
