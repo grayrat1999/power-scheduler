@@ -56,7 +56,7 @@ class JobInstanceEntity() : BaseEntity() {
      * 任务类型
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "job_type", nullable = false)
+    @Column(name = "job_type", nullable = false, updatable = false)
     var jobType: JobTypeEnum? = null
 
     /**
@@ -126,13 +126,13 @@ class JobInstanceEntity() : BaseEntity() {
      * 脚本类型
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "script_type")
+    @Column(name = "script_type", updatable = false)
     var scriptType: ScriptTypeEnum? = null
 
     /**
      * 脚本源代码
      */
-    @Column(name = "script_code")
+    @Column(name = "script_code", updatable = false)
     var scriptCode: String? = null
 
     /**
@@ -144,12 +144,12 @@ class JobInstanceEntity() : BaseEntity() {
     /**
      * 最大重试次数
      */
-    @Column(name = "max_attempt_cnt", nullable = false)
+    @Column(name = "max_attempt_cnt", nullable = false, updatable = false)
     var maxAttemptCnt: Int? = null
 
     /**
      * 优先级
      */
-    @Column(name = "priority")
+    @Column(name = "priority", updatable = false)
     var priority: Int? = null
 }
