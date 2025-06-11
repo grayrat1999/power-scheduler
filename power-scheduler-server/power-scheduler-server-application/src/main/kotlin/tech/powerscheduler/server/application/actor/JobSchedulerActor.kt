@@ -190,10 +190,11 @@ class JobSchedulerActor(
             val availableWorkers = workerRegistryRepository.findAllByAppCode(appCode!!)
             if (availableWorkers.isEmpty()) {
                 jobInfoToSchedule.apply {
-                    this.updateNextScheduleTime()
-                    // 如果是固定延迟的调度模式, 以当前时间为基准设置下次调度时间
+                    // 固定延迟的调度模式由于调度取消无法更新上次完成时间, 所以用本次调度时间为基准设置下次调度时间
                     if (scheduleType == ScheduleTypeEnum.FIX_DELAY) {
-                        this.nextScheduleAt = now.plusSeconds(this.scheduleConfig!!.toLong())
+                        this.nextScheduleAt = this.nextScheduleAt!!.plusSeconds(this.scheduleConfig!!.toLong())
+                    } else {
+                        this.updateNextScheduleTime()
                     }
                 }
                 jobInfoRepository.save(jobInfoToSchedule)
@@ -208,7 +209,17 @@ class JobSchedulerActor(
             val jobInstance = jobInfoToSchedule.createInstance()
             jobInstance.jobStatus = JobStatusEnum.WAITING_SCHEDULE
             jobInstance.schedulerAddress = currentServerAddress
-            jobInfoToSchedule.updateNextScheduleTime()
+            jobInfoToSchedule.apply {
+                /*
+                    对于固定延迟的调度模式, 先以本次调度时间为基准设置下次调度时间(避免本次调度的任务完成前, 调度方法总是将任务查出来)
+                    在任务完成后再真正更新下次调度时间，之所以可以这么做是: 任务完成时间 + 固定延迟 > 任务调度时间 + 固定延迟
+                 */
+                if (scheduleType == ScheduleTypeEnum.FIX_DELAY) {
+                    this.nextScheduleAt = this.nextScheduleAt!!.plusSeconds(this.scheduleConfig!!.toLong())
+                } else {
+                    updateNextScheduleTime()
+                }
+            }
 
             jobInfoRepository.save(jobInfoToSchedule)
             jobInstanceRepository.save(jobInstance)
