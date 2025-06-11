@@ -148,7 +148,11 @@ class TaskDispatcherActor(
     }
 
     fun dispatchOne(task: Task, candidateWorkers: Set<String>) {
-        val jobInstance = jobInstanceRepository.findById(task.jobInstanceId!!)!!
+        val jobInstance = jobInstanceRepository.findById(task.jobInstanceId!!)
+        if (jobInstance == null) {
+            log.warn("jobInstance with id [{}] not found", task.jobInstanceId?.value)
+            return
+        }
         if (candidateWorkers.isEmpty()
             || (task.executeMode == ExecuteModeEnum.BROADCAST && candidateWorkers.contains(task.workerAddress).not())
         ) {
