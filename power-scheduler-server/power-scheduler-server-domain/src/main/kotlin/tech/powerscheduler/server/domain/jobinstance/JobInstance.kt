@@ -195,8 +195,6 @@ class JobInstance {
             it.processor = this.processor
             it.jobStatus = JobStatusEnum.WAITING_DISPATCH
             it.scheduleAt = this.scheduleAt
-            it.startAt = this.startAt
-            it.endAt = this.endAt
             it.executeParams = this.executeParams
             it.executeMode = this.executeMode
             it.scheduleType = this.scheduleType
@@ -204,12 +202,20 @@ class JobInstance {
             it.dataTime = this.dataTime
             it.scriptType = this.scriptType
             it.scriptCode = this.scriptCode
-            it.attemptCnt = this.attemptCnt
-            it.maxAttemptCnt = this.maxAttemptCnt
-            it.attemptInterval = this.attemptInterval
             it.priority = this.priority
             it.schedulerAddress = this.schedulerAddress
             it.workerAddress = workerAddress
+            it.batch = this.attemptCnt
+            when (this.executeMode!!) {
+                SINGLE -> {
+                    it.attemptCnt = 0
+                    it.maxAttemptCnt = 0
+                    it.attemptInterval = 0
+                }
+
+                BROADCAST -> TODO()
+                MAP_REDUCE -> TODO()
+            }
         }
         return task
     }
@@ -218,20 +224,26 @@ class JobInstance {
         if (this.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
             return this.jobStatus!!
         }
-        return when (this.executeMode) {
-            SINGLE -> tasks.first().jobStatus!!
+        val maxBatch = tasks.maxOfOrNull { it.batch!! }
+        return when (this.executeMode!!) {
+            SINGLE -> tasks.first { it.batch == maxBatch }.jobStatus!!
             BROADCAST -> TODO()
             MAP_REDUCE -> TODO()
-            null -> TODO()
         }
     }
 
     fun calculateStartAt(tasks: Iterable<Task>): LocalDateTime? {
-        return tasks.mapNotNull { it.startAt }.minOrNull()
+        return tasks.asSequence()
+            .mapNotNull { it.startAt }
+            .minOrNull()
     }
 
     fun calculateEndAt(tasks: Iterable<Task>): LocalDateTime? {
-        return tasks.mapNotNull { it.endAt }.maxOrNull()
+        val maxBatch = tasks.maxOfOrNull { it.batch!! }
+        return tasks.asSequence()
+            .filter { it.batch == maxBatch }
+            .mapNotNull { it.endAt }
+            .maxOrNull()
     }
 
     fun terminate() {

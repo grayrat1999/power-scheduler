@@ -217,6 +217,7 @@ fun Task.toEntity(): TaskEntity {
         it.attemptCnt = this.attemptCnt
         it.maxAttemptCnt = this.maxAttemptCnt
         it.priority = this.priority
+        it.batch = this.batch
     }
 }
 
@@ -245,6 +246,7 @@ fun TaskEntity.toDomainModel(): Task {
         it.attemptCnt = this.attemptCnt
         it.maxAttemptCnt = this.maxAttemptCnt
         it.priority = this.priority
+        it.batch = this.batch
     }
 }
 
