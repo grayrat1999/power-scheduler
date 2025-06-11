@@ -38,3 +38,6 @@ power-scheduler-server:
     # 节点通信端口
     remote-port: ${AKKA_REMOTE_PORT:25258}
 
+logging:
+  file:
+    name: logs/app.log
