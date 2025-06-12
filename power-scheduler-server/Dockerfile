@@ -3,10 +3,15 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 ENV TZ=Asia/Shanghai
-ENV JVM_OPTIONS=""
+ENV JVM_OPTIONS="\
+-XX:+HeapDumpOnOutOfMemoryError \
+-XX:HeapDumpPath=/app/dump \
+-Xlog:gc*,safepoint:file=/app/logs/gc.log:time,level,tags \
+"
 ENV ARGS=""
 
-RUN apt update && \
+RUN mkdir /app/logs && \
+    apt update && \
     apt install -y vim-tiny iputils-ping curl tini && \
     apt clean
 
