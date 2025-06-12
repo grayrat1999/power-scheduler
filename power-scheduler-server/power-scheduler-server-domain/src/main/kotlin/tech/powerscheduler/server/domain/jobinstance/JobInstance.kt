@@ -168,6 +168,13 @@ class JobInstance {
     val canReattempt
         get() = this.attemptCnt!! < this.maxAttemptCnt!!
 
+    fun markFailed(message: String? = null) {
+        this.startAt = this.startAt ?: LocalDateTime.now()
+        this.endAt = LocalDateTime.now()
+        this.jobStatus = JobStatusEnum.FAILED
+        this.message = message?.take(2000)
+    }
+
     fun resetStatusForReattempt() {
         this.scheduleAt = LocalDateTime.now().plusSeconds(this.attemptInterval?.toLong() ?: 15)
         this.startAt = null
