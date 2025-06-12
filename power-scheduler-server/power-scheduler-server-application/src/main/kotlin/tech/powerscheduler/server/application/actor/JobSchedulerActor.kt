@@ -267,6 +267,15 @@ class JobSchedulerActor(
                     val workerRegistries = appCode2AvailableWorkers.computeIfAbsent(appCode) { appCode ->
                         workerRegistryRepository.findAllByAppCode(appCode)
                     }
+                    if (workerRegistries.isEmpty()) {
+                        if (jobInstance.canReattempt) {
+                            jobInstance.resetStatusForReattempt()
+                        } else {
+                            jobInstance.markFailed(message = "no available workers")
+                        }
+                        jobInstanceRepository.save(jobInstance)
+                        return@executeWithoutResult
+                    }
                     jobInstance.jobStatus = JobStatusEnum.WAITING_DISPATCH
                     val tasks = doCreateTasks(jobInstance, workerRegistries)
                     jobInstanceRepository.save(jobInstance)

@@ -150,7 +150,7 @@ class WorkerLifeCycleService(
                 if (it.canReattempt) {
                     it.resetStatusForReattempt()
                 } else {
-                    it.markFailedWhenWorkerOffline()
+                    it.markFailed(message = "worker is offline")
                 }
             }
             workerRegistryRepository.delete(existWorkerRegistry.id!!)

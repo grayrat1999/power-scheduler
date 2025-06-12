@@ -143,9 +143,7 @@ class Task {
         get() = JobStatusEnum.COMPLETED_STATUSES.contains(this.jobStatus)
 
     fun markFailed(message: String? = null) {
-        if (this.startAt == null) {
-            this.startAt = LocalDateTime.now()
-        }
+        this.startAt = this.startAt ?: LocalDateTime.now()
         this.endAt = LocalDateTime.now()
         this.jobStatus = JobStatusEnum.FAILED
         this.message = message?.take(2000)
@@ -157,13 +155,6 @@ class Task {
         this.endAt = null
         this.scheduleAt = LocalDateTime.now().plusSeconds(this.attemptInterval?.toLong() ?: 15)
         this.attemptCnt = this.attemptCnt!! + 1
-    }
-
-    fun markFailedWhenWorkerOffline() {
-        this.jobStatus = JobStatusEnum.FAILED
-        this.startAt = this.startAt ?: LocalDateTime.now()
-        this.endAt = LocalDateTime.now()
-        this.message = "worker is offline"
     }
 
     fun terminate() {
