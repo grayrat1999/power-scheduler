@@ -23,15 +23,15 @@ class TaskStatusChangeEventListener(
     @EventListener
     fun onTaskStatusChange(event: TaskStatusChangeEvent) {
         when (event.executeMode) {
-            SINGLE -> updateJobInstanceProgressNow(event)
-            BROADCAST, MAP_REDUCE -> persistentTask(event)
+            SINGLE, BROADCAST -> updateJobInstanceProgressNow(event)
+            MAP_REDUCE -> persistentEvent(event)
         }
     }
 
-    fun persistentTask(event: TaskStatusChangeEvent) {
+    fun persistentEvent(event: TaskStatusChangeEvent) {
         val domainEvent = DomainEvent().apply {
             this.eventStatus = DomainEventStatusEnum.PENDING
-            this.aggregateId = "Task-${event.taskId}"
+            this.aggregateId = "Task-${event.taskId.value}"
             this.eventType = DomainEventTypeEnum.TASK_STATUS_CHANGED
             this.payload = ""
             this.retryCnt = 0

@@ -31,14 +31,9 @@ class JobInfoAssembler {
             this.scheduleConfig = jobInfo.scheduleConfig
             this.processor = jobInfo.processor
             this.executeMode = jobInfo.executeMode.toDTO()
-            this.executeParams = jobInfo.executeParams
             this.nextScheduleAt = jobInfo.nextScheduleAt
             this.enabled = jobInfo.enabled
-            this.maxConcurrentNum = jobInfo.maxConcurrentNum
             this.scriptType = jobInfo.scriptType.toDTO()
-            this.scriptCode = jobInfo.scriptCode
-            this.maxAttemptCnt = jobInfo.maxAttemptCnt
-            this.priority = jobInfo.priority
             this.createdBy = jobInfo.createdBy
             this.createdAt = jobInfo.createdAt
             this.updatedBy = jobInfo.updatedBy
@@ -73,6 +68,8 @@ class JobInfoAssembler {
             this.scriptCode = jobInfo.scriptCode
             this.maxAttemptCnt = jobInfo.maxAttemptCnt
             this.attemptInterval = jobInfo.attemptInterval
+            this.taskMaxAttemptCnt = jobInfo.taskMaxAttemptCnt
+            this.taskAttemptInterval = jobInfo.taskAttemptInterval
             this.priority = jobInfo.priority
             this.retentionPolicy = jobInfo.retentionPolicy.toDTO()
             this.retentionValue = jobInfo.retentionValue
@@ -108,6 +105,8 @@ class JobInfoAssembler {
             this.priority = param.priority
             this.retentionPolicy = param.retentionPolicy
             this.retentionValue = param.retentionValue
+            this.taskMaxAttemptCnt = param.taskMaxAttemptCnt
+            this.taskAttemptInterval = param.taskAttemptInterval
         }
     }
 
@@ -138,6 +137,8 @@ class JobInfoAssembler {
             this.nextScheduleAt = null
             this.retentionPolicy = param.retentionPolicy
             this.retentionValue = param.retentionValue
+            this.taskMaxAttemptCnt = param.taskMaxAttemptCnt
+            this.taskAttemptInterval = param.taskAttemptInterval
         }
     }
 

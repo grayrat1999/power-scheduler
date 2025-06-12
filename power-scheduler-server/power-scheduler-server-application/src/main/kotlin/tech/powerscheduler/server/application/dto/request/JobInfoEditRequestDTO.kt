@@ -1,16 +1,8 @@
 package tech.powerscheduler.server.application.dto.request
 
 
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Positive
-import jakarta.validation.constraints.PositiveOrZero
-import tech.powerscheduler.common.enums.ExecuteModeEnum
-import tech.powerscheduler.common.enums.JobTypeEnum
-import tech.powerscheduler.common.enums.RetentionPolicyEnum
-import tech.powerscheduler.common.enums.ScheduleTypeEnum
-import tech.powerscheduler.common.enums.ScriptTypeEnum
+import jakarta.validation.constraints.*
+import tech.powerscheduler.common.enums.*
 
 /**
  * 任务编辑请求参数
@@ -87,22 +79,32 @@ class JobInfoEditRequestDTO {
     var scriptCode: String? = null
 
     /**
-     * 最大重试次数
-     */
-    @PositiveOrZero
-    var maxAttemptCnt: Int = 0
-
-    /**
      * 优先级
      */
     @PositiveOrZero
     var priority: Int = 1
 
     /**
+     * 最大重试次数
+     */
+    @PositiveOrZero
+    var maxAttemptCnt: Int = 0
+
+    /**
      * 重试间隔(s)
      */
     @PositiveOrZero
-    var attemptInterval: Int? = null
+    var attemptInterval: Int? = 15
+
+    /**
+     * 子任务最大重试次数
+     */
+    var taskMaxAttemptCnt: Int? = 0
+
+    /**
+     * 子任务重试间隔(s)
+     */
+    var taskAttemptInterval: Int? = 15
 
     /**
      * 保留策略
