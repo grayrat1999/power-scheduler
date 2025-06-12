@@ -136,6 +136,11 @@ class JobInstance {
     var priority: Int? = null
 
     /**
+     * worker地址(指定机器运行时使用)
+     */
+    var workerAddress: String? = null
+
+    /**
      * 调度器地址
      */
     var schedulerAddress: String? = null
@@ -214,7 +219,12 @@ class JobInstance {
             it.scriptCode = this.scriptCode
             it.priority = this.priority
             it.schedulerAddress = this.schedulerAddress
-            it.workerAddress = workerAddress
+            it.workerAddress = if (this.executeMode == SINGLE && this.workerAddress.orEmpty().isNotEmpty()) {
+                // 单机模式支持指定机器运行
+                this.workerAddress
+            } else {
+                workerAddress
+            }
             it.batch = this.attemptCnt
             it.attemptCnt = 0
             when (this.executeMode!!) {

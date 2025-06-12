@@ -82,6 +82,7 @@ class JobInstanceService(
             ?: throw BizException(message = "运行任务失败: 任务不存在")
         val jobInstance = jobInfo.createInstance().apply {
             this.dataTime = param.dataTime
+            this.workerAddress = param.workerAddress
             this.executeParams = param.executeParams
             this.maxAttemptCnt = 0
             this.scheduleAt = LocalDateTime.now()
