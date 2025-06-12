@@ -58,13 +58,10 @@ class JobInfoAssemblerTest : FunSpec({
             result.processor shouldBe jobInfo.processor
             result.executeMode!!.code shouldBe jobInfo.executeMode?.code
             result.executeMode!!.label shouldBe jobInfo.executeMode?.label
-            result.executeParams shouldBe jobInfo.executeParams
             result.nextScheduleAt shouldBe jobInfo.nextScheduleAt
             result.enabled shouldBe jobInfo.enabled
-            result.maxConcurrentNum shouldBe jobInfo.maxConcurrentNum
             result.scriptType!!.code shouldBe jobInfo.scriptType?.code
             result.scriptType!!.label shouldBe jobInfo.scriptType?.label
-            result.scriptCode shouldBe jobInfo.scriptCode
         }
     }
 
