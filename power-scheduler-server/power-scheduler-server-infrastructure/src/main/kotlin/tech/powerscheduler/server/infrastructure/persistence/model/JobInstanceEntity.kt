@@ -41,6 +41,12 @@ class JobInstanceEntity() : BaseEntity() {
     var appCode: String? = null
 
     /**
+     * worker地址(指定机器运行时使用)
+     */
+    @Column(name = "worker_address", updatable = false)
+    var workerAddress: String? = null
+
+    /**
      * 调度端ip
      */
     @Column(name = "scheduler_address")

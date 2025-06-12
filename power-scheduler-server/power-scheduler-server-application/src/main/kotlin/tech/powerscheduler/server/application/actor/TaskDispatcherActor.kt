@@ -21,6 +21,7 @@ import tech.powerscheduler.server.application.utils.hostPort
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
+import tech.powerscheduler.server.domain.jobinstance.JobInstance
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
 import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskRepository
@@ -176,7 +177,7 @@ class TaskDispatcherActor(
             return
         }
 
-        val targetWorker = selectWorker(task, candidateWorkers)
+        val targetWorker = selectWorker(task, jobInstance, candidateWorkers)
         task.workerAddress = targetWorker
         task.schedulerAddress = context.system.hostPort()
         task.jobStatus = JobStatusEnum.DISPATCHING
@@ -211,18 +212,26 @@ class TaskDispatcherActor(
 
     private fun selectWorker(
         task: Task,
+        jobInstance: JobInstance,
         candidateWorkers: Set<String>
-    ): String = if (task.executeMode != ExecuteModeEnum.BROADCAST) {
-        if (task.attemptCnt!! > 0 && candidateWorkers.size > 1) {
-            // 如果上次任务派发失败了，本次就换个节点派发
-            (candidateWorkers - task.workerAddress.orEmpty()).random()
-        } else {
-            // 如果是首次派发，或者就只有一个节点，那就只能派发到该节点
-            candidateWorkers.random()
+    ): String {
+        val specifiedWorkerAddress = jobInstance.workerAddress
+        if (specifiedWorkerAddress.orEmpty().isNotBlank()) {
+            // 使用用户指定的运行机器
+            return specifiedWorkerAddress!!
         }
-    } else {
-        // 广播任务不能换节点
-        task.workerAddress.orEmpty()
+        return if (task.executeMode != ExecuteModeEnum.BROADCAST) {
+            if (task.attemptCnt!! > 0 && candidateWorkers.size > 1) {
+                // 如果上次任务派发失败了，本次就换个节点派发
+                (candidateWorkers - task.workerAddress.orEmpty()).random()
+            } else {
+                // 如果是首次派发，或者就只有一个节点，那就只能派发到该节点
+                candidateWorkers.random()
+            }
+        } else {
+            // 广播任务不能换节点
+            task.workerAddress.orEmpty()
+        }
     }
 
     fun publishTaskStatusChangeEvent(task: Task) {
