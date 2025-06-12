@@ -31,14 +31,9 @@ class JobInfoAssembler {
             this.scheduleConfig = jobInfo.scheduleConfig
             this.processor = jobInfo.processor
             this.executeMode = jobInfo.executeMode.toDTO()
-            this.executeParams = jobInfo.executeParams
             this.nextScheduleAt = jobInfo.nextScheduleAt
             this.enabled = jobInfo.enabled
-            this.maxConcurrentNum = jobInfo.maxConcurrentNum
             this.scriptType = jobInfo.scriptType.toDTO()
-            this.scriptCode = jobInfo.scriptCode
-            this.maxAttemptCnt = jobInfo.maxAttemptCnt
-            this.priority = jobInfo.priority
             this.createdBy = jobInfo.createdBy
             this.createdAt = jobInfo.createdAt
             this.updatedBy = jobInfo.updatedBy

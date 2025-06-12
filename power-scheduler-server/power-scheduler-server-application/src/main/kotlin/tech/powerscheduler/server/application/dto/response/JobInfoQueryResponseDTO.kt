@@ -65,11 +65,6 @@ class JobInfoQueryResponseDTO {
     var executeMode: ExecuteModeDTO? = null
 
     /**
-     * 执行参数
-     */
-    var executeParams: String? = null
-
-    /**
      * 下次触发时间
      */
     var nextScheduleAt: LocalDateTime? = null
@@ -80,29 +75,9 @@ class JobInfoQueryResponseDTO {
     var enabled: Boolean? = null
 
     /**
-     * 任务并发数
-     */
-    var maxConcurrentNum: Int? = null
-
-    /**
      * 脚本类型
      */
     var scriptType: ScriptTypeDTO? = null
-
-    /**
-     * 脚本源代码
-     */
-    var scriptCode: String? = null
-
-    /**
-     * 最大重试次数
-     */
-    var maxAttemptCnt: Int? = null
-
-    /**
-     * 优先级
-     */
-    var priority: Int? = null
 
     /**
      * 创建人
