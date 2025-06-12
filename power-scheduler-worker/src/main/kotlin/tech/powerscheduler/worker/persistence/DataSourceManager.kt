@@ -14,14 +14,14 @@ import java.sql.Connection
  */
 object DataSourceManager {
 
-    private const val DATA_FILE = "data"
+    private val DB_FILE = System.getenv("DB_FILE") ?: "data"
 
     private val hikariConfig = HikariConfig().apply {
-        jdbcUrl = "jdbc:h2:file:${H2_DIR}/${DATA_FILE};DB_CLOSE_ON_EXIT=FALSE"
+        jdbcUrl = "jdbc:h2:file:${H2_DIR}/${DB_FILE};DB_CLOSE_ON_EXIT=FALSE"
         username = "sa"
         password = ""
         driverClassName = "org.h2.Driver"
-        maximumPoolSize = 10
+        maximumPoolSize = 20
         minimumIdle = 2
         idleTimeout = 60000
         connectionTimeout = 2000
@@ -36,7 +36,7 @@ object DataSourceManager {
 
     fun closeDataSource() {
         dataSource.close()
-        val dbFilePath = "${H2_DIR}/${DATA_FILE}.mv.db"
+        val dbFilePath = "${H2_DIR}/${DB_FILE}.mv.db"
         val dbFile = File(dbFilePath)
         dbFile.delete()
     }
