@@ -17,7 +17,7 @@ class WorkerRegistryAssembler {
     fun toDomainModel4RegisterRequestDTO(param: WorkerRegisterRequestDTO, remoteHost: String): WorkerRegistry {
         return WorkerRegistry().apply {
             this.appCode = param.appCode
-            this.host = param.host ?: remoteHost
+            this.host = param.host.takeUnless { it.isNullOrBlank() } ?: remoteHost
             this.port = param.port
             this.accessToken = UUID.randomUUID().toString()
             this.lastHeartbeatAt = LocalDateTime.now()
