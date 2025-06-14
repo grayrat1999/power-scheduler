@@ -49,7 +49,7 @@ class Task {
     /**
      * 任务状态
      */
-    var jobStatus: JobStatusEnum? = null
+    var taskStatus: JobStatusEnum? = null
 
     /**
      * 调度时间
@@ -140,17 +140,17 @@ class Task {
         get() = this.attemptCnt!! < this.maxAttemptCnt!!
 
     val isCompleted
-        get() = JobStatusEnum.COMPLETED_STATUSES.contains(this.jobStatus)
+        get() = JobStatusEnum.COMPLETED_STATUSES.contains(this.taskStatus)
 
     fun markFailed(message: String? = null) {
         this.startAt = this.startAt ?: LocalDateTime.now()
         this.endAt = LocalDateTime.now()
-        this.jobStatus = JobStatusEnum.FAILED
+        this.taskStatus = JobStatusEnum.FAILED
         this.message = message?.take(2000)
     }
 
     fun resetStatusForReattempt() {
-        this.jobStatus = JobStatusEnum.WAITING_DISPATCH
+        this.taskStatus = JobStatusEnum.WAITING_DISPATCH
         this.startAt = null
         this.endAt = null
         this.scheduleAt = LocalDateTime.now().plusSeconds(this.attemptInterval?.toLong() ?: 15)
@@ -164,6 +164,6 @@ class Task {
         if (this.endAt == null) {
             this.endAt = LocalDateTime.now()
         }
-        this.jobStatus = JobStatusEnum.CANCELED
+        this.taskStatus = JobStatusEnum.CANCELED
     }
 }

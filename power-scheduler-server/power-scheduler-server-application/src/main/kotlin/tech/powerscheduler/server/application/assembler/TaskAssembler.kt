@@ -20,7 +20,7 @@ class TaskAssembler {
             it.jobName = domainModel.jobName
             it.jobType = domainModel.jobType
             it.processor = domainModel.processor
-            it.jobStatus = domainModel.jobStatus
+            it.jobStatus = domainModel.taskStatus
             it.executeParams = domainModel.executeParams
             it.scheduleAt = domainModel.scheduleAt
             it.executeMode = domainModel.executeMode

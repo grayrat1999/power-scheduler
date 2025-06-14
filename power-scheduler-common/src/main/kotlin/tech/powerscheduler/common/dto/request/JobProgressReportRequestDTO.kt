@@ -25,7 +25,7 @@ class JobProgressReportRequestDTO {
      * 任务状态
      */
     @NotNull
-    var jobStatus: JobStatusEnum? = null
+    var taskStatus: JobStatusEnum? = null
 
     /**
      * 开始时间

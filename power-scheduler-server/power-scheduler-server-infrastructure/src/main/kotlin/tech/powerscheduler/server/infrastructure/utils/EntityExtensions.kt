@@ -213,7 +213,7 @@ fun Task.toEntity(): TaskEntity {
         it.jobName = this.jobName
         it.jobType = this.jobType
         it.processor = this.processor
-        it.jobStatus = this.jobStatus
+        it.jobStatus = this.taskStatus
         it.scheduleAt = this.scheduleAt
         it.startAt = this.startAt
         it.endAt = this.endAt
@@ -242,7 +242,7 @@ fun TaskEntity.toDomainModel(): Task {
         it.jobName = this.jobName
         it.jobType = this.jobType
         it.processor = this.processor
-        it.jobStatus = this.jobStatus
+        it.taskStatus = this.jobStatus
         it.scheduleAt = this.scheduleAt
         it.startAt = this.startAt
         it.endAt = this.endAt

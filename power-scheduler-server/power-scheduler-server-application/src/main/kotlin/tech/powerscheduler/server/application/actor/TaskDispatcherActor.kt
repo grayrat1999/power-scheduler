@@ -180,7 +180,7 @@ class TaskDispatcherActor(
         val targetWorker = selectWorker(task, jobInstance, candidateWorkers)
         task.workerAddress = targetWorker
         task.schedulerAddress = context.system.hostPort()
-        task.jobStatus = JobStatusEnum.DISPATCHING
+        task.taskStatus = JobStatusEnum.DISPATCHING
         transactionTemplate.executeWithoutResult {
             taskRepository.save(task)
             if (jobInstance.jobStatus == JobStatusEnum.WAITING_DISPATCH) {
