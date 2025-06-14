@@ -1,7 +1,6 @@
 package tech.powerscheduler.server.application.assembler
 
 import org.springframework.stereotype.Component
-import tech.powerscheduler.common.dto.request.JobDispatchRequestDTO
 import tech.powerscheduler.server.application.dto.request.JobInstanceQueryRequestDTO
 import tech.powerscheduler.server.application.dto.response.JobInstanceDetailResponseDTO
 import tech.powerscheduler.server.application.dto.response.JobInstanceQueryResponseDTO
@@ -82,26 +81,6 @@ class JobInstanceAssembler {
             this.scriptCode = domainModel.scriptCode
             this.attemptCnt = domainModel.attemptCnt
             this.priority = domainModel.priority
-        }
-    }
-
-    fun toDispatchJobRequestDTO(domainModel: JobInstance): JobDispatchRequestDTO {
-        return JobDispatchRequestDTO().also {
-            it.jobId = domainModel.jobId!!.value
-            it.jobInstanceId = domainModel.id!!.value
-            it.appCode = domainModel.appCode
-            it.jobName = domainModel.jobName
-            it.jobType = domainModel.jobType
-            it.processor = domainModel.processor
-            it.jobStatus = domainModel.jobStatus
-            it.executeParams = domainModel.executeParams
-            it.scheduleAt = domainModel.scheduleAt
-            it.executeMode = domainModel.executeMode
-            it.dataTime = domainModel.dataTime
-            it.scriptType = domainModel.scriptType
-            it.scriptCode = domainModel.scriptCode
-            it.attemptCnt = domainModel.attemptCnt
-            it.priority = domainModel.priority ?: 0
         }
     }
 
