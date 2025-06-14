@@ -100,7 +100,7 @@ class JobProgressReportService(
             this.taskId = latestJobProgress.taskId
             this.startAt = latestJobProgress.startAt
             this.endAt = latestJobProgress.endAt
-            this.jobStatus = latestJobProgress.status
+            this.taskStatus = latestJobProgress.status
             this.message = latestJobProgress.message
             this.appCode = workerRegisterService.appCode
             this.accessToken = workerRegisterService.accessToken

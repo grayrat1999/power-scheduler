@@ -11,7 +11,7 @@ import tech.powerscheduler.server.domain.task.Task
 @Component
 class TaskAssembler {
 
-    fun toDispatchTaskRequestDTO(domainModel: Task): JobDispatchRequestDTO {
+    fun toTaskDispatchRequestDTO(domainModel: Task): JobDispatchRequestDTO {
         return JobDispatchRequestDTO().also {
             it.jobId = domainModel.jobId!!.value
             it.jobInstanceId = domainModel.jobInstanceId!!.value
@@ -20,7 +20,7 @@ class TaskAssembler {
             it.jobName = domainModel.jobName
             it.jobType = domainModel.jobType
             it.processor = domainModel.processor
-            it.jobStatus = domainModel.jobStatus
+            it.jobStatus = domainModel.taskStatus
             it.executeParams = domainModel.executeParams
             it.scheduleAt = domainModel.scheduleAt
             it.executeMode = domainModel.executeMode
