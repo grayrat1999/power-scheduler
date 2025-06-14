@@ -105,8 +105,14 @@ class JobInstanceService(
 
     fun queryProgress(param: JobProgressQueryRequestDTO): PageDTO<JobProgressQueryResponseDTO> {
         val jobInstanceId = JobInstanceId(param.jobInstanceId!!)
+        val jobInstance = jobInstanceRepository.findById(jobInstanceId) ?: return PageDTO.empty()
+        val batch = jobInstance.attemptCnt!!
         val pageQuery = param.toDomainQuery()
-        val page = taskRepository.findAllByJobInstanceId(jobInstanceId, pageQuery)
+        val page = taskRepository.findAllByJobInstanceIdAndBatch(
+            jobInstanceId = jobInstanceId,
+            batch = batch,
+            pageQuery = pageQuery
+        )
         return page.toDTO().map { taskAssembler.toJobProgressQueryResponseDTO(it) }
     }
 
