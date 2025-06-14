@@ -17,7 +17,9 @@ import tech.powerscheduler.server.infrastructure.persistence.model.TaskEntity
 interface TaskRepositoryJpaRepository
     : JpaRepository<TaskEntity, Long>, JpaSpecificationExecutor<TaskEntity> {
 
-    fun findByJobInstanceId(jobInstanceId: Long): List<TaskEntity>
+    fun findAllByJobInstanceId(jobInstanceId: Long): List<TaskEntity>
+
+    fun findAllByJobInstanceIdAndBatch(jobInstanceId: Long, batch: Int, pageable: Pageable): Page<TaskEntity>
 
     @Query(
         """
@@ -34,6 +36,7 @@ interface TaskRepositoryJpaRepository
         jobStatuses: Iterable<JobStatusEnum>,
         pageRequest: Pageable
     ): Page<TaskEntity>
+
     fun deleteByJobInstanceIdIn(jobInstanceIds: Iterable<Long>)
 
 }

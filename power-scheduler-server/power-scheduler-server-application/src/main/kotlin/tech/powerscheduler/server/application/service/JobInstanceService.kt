@@ -10,10 +10,13 @@ import tech.powerscheduler.common.enums.JobStatusEnum.*
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
 import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.JobInstanceAssembler
+import tech.powerscheduler.server.application.assembler.TaskAssembler
 import tech.powerscheduler.server.application.dto.request.JobInstanceQueryRequestDTO
+import tech.powerscheduler.server.application.dto.request.JobProgressQueryRequestDTO
 import tech.powerscheduler.server.application.dto.request.JobRunRequestDTO
 import tech.powerscheduler.server.application.dto.response.JobInstanceDetailResponseDTO
 import tech.powerscheduler.server.application.dto.response.JobInstanceQueryResponseDTO
+import tech.powerscheduler.server.application.dto.response.JobProgressQueryResponseDTO
 import tech.powerscheduler.server.application.dto.response.PageDTO
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.jobinfo.JobId
@@ -32,6 +35,7 @@ import java.time.LocalDateTime
  */
 @Service
 class JobInstanceService(
+    private val taskAssembler: TaskAssembler,
     private val taskRepository: TaskRepository,
     private val jobInfoRepository: JobInfoRepository,
     private val jobInstanceRepository: JobInstanceRepository,
@@ -97,6 +101,19 @@ class JobInstanceService(
         val jobInstanceToReattempt = jobInstance.cloneForReattempt()
         val jobInstanceId = jobInstanceRepository.save(jobInstanceToReattempt)
         return jobInstanceId.value
+    }
+
+    fun queryProgress(param: JobProgressQueryRequestDTO): PageDTO<JobProgressQueryResponseDTO> {
+        val jobInstanceId = JobInstanceId(param.jobInstanceId!!)
+        val jobInstance = jobInstanceRepository.findById(jobInstanceId) ?: return PageDTO.empty()
+        val batch = jobInstance.attemptCnt!!
+        val pageQuery = param.toDomainQuery()
+        val page = taskRepository.findAllByJobInstanceIdAndBatch(
+            jobInstanceId = jobInstanceId,
+            batch = batch,
+            pageQuery = pageQuery
+        )
+        return page.toDTO().map { taskAssembler.toJobProgressQueryResponseDTO(it) }
     }
 
     fun updateJobInstanceProgress(jobInstanceId: JobInstanceId) {

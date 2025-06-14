@@ -12,6 +12,10 @@ data class PageDTO<T>(
     var content: List<T> = emptyList()
 ) {
 
+    companion object {
+        inline fun <reified T> empty(): PageDTO<T> = PageDTO()
+    }
+
     fun <R> map(transform: (T) -> R): PageDTO<R> {
         return PageDTO(
             number = number,
