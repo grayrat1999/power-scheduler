@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import tech.powerscheduler.server.application.dto.request.JobInstanceQueryRequestDTO
+import tech.powerscheduler.server.application.dto.request.JobProgressQueryRequestDTO
 import tech.powerscheduler.server.application.service.JobInstanceService
 
 /**
@@ -50,5 +51,11 @@ internal class JobInstanceController(
     @PostMapping("/reattempt")
     fun reattempt(@NotNull jobInstanceId: Long?) = wrapperResponse {
         jobInstanceService.reattempt(jobInstanceId!!)
+    }
+
+    @Operation(summary = "查询任务进度")
+    @PostMapping("/queryProgress")
+    fun queryProgress(@RequestBody @NotNull param: JobProgressQueryRequestDTO) = wrapperResponse {
+        jobInstanceService.queryProgress(param)
     }
 }

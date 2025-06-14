@@ -15,6 +15,8 @@ interface TaskRepository {
 
     fun findAllByJobInstanceId(jobInstanceId: JobInstanceId): List<Task>
 
+    fun findAllByJobInstanceId(jobInstanceId: JobInstanceId, pageQuery: PageQuery): Page<Task>
+
     fun listDispatchable(
         jobIds: Iterable<JobId>,
         pageQuery: PageQuery

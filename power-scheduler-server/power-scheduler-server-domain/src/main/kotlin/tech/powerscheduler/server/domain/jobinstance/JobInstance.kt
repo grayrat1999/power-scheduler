@@ -215,7 +215,7 @@ class JobInstance {
             it.jobName = this.jobName
             it.jobType = this.jobType
             it.processor = this.processor
-            it.jobStatus = JobStatusEnum.WAITING_DISPATCH
+            it.taskStatus = JobStatusEnum.WAITING_DISPATCH
             it.scheduleAt = this.scheduleAt
             it.executeParams = this.executeParams
             it.executeMode = this.executeMode
@@ -255,10 +255,10 @@ class JobInstance {
         }
         val maxBatch = tasks.maxOfOrNull { it.batch!! }
         return when (this.executeMode!!) {
-            SINGLE -> tasks.first { it.batch == maxBatch }.jobStatus!!
+            SINGLE -> tasks.first { it.batch == maxBatch }.taskStatus!!
             BROADCAST -> {
                 val currentTasks = tasks.filter { it.batch == maxBatch }
-                val jobStatusSet = currentTasks.map { it.jobStatus!! }.toSet()
+                val jobStatusSet = currentTasks.map { it.taskStatus!! }.toSet()
                 if ((jobStatusSet - JobStatusEnum.COMPLETED_STATUSES).isEmpty()) {
                     if (jobStatusSet.all { it == JobStatusEnum.SUCCESS }) {
                         return JobStatusEnum.SUCCESS

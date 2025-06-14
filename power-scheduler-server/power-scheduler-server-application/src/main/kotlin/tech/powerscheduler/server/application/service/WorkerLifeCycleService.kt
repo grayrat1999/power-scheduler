@@ -112,12 +112,12 @@ class WorkerLifeCycleService(
             log.warn("更新任务状态失败: 子任务[${taskId.value}]不存在")
             return
         }
-        if (task.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
+        if (task.taskStatus in JobStatusEnum.COMPLETED_STATUSES) {
             log.info("updateProgress cancel, task [{}] is already completed", taskId.value)
             return
         }
         task.apply {
-            this.jobStatus = param.jobStatus
+            this.taskStatus = param.taskStatus
             this.startAt = param.startAt
             this.endAt = param.endAt
             this.message = param.message?.take(5000)
@@ -128,11 +128,11 @@ class WorkerLifeCycleService(
             executeMode = task.executeMode!!,
         )
         transactionTemplate.executeWithoutResult {
-            if (param.jobStatus == FAILED && task.canReattempt) {
+            if (param.taskStatus == FAILED && task.canReattempt) {
                 task.resetStatusForReattempt()
             }
             taskRepository.save(task)
-            log.info("task update successfully: id={}, status={}", taskId.value, task.jobStatus)
+            log.info("task update successfully: id={}, status={}", taskId.value, task.taskStatus)
             applicationEventPublisher.publishEvent(taskStatusChangeEvent)
         }
     }
