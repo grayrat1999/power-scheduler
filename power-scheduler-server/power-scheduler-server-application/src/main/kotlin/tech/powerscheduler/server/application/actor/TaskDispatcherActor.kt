@@ -188,7 +188,7 @@ class TaskDispatcherActor(
             }
         }
 
-        val dispatchTaskRequestDTO = taskAssembler.toDispatchTaskRequestDTO(task)
+        val dispatchTaskRequestDTO = taskAssembler.toTaskDispatchRequestDTO(task)
         val result = workerRemoteService.dispatch(targetWorker, dispatchTaskRequestDTO)
         if (result.success && result.data == true) {
             log.info("dispatch task [{}] to worker [{}] successfully", task.id!!.value, targetWorker)
