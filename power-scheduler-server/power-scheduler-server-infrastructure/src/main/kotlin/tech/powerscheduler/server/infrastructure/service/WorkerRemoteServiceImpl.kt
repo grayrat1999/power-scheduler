@@ -34,9 +34,9 @@ class WorkerRemoteServiceImpl : WorkerRemoteService {
     private val client: HttpClient = HttpClient(CIO) {
         expectSuccess = true
         install(HttpTimeout) {
-            connectTimeoutMillis = 2_000
-            requestTimeoutMillis = 2_000
-            socketTimeoutMillis = 1_000
+            requestTimeoutMillis = 5_000
+            connectTimeoutMillis = 4_000
+            socketTimeoutMillis = 4_000
         }
         install(Logging) {
             this.level = LogLevel.NONE
