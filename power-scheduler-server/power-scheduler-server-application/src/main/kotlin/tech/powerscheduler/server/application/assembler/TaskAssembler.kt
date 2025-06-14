@@ -2,6 +2,8 @@ package tech.powerscheduler.server.application.assembler
 
 import org.springframework.stereotype.Component
 import tech.powerscheduler.common.dto.request.JobDispatchRequestDTO
+import tech.powerscheduler.server.application.dto.response.JobProgressQueryResponseDTO
+import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.task.Task
 
 /**
@@ -32,4 +34,15 @@ class TaskAssembler {
         }
     }
 
+    fun toJobProgressQueryResponseDTO(task: Task): JobProgressQueryResponseDTO {
+        return JobProgressQueryResponseDTO().also {
+            it.taskId = task.id!!.value
+            it.jobInstanceId = task.jobInstanceId!!.value
+            it.taskName = task.jobName
+            it.taskStatus = task.taskStatus.toDTO()
+            it.workerAddress = task.workerAddress
+            it.startAt = task.startAt
+            it.endAt = task.endAt
+        }
+    }
 }

@@ -39,6 +39,19 @@ class TaskRepositoryRepositoryImpl(
         return entities.map { it.toDomainModel() }
     }
 
+    override fun findAllByJobInstanceId(
+        jobInstanceId: JobInstanceId,
+        pageQuery: PageQuery
+    ): Page<Task> {
+        val pageable = PageRequest.of(
+            pageQuery.pageNo - 1,
+            pageQuery.pageSize,
+            Sort.by(JobInstanceEntity::scheduleAt.name).ascending()
+        )
+        val entities = taskRepositoryJpaRepository.findByJobInstanceId(jobInstanceId.value,pageable)
+        return entities.map { it.toDomainModel() }.toDomainPage()
+    }
+
     override fun listDispatchable(
         jobIds: Iterable<JobId>,
         pageQuery: PageQuery

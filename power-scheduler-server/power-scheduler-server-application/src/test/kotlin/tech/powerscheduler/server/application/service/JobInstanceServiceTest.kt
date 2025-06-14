@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.JobInstanceAssembler
+import tech.powerscheduler.server.application.assembler.TaskAssembler
 import tech.powerscheduler.server.application.dto.request.JobInstanceQueryRequestDTO
 import tech.powerscheduler.server.application.dto.request.JobRunRequestDTO
 import tech.powerscheduler.server.application.dto.response.JobInstanceDetailResponseDTO
@@ -30,6 +31,7 @@ class JobInstanceServiceTest : FunSpec({
     val taskRepository = mockk<TaskRepository>()
     val jobInfoRepository = mockk<JobInfoRepository>()
     val jobInstanceRepository = mockk<JobInstanceRepository>()
+    val taskAssembler = mockk<TaskAssembler>()
     val jobInstanceAssembler = mockk<JobInstanceAssembler>()
     val transactionTemplate = mockk<TransactionTemplate>()
     val applicationEventPublisher = mockk<ApplicationEventPublisher>()
@@ -41,6 +43,7 @@ class JobInstanceServiceTest : FunSpec({
         jobInstanceAssembler = jobInstanceAssembler,
         transactionTemplate = transactionTemplate,
         applicationEventPublisher = applicationEventPublisher,
+        taskAssembler = taskAssembler,
     )
 
     context("test ${JobInstanceService::list}") {

@@ -19,6 +19,8 @@ interface TaskRepositoryJpaRepository
 
     fun findByJobInstanceId(jobInstanceId: Long): List<TaskEntity>
 
+    fun findByJobInstanceId(jobInstanceId: Long, pageable: Pageable): Page<TaskEntity>
+
     @Query(
         """
         SELECT 
