@@ -5,7 +5,8 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import tech.powerscheduler.common.dto.request.JobTerminateRequestDTO
 import tech.powerscheduler.server.application.utils.CoroutineExecutor
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
+import tech.powerscheduler.server.domain.common.PageQuery
+import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceTerminatedEvent
 import tech.powerscheduler.server.domain.task.TaskRepository
 import tech.powerscheduler.server.domain.worker.WorkerRemoteService
@@ -17,6 +18,7 @@ import tech.powerscheduler.server.domain.worker.WorkerRemoteService
 @Component
 class JobInstanceTerminatedEventListener(
     private val taskRepository: TaskRepository,
+    private val jobInstanceRepository: JobInstanceRepository,
     private val workerRemoteService: WorkerRemoteService,
 ) {
 
@@ -31,10 +33,20 @@ class JobInstanceTerminatedEventListener(
     fun onJobInstanceTerminated(evet: JobInstanceTerminatedEvent) {
         val jobInstanceId = evet.jobInstanceId
         val terminateParam = JobTerminateRequestDTO().apply {
-            this.jobInstanceId = jobInstanceId
+            this.jobInstanceId = jobInstanceId.value
         }
-        val tasks = taskRepository.findAllByJobInstanceId(JobInstanceId(jobInstanceId))
-        log.info("jobInstance [{}] is terminated, start to terminate task", jobInstanceId)
+        val jobInstance = jobInstanceRepository.findById(jobInstanceId) ?: return
+        // TODO: 暂时写个2000条, 后面做MapReduce的时候再调整一下
+        val taskPage = taskRepository.findAllByJobInstanceIdAndBatch(
+            jobInstanceId = jobInstanceId,
+            batch = jobInstance.batch!!,
+            pageQuery = PageQuery(
+                pageNo = 1,
+                pageSize = 2000
+            )
+        )
+        val tasks = taskPage.content
+        log.info("jobInstance [{}] is terminated, start to terminate task", jobInstanceId.value)
         val tasksToTerminate = tasks.filterNot { it.isCompleted }
         val workerAddress2Tasks = tasksToTerminate.asSequence()
             .filterNot { it.workerAddress.isNullOrBlank() }
@@ -49,10 +61,10 @@ class JobInstanceTerminatedEventListener(
                     )
                     tasks.forEach { it.terminate() }
                     taskRepository.saveAll(tasks)
-                    log.info("terminated [{}] tasks for job [{}] ", tasks.size, jobInstanceId)
+                    log.info("terminated [{}] tasks for job [{}] ", tasks.size, jobInstanceId.value)
                 } catch (e: Exception) {
                     throw RuntimeException(
-                        "Failed to terminate tasks in [$workerAddress] for jobInstance [${jobInstanceId}]",
+                        "Failed to terminate tasks in [$workerAddress] for jobInstance [${jobInstanceId.value}]",
                         e
                     )
                 }

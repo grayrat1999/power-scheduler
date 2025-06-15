@@ -5,5 +5,5 @@ package tech.powerscheduler.server.domain.jobinstance
  * @since 2025/6/8
  */
 class JobInstanceTerminatedEvent (
-    val jobInstanceId: Long,
+    val jobInstanceId: JobInstanceId,
 )

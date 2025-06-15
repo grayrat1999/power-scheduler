@@ -71,7 +71,7 @@ class JobInstanceService(
                 jobInstance.terminate()
                 jobInstanceRepository.save(jobInstance)
                 val terminatedEvent = JobInstanceTerminatedEvent(
-                    jobInstanceId = jobInstanceId,
+                    jobInstanceId = JobInstanceId(jobInstanceId),
                 )
                 applicationEventPublisher.publishEvent(terminatedEvent)
             }
@@ -106,7 +106,7 @@ class JobInstanceService(
     fun queryProgress(param: JobProgressQueryRequestDTO): PageDTO<JobProgressQueryResponseDTO> {
         val jobInstanceId = JobInstanceId(param.jobInstanceId!!)
         val jobInstance = jobInstanceRepository.findById(jobInstanceId) ?: return PageDTO.empty()
-        val batch = jobInstance.attemptCnt!!
+        val batch = jobInstance.batch!!
         val pageQuery = param.toDomainQuery()
         val page = taskRepository.findAllByJobInstanceIdAndBatch(
             jobInstanceId = jobInstanceId,
