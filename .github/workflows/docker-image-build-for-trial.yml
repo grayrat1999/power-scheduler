@@ -6,6 +6,11 @@ on:
       - docker/trial_image
 
   workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Image tag'
+        required: false
+        default: 'trial'
 
 jobs:
 
