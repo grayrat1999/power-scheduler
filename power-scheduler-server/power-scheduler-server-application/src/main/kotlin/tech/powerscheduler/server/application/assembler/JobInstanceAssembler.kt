@@ -65,6 +65,7 @@ class JobInstanceAssembler {
             this.appCode = domainModel.appGroup?.code
             this.appName = domainModel.appGroup?.name
             this.schedulerAddress = domainModel.schedulerAddress
+            this.workerAddress = domainModel.workerAddress
             this.jobName = domainModel.jobName
             this.jobType = domainModel.jobType.toDTO()
             this.processor = domainModel.processor

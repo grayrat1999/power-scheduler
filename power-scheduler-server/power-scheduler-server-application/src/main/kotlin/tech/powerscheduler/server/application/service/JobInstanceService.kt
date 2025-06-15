@@ -138,6 +138,7 @@ class JobInstanceService(
             if (this.startAt == null) {
                 this.startAt = this.calculateStartAt(tasks)
             }
+            this.workerAddress = this.calculateWorkerAddress(tasks)
             if (calculatedJobStatus in JobStatusEnum.COMPLETED_STATUSES) {
                 this.endAt = this.calculateEndAt(tasks)
             }

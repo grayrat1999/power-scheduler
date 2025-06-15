@@ -43,7 +43,7 @@ class JobInstanceEntity() : BaseEntity() {
     /**
      * worker地址(指定机器运行时使用)
      */
-    @Column(name = "worker_address", updatable = false)
+    @Column(name = "worker_address")
     var workerAddress: String? = null
 
     /**
