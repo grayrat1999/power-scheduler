@@ -297,6 +297,15 @@ class JobInstance {
             .maxOrNull()
     }
 
+    fun calculateWorkerAddress(tasks: Iterable<Task>): String? {
+        val maxBatch = tasks.maxOfOrNull { it.batch!! }
+        // 只有单机模式需要将task中的worker地址回写
+        if (this.executeMode == SINGLE) {
+            return tasks.firstOrNull { it.batch == maxBatch }?.workerAddress
+        }
+        return null
+    }
+
     fun terminate() {
         if (this.startAt == null) {
             this.startAt = LocalDateTime.now()

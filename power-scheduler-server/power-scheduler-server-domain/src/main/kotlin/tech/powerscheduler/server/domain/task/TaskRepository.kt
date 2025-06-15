@@ -17,8 +17,8 @@ interface TaskRepository {
 
     fun findAllByJobInstanceIdAndBatch(
         jobInstanceId: JobInstanceId,
-        batch: Int, pageQuery:
-        PageQuery
+        batch: Int,
+        pageQuery: PageQuery
     ): Page<Task>
 
     fun listDispatchable(
