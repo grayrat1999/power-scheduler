@@ -57,8 +57,8 @@ class TaskEntity : BaseEntity() {
     /**
      * 任务名称
      */
-    @Column(name = "job_name", nullable = false, updatable = false)
-    var jobName: String? = null
+    @Column(name = "task_name", nullable = false, updatable = false)
+    var taskName: String? = null
 
     /**
      * 任务类型
@@ -77,8 +77,8 @@ class TaskEntity : BaseEntity() {
      * 任务状态
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "job_status", nullable = false)
-    var jobStatus: JobStatusEnum? = null
+    @Column(name = "task_status", nullable = false)
+    var taskStatus: JobStatusEnum? = null
 
     /**
      * 触发时间

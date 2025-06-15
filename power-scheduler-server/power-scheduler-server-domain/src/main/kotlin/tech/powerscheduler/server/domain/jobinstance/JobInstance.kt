@@ -215,7 +215,7 @@ class JobInstance {
             it.jobId = this.jobId
             it.jobInstanceId = this.id
             it.appCode = this.appCode
-            it.jobName = this.jobName
+            it.taskName = this.jobName
             it.jobType = this.jobType
             it.processor = this.processor
             it.taskStatus = JobStatusEnum.WAITING_DISPATCH
@@ -295,6 +295,15 @@ class JobInstance {
             .filter { it.batch == maxBatch }
             .mapNotNull { it.endAt }
             .maxOrNull()
+    }
+
+    fun calculateWorkerAddress(tasks: Iterable<Task>): String? {
+        val maxBatch = tasks.maxOfOrNull { it.batch!! }
+        // 只有单机模式需要将task中的worker地址回写
+        if (this.executeMode == SINGLE) {
+            return tasks.firstOrNull { it.batch == maxBatch }?.workerAddress
+        }
+        return null
     }
 
     fun terminate() {
