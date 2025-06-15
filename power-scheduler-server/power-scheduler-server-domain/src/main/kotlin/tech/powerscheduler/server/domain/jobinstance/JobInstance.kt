@@ -165,6 +165,9 @@ class JobInstance {
      */
     var updatedAt: LocalDateTime? = null
 
+    val batch: Int?
+        get() = attemptCnt
+
     val canReattempt
         get() = this.attemptCnt!! < this.maxAttemptCnt!!
 
@@ -232,7 +235,7 @@ class JobInstance {
             } else {
                 workerAddress
             }
-            it.batch = this.attemptCnt
+            it.batch = this.batch
             it.attemptCnt = 0
             when (this.executeMode!!) {
                 SINGLE -> {
