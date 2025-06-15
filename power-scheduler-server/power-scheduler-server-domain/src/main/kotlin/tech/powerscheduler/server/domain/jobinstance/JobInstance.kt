@@ -215,7 +215,7 @@ class JobInstance {
             it.jobId = this.jobId
             it.jobInstanceId = this.id
             it.appCode = this.appCode
-            it.jobName = this.jobName
+            it.taskName = this.jobName
             it.jobType = this.jobType
             it.processor = this.processor
             it.taskStatus = JobStatusEnum.WAITING_DISPATCH

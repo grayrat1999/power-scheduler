@@ -19,7 +19,7 @@ class TaskAssembler {
             it.jobInstanceId = domainModel.jobInstanceId!!.value
             it.taskId = domainModel.id!!.value
             it.appCode = domainModel.appCode
-            it.jobName = domainModel.jobName
+            it.jobName = domainModel.taskName
             it.jobType = domainModel.jobType
             it.processor = domainModel.processor
             it.jobStatus = domainModel.taskStatus
@@ -38,7 +38,7 @@ class TaskAssembler {
         return JobProgressQueryResponseDTO().also {
             it.taskId = task.id!!.value
             it.jobInstanceId = task.jobInstanceId!!.value
-            it.taskName = task.jobName
+            it.taskName = task.taskName
             it.taskStatus = task.taskStatus.toDTO()
             it.workerAddress = task.workerAddress
             it.startAt = task.startAt
