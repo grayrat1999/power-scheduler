@@ -28,7 +28,7 @@ interface TaskRepositoryJpaRepository
         FROM TaskEntity AS task
         WHERE true 
           AND task.jobId IN :jobIds 
-          AND task.jobStatus IN :jobStatuses
+          AND task.taskStatus IN :jobStatuses
     """
     )
     fun listDispatchable(

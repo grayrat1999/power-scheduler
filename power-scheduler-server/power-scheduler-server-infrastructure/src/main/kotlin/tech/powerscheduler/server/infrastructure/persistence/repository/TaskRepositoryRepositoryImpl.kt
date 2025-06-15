@@ -79,9 +79,9 @@ class TaskRepositoryRepositoryImpl(
             val workerAddressEqual = criteriaBuilder.equal(
                 root.get<String>(TaskEntity::workerAddress.name), workerAddress
             )
-            val jobStatusIn = root.get<String>(TaskEntity::jobStatus.name)
+            val taskStatusIn = root.get<String>(TaskEntity::taskStatus.name)
                 .`in`(JobStatusEnum.UNCOMPLETED_STATUSES)
-            criteriaBuilder.and(workerAddressEqual, jobStatusIn)
+            criteriaBuilder.and(workerAddressEqual, taskStatusIn)
         }
         val list = taskRepositoryJpaRepository.findAll(specification)
         return list.map { it.toDomainModel() }

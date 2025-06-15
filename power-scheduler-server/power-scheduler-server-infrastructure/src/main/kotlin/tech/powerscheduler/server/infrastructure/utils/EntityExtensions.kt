@@ -210,10 +210,10 @@ fun Task.toEntity(): TaskEntity {
         it.appCode = this.appCode
         it.schedulerAddress = this.schedulerAddress
         it.workerAddress = this.workerAddress
-        it.jobName = this.jobName
+        it.taskName = this.taskName
         it.jobType = this.jobType
         it.processor = this.processor
-        it.jobStatus = this.taskStatus
+        it.taskStatus = this.taskStatus
         it.scheduleAt = this.scheduleAt
         it.startAt = this.startAt
         it.endAt = this.endAt
@@ -239,10 +239,10 @@ fun TaskEntity.toDomainModel(): Task {
         it.appCode = this.appCode
         it.schedulerAddress = this.schedulerAddress
         it.workerAddress = this.workerAddress
-        it.jobName = this.jobName
+        it.taskName = this.taskName
         it.jobType = this.jobType
         it.processor = this.processor
-        it.taskStatus = this.jobStatus
+        it.taskStatus = this.taskStatus
         it.scheduleAt = this.scheduleAt
         it.startAt = this.startAt
         it.endAt = this.endAt

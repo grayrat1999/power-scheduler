@@ -34,7 +34,7 @@ class Task {
     /**
      * 任务名称
      */
-    var jobName: String? = null
+    var taskName: String? = null
 
     /**
      * 任务类型
