@@ -27,6 +27,7 @@ import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskRepository
 import tech.powerscheduler.server.domain.task.TaskStatusChangeEvent
 import tech.powerscheduler.server.domain.worker.WorkerRemoteService
+import tech.powerscheduler.server.domain.workerregistry.WorkerRegistry
 import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryRepository
 import java.time.Duration
 
@@ -142,7 +143,7 @@ class TaskDispatcherActor(
                 async {
                     channel.send(Unit)
                     val appCode = task.appCode
-                    val candidateWorkers = appCode2WorkerRegistry[appCode].orEmpty().map { it.address }.toSet()
+                    val candidateWorkers = appCode2WorkerRegistry[appCode].orEmpty().toSet()
                     try {
                         dispatchOne(task, candidateWorkers)
                     } catch (e: Exception) {
@@ -156,15 +157,13 @@ class TaskDispatcherActor(
         }
     }
 
-    fun dispatchOne(task: Task, candidateWorkers: Set<String>) {
+    fun dispatchOne(task: Task, candidateWorkers: Set<WorkerRegistry>) {
         val jobInstance = jobInstanceRepository.findById(task.jobInstanceId!!)
         if (jobInstance == null) {
             log.warn("jobInstance with id [{}] not found", task.jobInstanceId?.value)
             return
         }
-        if (candidateWorkers.isEmpty()
-            || (task.executeMode == ExecuteModeEnum.BROADCAST && candidateWorkers.contains(task.workerAddress).not())
-        ) {
+        if (candidateWorkers.isEmpty()) {
             if (task.canReattempt) {
                 task.resetStatusForReattempt()
             } else {
@@ -213,7 +212,7 @@ class TaskDispatcherActor(
     private fun selectWorker(
         task: Task,
         jobInstance: JobInstance,
-        candidateWorkers: Set<String>
+        candidateWorkers: Set<WorkerRegistry>
     ): String {
         val specifiedWorkerAddress = jobInstance.workerAddress
         if (specifiedWorkerAddress.orEmpty().isNotBlank()) {
@@ -223,10 +222,12 @@ class TaskDispatcherActor(
         return if (task.executeMode != ExecuteModeEnum.BROADCAST) {
             if (task.attemptCnt!! > 0 && candidateWorkers.size > 1) {
                 // 如果上次任务派发失败了，本次就换个节点派发
-                (candidateWorkers - task.workerAddress.orEmpty()).random()
+                candidateWorkers.asSequence()
+                    .filterNot { it.address == task.workerAddress }
+                    .maxBy { it.healthScore }
+                    .address
             } else {
-                // 如果是首次派发，或者就只有一个节点，那就只能派发到该节点
-                candidateWorkers.random()
+                candidateWorkers.maxBy { it.healthScore }.address
             }
         } else {
             // 广播任务不能换节点
