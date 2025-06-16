@@ -5,7 +5,7 @@ plugins {
 
 allprojects {
     group = "tech.powerscheduler"
-    version = "1.1.1"
+    version = "2.0.0"
 
     repositories {
         maven {
