@@ -1,10 +1,10 @@
-package tech.powerscheduler.worker.job
+package tech.powerscheduler.worker.task
 
 import org.slf4j.LoggerFactory
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.worker.exception.PowerSchedulerWorkerException
-import tech.powerscheduler.worker.persistence.JobProgressEntity
-import tech.powerscheduler.worker.persistence.JobProgressRepository
+import tech.powerscheduler.worker.persistence.TaskProgressEntity
+import tech.powerscheduler.worker.persistence.TaskProgressRepository
 import tech.powerscheduler.worker.processor.ProcessResult
 import tech.powerscheduler.worker.processor.ProcessorRegistry
 import java.time.LocalDateTime
@@ -18,11 +18,11 @@ import java.util.concurrent.TimeUnit
  * @author grayrat
  * @since 2025/4/26
  */
-class Job(
+class Task(
     /**
      * 任务上下文
      */
-    val context: JobContext,
+    val context: TaskContext,
     /**
      * 调度时间
      */
@@ -37,7 +37,7 @@ class Job(
     val priority: Int,
 ) : Delayed {
 
-    private val log = LoggerFactory.getLogger(Job::class.qualifiedName)
+    private val log = LoggerFactory.getLogger(Task::class.qualifiedName)
 
     /**
      * 任务的执行线程
@@ -126,7 +126,7 @@ class Job(
         if (jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
             this.endAt = LocalDateTime.now()
         }
-        val jobProgressEntity = JobProgressEntity().also {
+        val taskProgressEntity = TaskProgressEntity().also {
             it.jobId = this.context.jobId!!
             it.jobInstanceId = this.context.jobInstanceId!!
             it.taskId = this.context.taskId!!
@@ -135,7 +135,7 @@ class Job(
             it.endAt = this.endAt
             it.message = message
         }
-        JobProgressRepository.save(jobProgressEntity)
+        TaskProgressRepository.save(taskProgressEntity)
     }
 
     override fun getDelay(unit: TimeUnit): Long {
@@ -147,9 +147,9 @@ class Job(
         if (other === this) {
             return 0
         }
-        val otherJob = other as Job
-        return Comparator.comparing<Job, LocalDateTime?> { it!!.scheduleAt }
-            .thenComparing(Comparator.comparingInt<Job> { obj: Job -> obj.priority }.reversed())
-            .compare(this, otherJob)
+        val otherTask = other as Task
+        return Comparator.comparing<Task, LocalDateTime?> { it!!.scheduleAt }
+            .thenComparing(Comparator.comparingInt<Task> { obj: Task -> obj.priority }.reversed())
+            .compare(this, otherTask)
     }
 }

@@ -1,6 +1,6 @@
 package tech.powerscheduler.worker.processor
 
-import tech.powerscheduler.worker.job.JobContext
+import tech.powerscheduler.worker.task.TaskContext
 
 /**
  * 任务处理器接口
@@ -17,7 +17,7 @@ interface Processor {
      * @return 任务执行结果
      */
     @Throws(Exception::class)
-    fun process(context: JobContext): ProcessResult?
+    fun process(context: TaskContext): ProcessResult?
 
     /**
      * 处理器路径

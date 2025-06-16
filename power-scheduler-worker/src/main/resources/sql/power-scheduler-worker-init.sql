@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS job_progress;
+DROP TABLE IF EXISTS task_progress;
 
-CREATE TABLE job_progress
+CREATE TABLE task_progress
 (
     id              BIGINT PRIMARY KEY AUTO_INCREMENT,
     job_id          BIGINT NOT NULL,

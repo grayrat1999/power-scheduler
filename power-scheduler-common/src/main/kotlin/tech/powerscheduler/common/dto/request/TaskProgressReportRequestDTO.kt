@@ -11,7 +11,7 @@ import java.time.LocalDateTime
  * @author grayrat
  * @since 2025/5/20
  */
-class JobProgressReportRequestDTO {
+class TaskProgressReportRequestDTO {
     /**
      * 任务实例id
      */

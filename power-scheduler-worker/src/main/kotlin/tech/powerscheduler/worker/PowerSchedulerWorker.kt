@@ -69,16 +69,16 @@ class PowerSchedulerWorker(
         serverDiscoveryService = serverDiscoveryService,
     )
 
-    private val jobExecutorService = JobExecutorService()
+    private val taskExecutorService = TaskExecutorService()
 
-    private val jobProgressReportService = JobProgressReportService(
+    private val taskProgressReportService = TaskProgressReportService(
         serverDiscoveryService = serverDiscoveryService,
         workerRegisterService = workerRegisterService,
     )
 
     private val embedServer = EmbedServer(
         port = port,
-        jobExecutorService = jobExecutorService
+        taskExecutorService = taskExecutorService
     )
 
     fun init() {
@@ -96,9 +96,9 @@ class PowerSchedulerWorker(
         }
         initDatabase()
         embedServer.start()
-        jobExecutorService.start()
+        taskExecutorService.start()
         serverDiscoveryService.start()
-        jobProgressReportService.start()
+        taskProgressReportService.start()
         workerRegisterService.start()
 
         // 兼容非spring程序的优雅退出
@@ -110,8 +110,8 @@ class PowerSchedulerWorker(
     fun destroy() {
         if (destroyed.compareAndSet(false, true)) {
             embedServer.stop()
-            jobExecutorService.stop()
-            jobProgressReportService.stop()
+            taskExecutorService.stop()
+            taskProgressReportService.stop()
             workerRegisterService.stop()
             serverDiscoveryService.stop()
             DataSourceManager.closeDataSource()

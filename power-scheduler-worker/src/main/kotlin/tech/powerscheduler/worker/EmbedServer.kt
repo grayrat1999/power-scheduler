@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
  */
 class EmbedServer(
     private val port: Int,
-    private val jobExecutorService: JobExecutorService
+    private val taskExecutorService: TaskExecutorService
 ) {
 
     private val server = embeddedServer(
@@ -57,7 +57,7 @@ class EmbedServer(
                 post(DISPATCH_API) {
                     val param: JobDispatchRequestDTO? = this.call.receive()
                     val responseWrapper = wrapperResponse {
-                        jobExecutorService.schedule(param!!)
+                        taskExecutorService.schedule(param!!)
                         return@wrapperResponse true
                     }
                     call.respond(responseWrapper)
@@ -65,7 +65,7 @@ class EmbedServer(
                 post(TERMINATE_API) {
                     val param: JobTerminateRequestDTO? = this.call.receive()
                     val responseWrapper = wrapperResponse {
-                        jobExecutorService.terminate(param!!)
+                        taskExecutorService.terminate(param!!)
                         return@wrapperResponse true
                     }
                     call.respond(responseWrapper)

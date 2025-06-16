@@ -3,8 +3,8 @@ package tech.powerscheduler.worker
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.slf4j.LoggerFactory
-import tech.powerscheduler.common.dto.request.JobProgressReportRequestDTO
-import tech.powerscheduler.worker.persistence.JobProgressRepository
+import tech.powerscheduler.common.dto.request.TaskProgressReportRequestDTO
+import tech.powerscheduler.worker.persistence.TaskProgressRepository
 import tech.powerscheduler.worker.util.ExecutorCoroutineScope
 
 /**
@@ -13,7 +13,7 @@ import tech.powerscheduler.worker.util.ExecutorCoroutineScope
  * @author grayrat
  * @since 2025/5/25
  */
-class JobProgressReportService(
+class TaskProgressReportService(
     /**
      * worker注册服务
      */
@@ -35,7 +35,7 @@ class JobProgressReportService(
      */
     private val httpClient = PowerSchedulerWorkerHttpClient()
 
-    private val log = LoggerFactory.getLogger(JobProgressReportService::class.java)
+    private val log = LoggerFactory.getLogger(TaskProgressReportService::class.java)
 
     /**
      * 启用任务进度上报服务
@@ -62,7 +62,7 @@ class JobProgressReportService(
     }
 
     suspend fun CoroutineScope.reportProgress() {
-        val taskIdSet = JobProgressRepository.listDistinctJobInstanceIds()
+        val taskIdSet = TaskProgressRepository.listDistinctJobInstanceIds()
         if (taskIdSet.isEmpty()) {
             delay(300)
             return
@@ -93,9 +93,9 @@ class JobProgressReportService(
             log.warn("[Powerscheduler] reportProgress failed: no available server]")
             return
         }
-        val jobProgressList = JobProgressRepository.listByTaskId(taskId)
+        val jobProgressList = TaskProgressRepository.listByTaskId(taskId)
         val latestJobProgress = jobProgressList.sortedByDescending { it.id }.first()
-        val param = JobProgressReportRequestDTO().apply {
+        val param = TaskProgressReportRequestDTO().apply {
             this.jobInstanceId = latestJobProgress.jobInstanceId
             this.taskId = latestJobProgress.taskId
             this.startAt = latestJobProgress.startAt
@@ -112,7 +112,7 @@ class JobProgressReportService(
                 taskId, latestJobProgress.status
             )
             val ids = jobProgressList.mapNotNull { it.id }
-            JobProgressRepository.deleteByIds(ids)
+            TaskProgressRepository.deleteByIds(ids)
         } else {
             log.warn("[Powerscheduler] reportProgress failed: {}", result.message, result.cause)
         }

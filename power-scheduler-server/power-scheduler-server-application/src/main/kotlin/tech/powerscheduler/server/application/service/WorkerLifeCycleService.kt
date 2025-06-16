@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import tech.powerscheduler.common.dto.request.JobProgressReportRequestDTO
+import tech.powerscheduler.common.dto.request.TaskProgressReportRequestDTO
 import tech.powerscheduler.common.dto.request.WorkerHeartbeatRequestDTO
 import tech.powerscheduler.common.dto.request.WorkerRegisterRequestDTO
 import tech.powerscheduler.common.dto.request.WorkerUnregisterRequestDTO
@@ -105,7 +105,7 @@ class WorkerLifeCycleService(
         }
     }
 
-    fun updateProgress(param: JobProgressReportRequestDTO) {
+    fun updateProgress(param: TaskProgressReportRequestDTO) {
         val taskId = TaskId(param.taskId!!)
         val task = taskRepository.findById(taskId)
         if (task == null) {

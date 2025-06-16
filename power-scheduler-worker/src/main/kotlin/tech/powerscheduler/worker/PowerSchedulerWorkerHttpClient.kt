@@ -14,7 +14,7 @@ import io.ktor.serialization.jackson.*
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import tech.powerscheduler.common.api.*
-import tech.powerscheduler.common.dto.request.JobProgressReportRequestDTO
+import tech.powerscheduler.common.dto.request.TaskProgressReportRequestDTO
 import tech.powerscheduler.common.dto.request.WorkerHeartbeatRequestDTO
 import tech.powerscheduler.common.dto.request.WorkerRegisterRequestDTO
 import tech.powerscheduler.common.dto.request.WorkerUnregisterRequestDTO
@@ -110,7 +110,7 @@ class PowerSchedulerWorkerHttpClient {
         return result
     }
 
-    fun reportProgress(baseUrl: String, param: JobProgressReportRequestDTO): ResponseWrapper<Boolean> {
+    fun reportProgress(baseUrl: String, param: TaskProgressReportRequestDTO): ResponseWrapper<Boolean> {
         val url = buildUrl(baseUrl, REPORT_PROGRESS_API)
         val result = post<Boolean>(url, param)
         return result

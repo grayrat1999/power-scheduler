@@ -9,7 +9,7 @@ import java.time.LocalDateTime
  * @author grayrat
  * @since 2025/5/25
  */
-class JobProgressEntity {
+class TaskProgressEntity {
     var id: Long? = null
     var jobId: Long? = null
     var jobInstanceId: Long? = null

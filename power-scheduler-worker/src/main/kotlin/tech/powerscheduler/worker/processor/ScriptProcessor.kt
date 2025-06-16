@@ -1,10 +1,10 @@
 package tech.powerscheduler.worker.processor
 
 import org.slf4j.LoggerFactory
-import tech.powerscheduler.worker.job.JobContext
-import tech.powerscheduler.worker.job.ScriptJobContext
 import tech.powerscheduler.worker.processor.ProcessResult.Companion.failure
 import tech.powerscheduler.worker.processor.ProcessResult.Companion.success
+import tech.powerscheduler.worker.task.ScriptTaskContext
+import tech.powerscheduler.worker.task.TaskContext
 import tech.powerscheduler.worker.util.SCRIPT_DIR
 import java.io.BufferedReader
 import java.io.File
@@ -25,11 +25,11 @@ class ScriptProcessor : Processor {
 
     private val log = LoggerFactory.getLogger(ScriptProcessor::class.java)
 
-    override fun process(context: JobContext): ProcessResult {
-        return doProcess((context as ScriptJobContext))
+    override fun process(context: TaskContext): ProcessResult {
+        return doProcess((context as ScriptTaskContext))
     }
 
-    fun doProcess(context: ScriptJobContext): ProcessResult {
+    fun doProcess(context: ScriptTaskContext): ProcessResult {
         val dir = File(SCRIPT_DIR)
         if (!dir.exists()) {
             dir.mkdir()

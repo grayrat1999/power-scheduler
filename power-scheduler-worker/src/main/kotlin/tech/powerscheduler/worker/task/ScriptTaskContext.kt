@@ -1,4 +1,4 @@
-package tech.powerscheduler.worker.job
+package tech.powerscheduler.worker.task
 
 import tech.powerscheduler.common.enums.ScriptTypeEnum
 
@@ -8,7 +8,7 @@ import tech.powerscheduler.common.enums.ScriptTypeEnum
  * @author grayrat
  * @since 2025/5/19
  */
-class ScriptJobContext : JobContext() {
+class ScriptTaskContext : TaskContext() {
     /**
      * 脚本类型
      */

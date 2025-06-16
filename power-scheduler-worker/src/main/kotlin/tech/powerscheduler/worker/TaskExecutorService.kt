@@ -5,11 +5,11 @@ import tech.powerscheduler.common.dto.request.JobDispatchRequestDTO
 import tech.powerscheduler.common.dto.request.JobTerminateRequestDTO
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobTypeEnum
-import tech.powerscheduler.worker.job.Job
-import tech.powerscheduler.worker.job.JobContext
-import tech.powerscheduler.worker.job.ScriptJobContext
-import tech.powerscheduler.worker.persistence.JobProgressEntity
-import tech.powerscheduler.worker.persistence.JobProgressRepository
+import tech.powerscheduler.worker.persistence.TaskProgressEntity
+import tech.powerscheduler.worker.persistence.TaskProgressRepository
+import tech.powerscheduler.worker.task.ScriptTaskContext
+import tech.powerscheduler.worker.task.Task
+import tech.powerscheduler.worker.task.TaskContext
 import tech.powerscheduler.worker.util.BasicThreadFactory
 import tech.powerscheduler.worker.util.BoundedDelayQueue
 import java.time.LocalDateTime
@@ -24,12 +24,12 @@ import java.util.concurrent.TimeUnit
  * @author grayrat
  * @since 2025/5/22
  */
-class JobExecutorService {
+class TaskExecutorService {
 
     private val scheduledThreadPoolExecutor = ScheduledThreadPoolExecutor(1)
 
-    private val jobRegistry = HashMap<Long, Job>()
-    private val jobQueue = BoundedDelayQueue<Job>(1000)
+    private val taskRegistry = HashMap<Long, Task>()
+    private val taskQueue = BoundedDelayQueue<Task>(1000)
     private val workerThreadPool = ThreadPoolExecutor(
         10,
         10,
@@ -39,7 +39,7 @@ class JobExecutorService {
         BasicThreadFactory("PS-Worker-"),
         ThreadPoolExecutor.AbortPolicy()
     )
-    private val log = LoggerFactory.getLogger(JobExecutorService::class.java)
+    private val log = LoggerFactory.getLogger(TaskExecutorService::class.java)
 
     fun start() {
         scheduledThreadPoolExecutor.scheduleWithFixedDelay(
@@ -57,7 +57,7 @@ class JobExecutorService {
 
     private fun onTick() {
         do {
-            val job = jobQueue.poll()
+            val job = taskQueue.poll()
             if (job == null) {
                 break
             }
@@ -68,49 +68,49 @@ class JobExecutorService {
     }
 
     fun schedule(command: JobDispatchRequestDTO) {
-        val jobContext = if (command.jobType == JobTypeEnum.SCRIPT) {
-            ScriptJobContext().apply {
+        val taskContext = if (command.jobType == JobTypeEnum.SCRIPT) {
+            ScriptTaskContext().apply {
                 this.scriptType = command.scriptType
                 this.scriptCode = command.scriptCode
             }
         } else {
-            JobContext()
+            TaskContext()
         }
-        jobContext.also {
+        taskContext.also {
             it.jobId = command.jobId
             it.jobInstanceId = command.jobInstanceId!!
             it.taskId = command.taskId
             it.executeParams = command.executeParams
             it.dataTime = command.dataTime
         }
-        val job = Job(
-            context = jobContext,
+        val task = Task(
+            context = taskContext,
             scheduleAt = command.scheduleAt!!,
             processorPath = command.processor!!,
             priority = command.priority
         )
-        val jobProgressEntity = JobProgressEntity().also {
+        val taskProgressEntity = TaskProgressEntity().also {
             it.jobId = command.jobId
             it.jobInstanceId = command.jobInstanceId!!
             it.taskId = command.taskId
         }
-        if (jobQueue.offer(job).not()) {
-            job.terminate()
-            jobProgressEntity.also {
+        if (taskQueue.offer(task).not()) {
+            task.terminate()
+            taskProgressEntity.also {
                 it.startAt = LocalDateTime.now()
                 it.startAt = LocalDateTime.now()
                 it.status = JobStatusEnum.FAILED
                 it.message = "job queue is full"
             }
         } else {
-            jobRegistry.put(command.jobInstanceId!!, job)
-            jobProgressEntity.status = JobStatusEnum.PENDING
+            taskRegistry.put(command.jobInstanceId!!, task)
+            taskProgressEntity.status = JobStatusEnum.PENDING
         }
-        JobProgressRepository.save(jobProgressEntity)
+        TaskProgressRepository.save(taskProgressEntity)
     }
 
     fun terminate(param: JobTerminateRequestDTO) {
-        val job = jobRegistry.remove(param.jobInstanceId)
+        val job = taskRegistry.remove(param.jobInstanceId)
         job?.terminate()
     }
 }

@@ -1,4 +1,4 @@
-package tech.powerscheduler.worker.job
+package tech.powerscheduler.worker.task
 
 import java.time.LocalDateTime
 
@@ -8,7 +8,7 @@ import java.time.LocalDateTime
  * @author grayrat
  * @since 2025/4/26
  */
-open class JobContext {
+open class TaskContext {
     /**
      * 任务id
      */

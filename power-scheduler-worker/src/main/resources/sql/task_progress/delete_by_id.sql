@@ -1,3 +1,3 @@
 DELETE
-FROM job_progress
+FROM task_progress
 WHERE id = ?;

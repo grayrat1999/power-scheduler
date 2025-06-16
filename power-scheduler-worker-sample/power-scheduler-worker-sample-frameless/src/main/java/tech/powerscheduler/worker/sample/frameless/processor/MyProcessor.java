@@ -1,9 +1,9 @@
 package tech.powerscheduler.worker.sample.frameless.processor;
 
 import org.jetbrains.annotations.NotNull;
-import tech.powerscheduler.worker.job.JobContext;
 import tech.powerscheduler.worker.processor.JavaProcessor;
 import tech.powerscheduler.worker.processor.ProcessResult;
+import tech.powerscheduler.worker.task.TaskContext;
 
 import java.util.concurrent.TimeUnit;
 
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class MyProcessor extends JavaProcessor {
 
     @Override
-    public ProcessResult process(@NotNull JobContext context) throws InterruptedException {
+    public ProcessResult process(@NotNull TaskContext context) throws InterruptedException {
         TimeUnit.SECONDS.sleep(10);
         System.out.println("hello world");
         return ProcessResult.success();

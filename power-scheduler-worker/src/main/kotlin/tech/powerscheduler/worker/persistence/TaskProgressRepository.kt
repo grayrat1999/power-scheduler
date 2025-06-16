@@ -10,14 +10,14 @@ import java.time.LocalDateTime
  * @author grayrat
  * @since 2025/5/25
  */
-object JobProgressRepository {
+object TaskProgressRepository {
 
-    private val insertSql = readTextFrom("sql/job_progress/insert.sql")
-    private val deleteByIdSql = readTextFrom("sql/job_progress/delete_by_id.sql")
-    private val listByTaskIdSql = readTextFrom("sql/job_progress/list_by_job_instance_id.sql")
-    private val listDistinctTaskIdSql = readTextFrom("sql/job_progress/list_distinct_task_id.sql")
+    private val insertSql = readTextFrom("sql/task_progress/insert.sql")
+    private val deleteByIdSql = readTextFrom("sql/task_progress/delete_by_id.sql")
+    private val listByTaskIdSql = readTextFrom("sql/task_progress/list_by_job_instance_id.sql")
+    private val listDistinctTaskIdSql = readTextFrom("sql/task_progress/list_distinct_task_id.sql")
 
-    fun save(entity: JobProgressEntity) {
+    fun save(entity: TaskProgressEntity) {
         DataSourceManager.getConnection().use { conn ->
             conn.prepareStatement(insertSql).use { stmt ->
                 stmt.setObject(1, entity.jobId)
@@ -44,14 +44,14 @@ object JobProgressRepository {
         }
     }
 
-    fun listByTaskId(taskId: Long): List<JobProgressEntity> {
+    fun listByTaskId(taskId: Long): List<TaskProgressEntity> {
         return DataSourceManager.getConnection().use { conn ->
             conn.prepareStatement(listByTaskIdSql).use { stmt ->
                 stmt.setLong(1, taskId)
                 stmt.executeQuery().use { rs ->
                     generateSequence {
                         if (rs.next()) {
-                            JobProgressEntity().apply {
+                            TaskProgressEntity().apply {
                                 this.id = rs.getLong("id")
                                 this.jobId = rs.getLong("job_id")
                                 this.jobInstanceId = rs.getLong("job_instance_id")
