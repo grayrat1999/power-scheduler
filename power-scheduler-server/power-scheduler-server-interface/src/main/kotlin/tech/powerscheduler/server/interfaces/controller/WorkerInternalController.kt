@@ -7,10 +7,7 @@ import jakarta.validation.constraints.NotNull
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import tech.powerscheduler.common.api.*
-import tech.powerscheduler.common.dto.request.TaskProgressReportRequestDTO
-import tech.powerscheduler.common.dto.request.WorkerHeartbeatRequestDTO
-import tech.powerscheduler.common.dto.request.WorkerRegisterRequestDTO
-import tech.powerscheduler.common.dto.request.WorkerUnregisterRequestDTO
+import tech.powerscheduler.common.dto.request.*
 import tech.powerscheduler.server.application.service.WorkerLifeCycleService
 
 /**
@@ -69,6 +66,18 @@ internal class WorkerInternalController(
     @PostMapping(REPORT_PROGRESS_API)
     fun reportProgress(@RequestBody @NotNull param: TaskProgressReportRequestDTO?) = wrapperResponse {
         workerLifeCycleService.updateProgress(param!!)
+        return@wrapperResponse true
+    }
+
+    @PostMapping(REPORT_METRICS_API)
+    fun reportMetrics(
+        @RequestBody @NotNull param: WorkerMetricsReportRequestDTO?,
+        httpServletRequest: HttpServletRequest
+    ) = wrapperResponse {
+        workerLifeCycleService.updateWorkerMetrics(
+            param = param!!,
+            remoteAddr = httpServletRequest.remoteAddr,
+        )
         return@wrapperResponse true
     }
 }

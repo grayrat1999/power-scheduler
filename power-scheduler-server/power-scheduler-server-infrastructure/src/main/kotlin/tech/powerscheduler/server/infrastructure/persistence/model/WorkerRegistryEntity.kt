@@ -59,4 +59,16 @@ class WorkerRegistryEntity : BaseEntity() {
     @Version
     @Column(name = "version")
     var version: Long? = null
+
+    /**
+     * CPU利用率
+     */
+    @Column(name = "cpu_usage_percent", insertable = false)
+    var cpuUsagePercent: Double? = null
+
+    /**
+     * 内存利用率
+     */
+    @Column(name = "memory_usage_percent", insertable = false)
+    var memoryUsagePercent: Double? = null
 }

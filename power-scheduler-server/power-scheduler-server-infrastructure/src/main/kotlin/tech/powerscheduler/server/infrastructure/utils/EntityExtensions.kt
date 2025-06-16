@@ -187,6 +187,8 @@ fun WorkerRegistry.toEntity(): WorkerRegistryEntity {
         it.lastHeartbeatAt = this.lastHeartbeatAt
         it.accessToken = this.accessToken
         it.version = this.version
+        it.cpuUsagePercent = this.cpuUsagePercent
+        it.memoryUsagePercent = this.memoryUsagePercent
     }
 }
 
@@ -199,6 +201,8 @@ fun WorkerRegistryEntity.toDomainModel(): WorkerRegistry {
         it.accessToken = this.accessToken
         it.lastHeartbeatAt = this.lastHeartbeatAt
         it.version = this.version
+        it.cpuUsagePercent = this.cpuUsagePercent
+        it.memoryUsagePercent = this.memoryUsagePercent
     }
 }
 

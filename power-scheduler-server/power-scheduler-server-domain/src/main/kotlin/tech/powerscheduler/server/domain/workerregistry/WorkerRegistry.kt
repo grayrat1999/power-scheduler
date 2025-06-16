@@ -44,6 +44,22 @@ class WorkerRegistry {
      */
     var version: Long? = null
 
+    /**
+     * CPU利用率
+     */
+    var cpuUsagePercent: Double? = null
+
+    /**
+     * 内存利用率
+     */
+    var memoryUsagePercent: Double? = null
+
+    /**
+     * 健康分
+     */
+    val healthScore: Double
+        get() = (cpuUsagePercent ?: 0.0) * 0.5 + (memoryUsagePercent ?: 0.0) * 0.5
+
     val address
         get() = "$host:$port"
 }

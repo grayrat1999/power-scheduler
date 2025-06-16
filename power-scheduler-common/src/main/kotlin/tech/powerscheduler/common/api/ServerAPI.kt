@@ -47,3 +47,11 @@ const val UNREGISTER_API = "unregister"
  * @since 2025/5/14
  */
 const val REPORT_PROGRESS_API = "reportProgress"
+
+/**
+ * 系统指标上报API
+ *
+ * @author grayrat
+ * @since 2025/6/16
+ */
+const val REPORT_METRICS_API = "reportMetrics"

@@ -29,6 +29,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:4.0.3")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.19.0")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0")
+    implementation("com.github.oshi:oshi-core:5.8.7")
 
     runtimeOnly("com.h2database:h2:1.4.200")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))

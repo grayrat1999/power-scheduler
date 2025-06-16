@@ -185,4 +185,28 @@ class WorkerLifeCycleService(
         }
     }
 
+    @Retryable(
+        value = [OptimisticLockException::class],
+        maxAttempts = 3,
+        backoff = Backoff(delay = 0)
+    )
+    fun updateWorkerMetrics(param: WorkerMetricsReportRequestDTO, remoteAddr: String) {
+        val uk = WorkerRegistryUniqueKey(
+            appCode = param.appCode!!,
+            host = param.host ?: remoteAddr,
+            port = param.port!!,
+        )
+        val existWorkerRegistry = workerRegistryRepository.findByUk(uk)
+        if (existWorkerRegistry != null) {
+            if (existWorkerRegistry.accessToken != param.accessToken) {
+                throw BizException(message = "updateWorkerMetrics failed: invalid accessToken for worker [${existWorkerRegistry.address}]")
+            }
+            existWorkerRegistry.cpuUsagePercent = param.cpuUsagePercent
+            existWorkerRegistry.memoryUsagePercent = param.memoryUsagePercent
+            workerRegistryRepository.save(existWorkerRegistry)
+        } else {
+            log.warn("worker [{}:{}] has not registered", uk.host, uk.port)
+        }
+    }
+
 }

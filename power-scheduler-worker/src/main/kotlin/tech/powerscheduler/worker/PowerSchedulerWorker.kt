@@ -69,6 +69,13 @@ class PowerSchedulerWorker(
         serverDiscoveryService = serverDiscoveryService,
     )
 
+    private val workerMetricsReportService = WorkerMetricsReportService(
+        host = externalHost,
+        port = externalPort ?: port,
+        workerRegisterService = workerRegisterService,
+        serverDiscoveryService = serverDiscoveryService,
+    )
+
     private val taskExecutorService = TaskExecutorService()
 
     private val taskProgressReportService = TaskProgressReportService(
@@ -96,6 +103,7 @@ class PowerSchedulerWorker(
         }
         initDatabase()
         embedServer.start()
+        workerMetricsReportService.start()
         taskExecutorService.start()
         serverDiscoveryService.start()
         taskProgressReportService.start()
@@ -112,6 +120,7 @@ class PowerSchedulerWorker(
             embedServer.stop()
             taskExecutorService.stop()
             taskProgressReportService.stop()
+            workerMetricsReportService.stop()
             workerRegisterService.stop()
             serverDiscoveryService.stop()
             DataSourceManager.closeDataSource()
