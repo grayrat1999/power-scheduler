@@ -189,6 +189,9 @@ class JobSchedulerActor(
                 jobInfoToSchedule.apply {
                     // 固定延迟的调度模式由于调度取消无法更新上次完成时间, 所以用本次调度时间为基准设置下次调度时间
                     if (scheduleType == ScheduleTypeEnum.FIX_DELAY) {
+                        if (this.nextScheduleAt!! < LocalDateTime.now()) {
+                            this.nextScheduleAt = LocalDateTime.now()
+                        }
                         this.nextScheduleAt = this.nextScheduleAt!!.plusSeconds(this.scheduleConfig!!.toLong())
                     } else {
                         this.updateNextScheduleTime()
