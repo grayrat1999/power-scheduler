@@ -1,13 +1,13 @@
 package tech.powerscheduler.server.application.service
 
+import jakarta.persistence.OptimisticLockException
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.retry.annotation.Backoff
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import tech.powerscheduler.common.dto.request.TaskProgressReportRequestDTO
-import tech.powerscheduler.common.dto.request.WorkerHeartbeatRequestDTO
-import tech.powerscheduler.common.dto.request.WorkerRegisterRequestDTO
-import tech.powerscheduler.common.dto.request.WorkerUnregisterRequestDTO
+import tech.powerscheduler.common.dto.request.*
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobStatusEnum.FAILED
 import tech.powerscheduler.common.exception.BizException
@@ -45,6 +45,11 @@ class WorkerLifeCycleService(
         return workerRegistries.map { workerRegistryAssembler.toWorkerQueryResponseDTO(it) }
     }
 
+    @Retryable(
+        value = [OptimisticLockException::class],
+        maxAttempts = 3,
+        backoff = Backoff(delay = 0)
+    )
     fun register(param: WorkerRegisterRequestDTO, remoteHost: String): String {
         checkAppCertificate(appCode = param.appCode!!, appSecret = param.appSecret!!)
         return transactionTemplate.execute {
@@ -68,6 +73,11 @@ class WorkerLifeCycleService(
         }!!
     }
 
+    @Retryable(
+        value = [OptimisticLockException::class],
+        maxAttempts = 3,
+        backoff = Backoff(delay = 0)
+    )
     fun handleHeartbeat(param: WorkerHeartbeatRequestDTO, remoteAddr: String) {
         val existWorkerRegistry = workerRegistryRepository.findByUk(
             WorkerRegistryUniqueKey(

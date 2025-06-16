@@ -9,6 +9,9 @@ dependencies {
     implementation("jakarta.validation:jakarta.validation-api")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-tx")
+    implementation("jakarta.persistence:jakarta.persistence-api:3.2.0")
+    implementation("org.springframework.retry:spring-retry")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
 
     testImplementation(libs.bundles.kotlin.test)
     testImplementation("org.springframework.boot:spring-boot-starter-test")
