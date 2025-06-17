@@ -1,6 +1,5 @@
 package tech.powerscheduler.server.application.service
 
-import jakarta.persistence.OptimisticLockException
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.retry.annotation.Backoff
@@ -8,11 +7,13 @@ import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.common.dto.request.*
+import tech.powerscheduler.common.enums.ExecuteModeEnum
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobStatusEnum.FAILED
 import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.WorkerRegistryAssembler
 import tech.powerscheduler.server.application.dto.response.WorkerQueryResponseDTO
+import tech.powerscheduler.server.application.exception.OptimisticLockingConflictException
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
 import tech.powerscheduler.server.domain.task.TaskId
 import tech.powerscheduler.server.domain.task.TaskRepository
@@ -46,7 +47,7 @@ class WorkerLifeCycleService(
     }
 
     @Retryable(
-        value = [OptimisticLockException::class],
+        value = [OptimisticLockingConflictException::class],
         maxAttempts = 3,
         backoff = Backoff(delay = 0)
     )
@@ -74,7 +75,7 @@ class WorkerLifeCycleService(
     }
 
     @Retryable(
-        value = [OptimisticLockException::class],
+        value = [OptimisticLockingConflictException::class],
         maxAttempts = 3,
         backoff = Backoff(delay = 0)
     )
@@ -186,7 +187,7 @@ class WorkerLifeCycleService(
     }
 
     @Retryable(
-        value = [OptimisticLockException::class],
+        value = [OptimisticLockingConflictException::class],
         maxAttempts = 3,
         backoff = Backoff(delay = 0)
     )
