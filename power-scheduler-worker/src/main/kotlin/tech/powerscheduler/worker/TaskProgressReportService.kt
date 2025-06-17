@@ -101,9 +101,11 @@ class TaskProgressReportService(
             this.startAt = latestJobProgress.startAt
             this.endAt = latestJobProgress.endAt
             this.taskStatus = latestJobProgress.status
-            this.message = latestJobProgress.message
+            this.result = latestJobProgress.result
             this.appCode = workerRegisterService.appCode
             this.accessToken = workerRegisterService.accessToken
+            this.subTaskBodyList = latestJobProgress.subTaskListBody
+            this.subTaskName = latestJobProgress.subTaskName
         }
         val result = httpClient.reportProgress(baseUrl = serverUrl, param = param)
         if (result.success && result.data == true) {

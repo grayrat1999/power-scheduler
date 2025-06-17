@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import tech.powerscheduler.common.enums.JobStatusEnum
+import tech.powerscheduler.common.enums.TaskTypeEnum
 import tech.powerscheduler.server.infrastructure.persistence.model.TaskEntity
 
 /**
@@ -19,7 +20,14 @@ interface TaskRepositoryJpaRepository
 
     fun findAllByJobInstanceId(jobInstanceId: Long): List<TaskEntity>
 
-    fun findAllByJobInstanceIdAndBatch(jobInstanceId: Long, batch: Int, pageable: Pageable): Page<TaskEntity>
+    fun findAllByJobInstanceIdAndBatch(jobInstanceId: Long, batch: Int): List<TaskEntity>
+
+    fun findAllByJobInstanceIdAndBatchAndTaskTypeIn(
+        jobInstanceId: Long,
+        batch: Int,
+        taskTypes: Collection<TaskTypeEnum>,
+        pageable: Pageable,
+    ): Page<TaskEntity>
 
     @Query(
         """
@@ -37,6 +45,6 @@ interface TaskRepositoryJpaRepository
         pageRequest: Pageable
     ): Page<TaskEntity>
 
-    fun deleteByJobInstanceIdIn(jobInstanceIds: Iterable<Long>)
+    fun deleteByJobInstanceIdIn(jobInstanceIds: Collection<Long>)
 
 }

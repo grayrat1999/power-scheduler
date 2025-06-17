@@ -25,6 +25,8 @@ interface WorkerRegistryRepository {
 
     fun findByUk(uniqueKey: WorkerRegistryUniqueKey): WorkerRegistry?
 
+    fun findByAccessToken(accessToken: String): WorkerRegistry?
+
     fun save(workerRegistry: WorkerRegistry): WorkerRegistryId
 
     fun delete(id: WorkerRegistryId)

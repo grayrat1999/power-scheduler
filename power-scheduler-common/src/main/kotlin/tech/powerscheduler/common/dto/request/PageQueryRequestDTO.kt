@@ -1,9 +1,5 @@
-package tech.powerscheduler.server.application.dto.request
+package tech.powerscheduler.common.dto.request
 
-/**
- * @author grayrat
- * @since 2025/4/16
- */
 open class PageQueryRequestDTO(
     /**
      * 当前页号

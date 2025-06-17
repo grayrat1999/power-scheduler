@@ -40,11 +40,21 @@ class TaskProgressReportRequestDTO {
     /**
      * 任务结果或者异常信息
      */
-    var message: String? = null
+    var result: String? = null
 
     @NotBlank
     var appCode: String? = null
 
     @NotBlank
     var accessToken: String? = null
+
+    /**
+     * 子任务列表
+     */
+    var subTaskBodyList: String? = null
+
+    /**
+     * 子任务名称
+     */
+    var subTaskName: String? = null
 }

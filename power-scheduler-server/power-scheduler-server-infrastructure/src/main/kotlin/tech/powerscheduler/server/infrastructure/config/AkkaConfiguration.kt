@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import tech.powerscheduler.server.application.actor.AppGuardian
-import tech.powerscheduler.server.infrastructure.utils.JSON
+import tech.powerscheduler.server.application.utils.JSON
 
 @Profile("!IT")
 @Configuration

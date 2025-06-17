@@ -1,6 +1,5 @@
 package tech.powerscheduler.server.application.actor
 
-import akka.actor.typed.ActorRef
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.Behavior
 import akka.actor.typed.Props
@@ -13,6 +12,7 @@ import com.typesafe.config.ConfigFactory
 import org.springframework.context.ApplicationContext
 import tech.powerscheduler.server.application.actor.singleton.JobAssignorActor
 import tech.powerscheduler.server.application.actor.singleton.JobInstanceCleanActor
+import tech.powerscheduler.server.application.actor.singleton.TaskStatusChangeEventHandlerActor
 import tech.powerscheduler.server.application.actor.singleton.WorkerRegistryCleanActor
 import java.util.concurrent.TimeUnit
 
@@ -26,7 +26,6 @@ class AppGuardian(
 ) {
 
     val actorSystem: ActorSystem<Void>
-    var jobAssignorActorRef: ActorRef<JobAssignorActor.Command>? = null
 
     init {
         val overrides = mutableMapOf<String, Any?>(
@@ -81,21 +80,21 @@ class AppGuardian(
             val singleton = ClusterSingleton.get(actorSystem)
 
             SingletonActor.of(
-                JobInstanceCleanActor.create(
-                    applicationContext = applicationContext,
-                ),
+                JobInstanceCleanActor.create(applicationContext = applicationContext),
                 JobInstanceCleanActor::class.simpleName,
             )
                 .withProps(Props.empty().withDispatcherFromConfig("job-instance-clean-dispatcher"))
                 .let { singleton.init(it) }
 
-            val jobAssignorActorRef = SingletonActor.of(
-                JobAssignorActor.create(
-                    applicationContext = applicationContext,
-                ),
-                JobAssignorActor::class.simpleName
+            SingletonActor.of(
+                JobAssignorActor.create(applicationContext = applicationContext),
+                JobAssignorActor::class.simpleName,
             ).let { singleton.init(it) }
-            this.jobAssignorActorRef = jobAssignorActorRef
+
+            SingletonActor.of(
+                TaskStatusChangeEventHandlerActor.create(applicationContext = applicationContext),
+                TaskStatusChangeEventHandlerActor::class.simpleName,
+            ).let { singleton.init(it) }
 
             context.spawn(
                 WorkerRegistryCleanActor.create(applicationContext),
@@ -111,6 +110,7 @@ class AppGuardian(
                 TaskDispatcherActor::class.simpleName,
                 Props.empty().withDispatcherFromConfig("job-dispatcher-dispatcher")
             )
+
             Behaviors.empty()
         }
     }

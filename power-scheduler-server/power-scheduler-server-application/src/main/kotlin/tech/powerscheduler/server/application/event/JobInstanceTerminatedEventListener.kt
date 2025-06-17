@@ -5,7 +5,6 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import tech.powerscheduler.common.dto.request.JobTerminateRequestDTO
 import tech.powerscheduler.server.application.utils.CoroutineExecutor
-import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceTerminatedEvent
 import tech.powerscheduler.server.domain.task.TaskRepository
@@ -36,16 +35,10 @@ class JobInstanceTerminatedEventListener(
             this.jobInstanceId = jobInstanceId.value
         }
         val jobInstance = jobInstanceRepository.findById(jobInstanceId) ?: return
-        // TODO: 暂时写个2000条, 后面做MapReduce的时候再调整一下
-        val taskPage = taskRepository.findAllByJobInstanceIdAndBatch(
+        val tasks = taskRepository.findAllByJobInstanceIdAndBatchAndTaskType(
             jobInstanceId = jobInstanceId,
             batch = jobInstance.batch!!,
-            pageQuery = PageQuery(
-                pageNo = 1,
-                pageSize = 2000
-            )
         )
-        val tasks = taskPage.content
         log.info("jobInstance [{}] is terminated, start to terminate task", jobInstanceId.value)
         val tasksToTerminate = tasks.filterNot { it.isCompleted }
         val workerAddress2Tasks = tasksToTerminate.asSequence()

@@ -1,5 +1,6 @@
 package tech.powerscheduler.worker.task
 
+import tech.powerscheduler.common.enums.TaskTypeEnum
 import java.time.LocalDateTime
 
 /**
@@ -22,7 +23,12 @@ open class TaskContext {
     /**
      * 子任务id
      */
-    var taskId:Long? = null
+    var taskId: Long? = null
+
+    /**
+     * 子任务名称
+     */
+    var taskName: String? = null
 
     /**
      * 任务执行参数
@@ -33,4 +39,9 @@ open class TaskContext {
      * 数据时间
      */
     var dataTime: LocalDateTime? = null
+
+    /**
+     * 子任务类型
+     */
+    var taskType: TaskTypeEnum? = null
 }

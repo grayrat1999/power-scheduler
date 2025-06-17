@@ -1,5 +1,6 @@
 package tech.powerscheduler.server.application.utils
 
+import tech.powerscheduler.common.dto.response.PageDTO
 import tech.powerscheduler.common.enums.*
 import tech.powerscheduler.server.application.dto.response.*
 import tech.powerscheduler.server.domain.common.Page

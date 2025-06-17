@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 import tech.powerscheduler.common.enums.JobStatusEnum
+import tech.powerscheduler.common.enums.TaskTypeEnum
 import tech.powerscheduler.server.domain.common.Page
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.jobinfo.JobId
@@ -39,9 +40,10 @@ class TaskRepositoryRepositoryImpl(
         return entities.map { it.toDomainModel() }
     }
 
-    override fun findAllByJobInstanceIdAndBatch(
+    override fun findAllByJobInstanceIdAndBatchAndTaskType(
         jobInstanceId: JobInstanceId,
         batch: Int,
+        taskTypes: Collection<TaskTypeEnum>,
         pageQuery: PageQuery
     ): Page<Task> {
         val pageable = PageRequest.of(
@@ -49,12 +51,24 @@ class TaskRepositoryRepositoryImpl(
             pageQuery.pageSize,
             Sort.by(JobInstanceEntity::scheduleAt.name).ascending()
         )
-        val entities = taskRepositoryJpaRepository.findAllByJobInstanceIdAndBatch(
+        val entities = taskRepositoryJpaRepository.findAllByJobInstanceIdAndBatchAndTaskTypeIn(
             jobInstanceId = jobInstanceId.value,
             batch = batch,
+            taskTypes = taskTypes,
             pageable = pageable
         )
         return entities.map { it.toDomainModel() }.toDomainPage()
+    }
+
+    override fun findAllByJobInstanceIdAndBatchAndTaskType(
+        jobInstanceId: JobInstanceId,
+        batch: Int
+    ): List<Task> {
+        val entities = taskRepositoryJpaRepository.findAllByJobInstanceIdAndBatch(
+            jobInstanceId = jobInstanceId.value,
+            batch = batch,
+        )
+        return entities.map { it.toDomainModel() }
     }
 
     override fun listDispatchable(

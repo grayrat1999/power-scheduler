@@ -17,5 +17,15 @@ class TaskProgressEntity {
     var status: JobStatusEnum? = null
     var startAt: LocalDateTime? = null
     var endAt: LocalDateTime? = null
-    var message: String? = null
+    var result: String? = null
+
+    /**
+     * 子任务列表
+     */
+    var subTaskListBody: String? = null
+
+    /**
+     * 子任务名称
+     */
+    var subTaskName: String? = null
 }

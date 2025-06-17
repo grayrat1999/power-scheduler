@@ -24,4 +24,6 @@ interface WorkerRegistryJpaRepository :
 
     fun findAllByAppCodeIn(appCodes: Iterable<String>): List<WorkerRegistryEntity>
 
+    fun findByAccessToken(accessToken: String): WorkerRegistryEntity?
+
 }

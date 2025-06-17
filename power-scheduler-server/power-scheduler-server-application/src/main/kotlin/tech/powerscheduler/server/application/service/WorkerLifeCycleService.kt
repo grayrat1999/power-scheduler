@@ -7,14 +7,24 @@ import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.common.dto.request.*
+import tech.powerscheduler.common.dto.response.FetchTaskResultResponseDTO
+import tech.powerscheduler.common.dto.response.PageDTO
 import tech.powerscheduler.common.enums.ExecuteModeEnum
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobStatusEnum.FAILED
+import tech.powerscheduler.common.enums.TaskTypeEnum
 import tech.powerscheduler.common.exception.BizException
+import tech.powerscheduler.server.application.assembler.TaskAssembler
 import tech.powerscheduler.server.application.assembler.WorkerRegistryAssembler
 import tech.powerscheduler.server.application.dto.response.WorkerQueryResponseDTO
 import tech.powerscheduler.server.application.exception.OptimisticLockingConflictException
+import tech.powerscheduler.server.application.utils.JSON
+import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
+import tech.powerscheduler.server.domain.common.PageQuery
+import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
+import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
+import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskId
 import tech.powerscheduler.server.domain.task.TaskRepository
 import tech.powerscheduler.server.domain.task.TaskStatusChangeEvent
@@ -31,11 +41,13 @@ import java.time.LocalDateTime
  */
 @Service
 class WorkerLifeCycleService(
+    private val taskAssembler: TaskAssembler,
     private val taskRepository: TaskRepository,
     private val appGroupRepository: AppGroupRepository,
+    private val transactionTemplate: TransactionTemplate,
+    private val jobInstanceRepository: JobInstanceRepository,
     private val workerRegistryRepository: WorkerRegistryRepository,
     private val workerRegistryAssembler: WorkerRegistryAssembler,
-    private val transactionTemplate: TransactionTemplate,
     private val applicationEventPublisher: ApplicationEventPublisher,
 ) {
 
@@ -120,7 +132,7 @@ class WorkerLifeCycleService(
         val taskId = TaskId(param.taskId!!)
         val task = taskRepository.findById(taskId)
         if (task == null) {
-            log.warn("更新任务状态失败: 子任务[${taskId.value}]不存在")
+            log.warn("updateProgress cancel: task [{}] not exist", taskId.value)
             return
         }
         if (task.taskStatus in JobStatusEnum.COMPLETED_STATUSES) {
@@ -131,21 +143,44 @@ class WorkerLifeCycleService(
             this.taskStatus = param.taskStatus
             this.startAt = param.startAt
             this.endAt = param.endAt
-            this.message = param.message?.take(5000)
+            this.result = param.result?.take(2000)
         }
-        val taskStatusChangeEvent = TaskStatusChangeEvent(
+        if (param.taskStatus == FAILED && task.canReattempt) {
+            task.resetStatusForReattempt()
+        }
+        val followingTasks = createFollowingTasks(task, param)
+        val taskStatusChangeEvent = TaskStatusChangeEvent.create(
             taskId = task.id!!,
             jobInstanceId = task.jobInstanceId!!,
             executeMode = task.executeMode!!,
         )
         transactionTemplate.executeWithoutResult {
-            if (param.taskStatus == FAILED && task.canReattempt) {
-                task.resetStatusForReattempt()
-            }
             taskRepository.save(task)
-            log.info("task update successfully: id={}, status={}", taskId.value, task.taskStatus)
+            if (followingTasks.isNotEmpty()) {
+                taskRepository.saveAll(followingTasks)
+            }
+            log.info("updateProgress successfully: taskId={}, status={}", taskId.value, task.taskStatus)
             applicationEventPublisher.publishEvent(taskStatusChangeEvent)
         }
+    }
+
+    private fun createFollowingTasks(
+        task: Task,
+        param: TaskProgressReportRequestDTO
+    ): List<Task> {
+        if (needCreateSubTask(task)) {
+            return task.createSubTask(
+                subTaskBodyList = JSON.splitJsonArrayToObjectStrings(param.subTaskBodyList),
+                subTaskName = param.subTaskName.orEmpty(),
+            )
+        }
+        return emptyList()
+    }
+
+    fun needCreateSubTask(task: Task): Boolean {
+        return task.executeMode in arrayOf(ExecuteModeEnum.MAP, ExecuteModeEnum.MAP_REDUCE)
+                && task.taskType in arrayOf(TaskTypeEnum.ROOT, TaskTypeEnum.SUB)
+                && task.taskStatus == JobStatusEnum.SUCCESS
     }
 
     fun removeWorkerRegistry(workerRegistry: WorkerRegistry) {
@@ -168,7 +203,7 @@ class WorkerLifeCycleService(
             taskRepository.saveAll(uncompletedTaskList)
 
             uncompletedTaskList.forEach {
-                val taskStatusChangeEvent = TaskStatusChangeEvent(
+                val taskStatusChangeEvent = TaskStatusChangeEvent.create(
                     taskId = it.id!!,
                     jobInstanceId = it.jobInstanceId!!,
                     executeMode = it.executeMode!!,
@@ -208,6 +243,20 @@ class WorkerLifeCycleService(
         } else {
             log.warn("worker [{}:{}] has not registered", uk.host, uk.port)
         }
+    }
+
+    fun fetchTaskResult(param: FetchTaskResultRequestDTO): PageDTO<FetchTaskResultResponseDTO> {
+        val jobInstance = jobInstanceRepository.findById(JobInstanceId(param.jobInstanceId!!))
+        if (jobInstance == null) {
+            return PageDTO.empty(number = param.pageNo, size = param.pageSize,)
+        }
+        val page = taskRepository.findAllByJobInstanceIdAndBatchAndTaskType(
+            jobInstanceId = jobInstance.id!!,
+            batch = jobInstance.batch!!,
+            taskTypes = listOf(TaskTypeEnum.SUB),
+            pageQuery = PageQuery(param.pageNo, param.pageSize),
+        )
+        return page.toDTO().map { taskAssembler.toFetchTaskResultResponseDTO(it) }
     }
 
 }

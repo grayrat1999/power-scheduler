@@ -1,4 +1,4 @@
-package tech.powerscheduler.server.application.dto.response
+package tech.powerscheduler.common.dto.response
 
 /**
  * @author grayrat
@@ -13,7 +13,13 @@ data class PageDTO<T>(
 ) {
 
     companion object {
-        inline fun <reified T> empty(): PageDTO<T> = PageDTO()
+        inline fun <reified T> empty(
+            number: Int = 1,
+            size: Int = 20,
+        ): PageDTO<T> = PageDTO(
+            number = number,
+            size = size,
+        )
     }
 
     fun <R> map(transform: (T) -> R): PageDTO<R> {

@@ -209,6 +209,7 @@ fun WorkerRegistryEntity.toDomainModel(): WorkerRegistry {
 fun Task.toEntity(): TaskEntity {
     return TaskEntity().also {
         it.id = this.id?.value
+        it.parentId = this.parentId?.value
         it.jobId = this.jobId!!.value
         it.jobInstanceId = this.jobInstanceId!!.value
         it.appCode = this.appCode
@@ -224,7 +225,7 @@ fun Task.toEntity(): TaskEntity {
         it.executeParams = this.executeParams
         it.executeMode = this.executeMode
         it.scheduleType = this.scheduleType
-        it.message = this.message
+        it.result = this.result
         it.dataTime = this.dataTime
         it.scriptType = this.scriptType
         it.scriptCode = this.scriptCode
@@ -232,12 +233,15 @@ fun Task.toEntity(): TaskEntity {
         it.maxAttemptCnt = this.maxAttemptCnt
         it.priority = this.priority
         it.batch = this.batch
+        it.taskBody = this.taskBody
+        it.taskType = this.taskType
     }
 }
 
 fun TaskEntity.toDomainModel(): Task {
     return Task().also {
         it.id = TaskId(this.id!!)
+        it.parentId = this.parentId?.let { parentId -> TaskId(parentId) }
         it.jobId = JobId(this.jobId!!)
         it.jobInstanceId = JobInstanceId(this.jobInstanceId!!)
         it.appCode = this.appCode
@@ -253,7 +257,7 @@ fun TaskEntity.toDomainModel(): Task {
         it.executeParams = this.executeParams
         it.executeMode = this.executeMode
         it.scheduleType = this.scheduleType
-        it.message = this.message
+        it.result = this.result
         it.dataTime = this.dataTime
         it.scriptType = this.scriptType
         it.scriptCode = this.scriptCode
@@ -261,6 +265,8 @@ fun TaskEntity.toDomainModel(): Task {
         it.maxAttemptCnt = this.maxAttemptCnt
         it.priority = this.priority
         it.batch = this.batch
+        it.taskBody = this.taskBody
+        it.taskType = this.taskType
     }
 }
 
@@ -268,9 +274,10 @@ fun DomainEvent.toEntity(): DomainEventEntity {
     return DomainEventEntity().also {
         it.id = this.id?.value
         it.aggregateId = this.aggregateId
+        it.aggregateType = this.aggregateType
         it.eventType = this.eventType
         it.eventStatus = this.eventStatus
-        it.payload = this.payload
+        it.body = this.body
         it.retryCnt = this.retryCnt
     }
 }
@@ -279,9 +286,10 @@ fun DomainEventEntity.toDomainModel(): DomainEvent {
     return DomainEvent().also {
         it.id = DomainEventId(this.id!!)
         it.aggregateId = this.aggregateId
+        it.aggregateType = this.aggregateType
         it.eventType = this.eventType
         it.eventStatus = this.eventStatus
-        it.payload = this.payload
+        it.body = this.body
         it.retryCnt = this.retryCnt
     }
 }

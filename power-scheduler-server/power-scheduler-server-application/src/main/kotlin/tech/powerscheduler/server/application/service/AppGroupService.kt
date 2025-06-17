@@ -1,6 +1,7 @@
 package tech.powerscheduler.server.application.service
 
 import org.springframework.stereotype.Service
+import tech.powerscheduler.common.dto.response.PageDTO
 import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.AppGroupAssembler
 import tech.powerscheduler.server.application.context.UserContext
@@ -8,7 +9,6 @@ import tech.powerscheduler.server.application.dto.request.AppGroupAddRequestDTO
 import tech.powerscheduler.server.application.dto.request.AppGroupEditRequestDTO
 import tech.powerscheduler.server.application.dto.request.AppGroupQueryRequestDTO
 import tech.powerscheduler.server.application.dto.response.AppGroupQueryResponseDTO
-import tech.powerscheduler.server.application.dto.response.PageDTO
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
 

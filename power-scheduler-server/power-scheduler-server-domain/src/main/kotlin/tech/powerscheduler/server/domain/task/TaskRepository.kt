@@ -1,5 +1,6 @@
 package tech.powerscheduler.server.domain.task
 
+import tech.powerscheduler.common.enums.TaskTypeEnum
 import tech.powerscheduler.server.domain.common.Page
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.jobinfo.JobId
@@ -15,11 +16,17 @@ interface TaskRepository {
 
     fun findAllByJobInstanceId(jobInstanceId: JobInstanceId): List<Task>
 
-    fun findAllByJobInstanceIdAndBatch(
+    fun findAllByJobInstanceIdAndBatchAndTaskType(
         jobInstanceId: JobInstanceId,
         batch: Int,
+        taskTypes: Collection<TaskTypeEnum>,
         pageQuery: PageQuery
     ): Page<Task>
+
+    fun findAllByJobInstanceIdAndBatchAndTaskType(
+        jobInstanceId: JobInstanceId,
+        batch: Int,
+    ): List<Task>
 
     fun listDispatchable(
         jobIds: Iterable<JobId>,

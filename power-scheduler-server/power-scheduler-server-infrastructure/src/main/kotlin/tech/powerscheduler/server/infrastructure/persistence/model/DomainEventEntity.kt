@@ -1,6 +1,7 @@
 package tech.powerscheduler.server.infrastructure.persistence.model
 
 import jakarta.persistence.*
+import tech.powerscheduler.server.domain.domainevent.AggregateTypeEnum
 import tech.powerscheduler.server.domain.domainevent.DomainEventStatusEnum
 import tech.powerscheduler.server.domain.domainevent.DomainEventTypeEnum
 
@@ -23,28 +24,37 @@ class DomainEventEntity : BaseEntity() {
     var id: Long? = null
 
     /**
-     * 聚合根id, 格式: DomainModelName-ModelId
+     * 聚合根id, 格式: ModelId
      */
     @Column(name = "aggregate_id", nullable = false, updatable = false)
     var aggregateId: String? = null
 
     /**
+     * 聚合根类型
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "aggregate_type", nullable = false, updatable = false)
+    var aggregateType: AggregateTypeEnum? = null
+
+    /**
      * 事件类型
      */
+    @Enumerated(EnumType.STRING)
     @Column(name = "event_type", nullable = false, updatable = false)
     var eventType: DomainEventTypeEnum? = null
 
     /**
      * 事件状态
      */
-    @Column(name = "event_status", nullable = false, updatable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "event_status", nullable = false)
     var eventStatus: DomainEventStatusEnum? = null
 
     /**
      * 事件内容
      */
-    @Column(name = "payload", updatable = false)
-    var payload: String? = null
+    @Column(name = "body", updatable = false)
+    var body: String? = null
 
     /**
      * 重试次数

@@ -11,9 +11,14 @@ class DomainEvent {
     var id: DomainEventId? = null
 
     /**
-     * 聚合根id, 格式: DomainModelName-ModelId
+     * 聚合根id
      */
     var aggregateId: String? = null
+
+    /**
+     * 聚合根类型
+     */
+    var aggregateType: AggregateTypeEnum? = null
 
     /**
      * 事件类型
@@ -28,10 +33,18 @@ class DomainEvent {
     /**
      * 事件内容
      */
-    var payload: String? = null
+    var body: String? = null
 
     /**
      * 重试次数
      */
     var retryCnt: Int? = null
+
+    val canRetry
+        get() = this.retryCnt!! < 3
+
+    fun resetStatusForRetry() {
+        this.eventStatus = DomainEventStatusEnum.PENDING
+        this.retryCnt = this.retryCnt!! + 1
+    }
 }

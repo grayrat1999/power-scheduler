@@ -7,6 +7,7 @@ import tech.powerscheduler.worker.persistence.TaskProgressEntity
 import tech.powerscheduler.worker.persistence.TaskProgressRepository
 import tech.powerscheduler.worker.processor.ProcessResult
 import tech.powerscheduler.worker.processor.ProcessorRegistry
+import tech.powerscheduler.worker.util.JsonUtil.writeValueAsString
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.Delayed
@@ -78,14 +79,22 @@ class Task(
             }
             val processor = ProcessorRegistry.find(processorPath)
                 ?: throw PowerSchedulerWorkerException(message = "[Powerscheduler] Processor [$processorPath] not exists")
-            val result = processor.process(context)
-            when (result) {
+            val processResult = processor.process(context)
+            when (processResult) {
                 is ProcessResult.Success -> {
-                    updateProgress(jobStatus = JobStatusEnum.SUCCESS)
+                    updateProgress(jobStatus = JobStatusEnum.SUCCESS, result = processResult.result)
                 }
 
                 is ProcessResult.Failure -> {
-                    updateProgress(jobStatus = JobStatusEnum.FAILED, message = result.message)
+                    updateProgress(jobStatus = JobStatusEnum.FAILED, result = processResult.message)
+                }
+
+                is ProcessResult.Map -> {
+                    updateProgress(
+                        jobStatus = JobStatusEnum.SUCCESS,
+                        subTaskList = processResult.taskList,
+                        subTaskName = processResult.taskName,
+                    )
                 }
 
                 null -> throw PowerSchedulerWorkerException("[Powerscheduler] ProcessResult can not be null")
@@ -95,15 +104,12 @@ class Task(
             updateProgress(jobStatus = JobStatusEnum.FAILED)
         } catch (e: PowerSchedulerWorkerException) {
             log.error(
-                "[Powerscheduler] Error while executing jobInstance [{}]: {}",
-                context.jobInstanceId,
-                e.message,
-                e
+                "[Powerscheduler] Error while executing jobInstance [{}]: {}", context.jobInstanceId, e.message, e
             )
-            updateProgress(jobStatus = JobStatusEnum.FAILED, message = e.message)
+            updateProgress(jobStatus = JobStatusEnum.FAILED, result = e.message)
         } catch (e: Throwable) {
             log.error("[Powerscheduler] Error while executing jobInstance [{}]", context.jobInstanceId, e)
-            updateProgress(jobStatus = JobStatusEnum.FAILED, message = e.stackTraceToString())
+            updateProgress(jobStatus = JobStatusEnum.FAILED, result = e.stackTraceToString())
         }
     }
 
@@ -118,10 +124,17 @@ class Task(
     /**
      * 更新任务进度
      *
-     * @param jobStatus 任务状态
-     * @param message   任务执行结果或者错误信息
+     * @param jobStatus     任务状态
+     * @param result        任务执行结果或者错误信息
+     * @param subTaskList   子任务列表
+     * @param subTaskName   子任务名称
      */
-    private fun updateProgress(jobStatus: JobStatusEnum, message: String? = "") {
+    private fun updateProgress(
+        jobStatus: JobStatusEnum,
+        result: Any? = null,
+        subTaskList: Iterable<Any> = emptyList(),
+        subTaskName: String = ""
+    ) {
         this.jobStatus = jobStatus
         if (jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
             this.endAt = LocalDateTime.now()
@@ -133,7 +146,9 @@ class Task(
             it.status = this.jobStatus
             it.startAt = this.startAt
             it.endAt = this.endAt
-            it.message = message
+            it.result = result?.let(::writeValueAsString)
+            it.subTaskListBody = writeValueAsString(subTaskList)
+            it.subTaskName = subTaskName
         }
         TaskProgressRepository.save(taskProgressEntity)
     }

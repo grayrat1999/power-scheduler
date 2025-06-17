@@ -1,7 +1,9 @@
 package tech.powerscheduler.server.infrastructure.persistence.repository
 
 import org.springframework.data.jpa.domain.Specification
+import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.stereotype.Repository
+import tech.powerscheduler.server.application.exception.OptimisticLockingConflictException
 import tech.powerscheduler.server.domain.common.AppCode
 import tech.powerscheduler.server.domain.workerregistry.WorkerRegistry
 import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryId
@@ -80,10 +82,19 @@ class WorkerRegistryRepositoryImpl(
         return workerRegistryEntity?.toDomainModel()
     }
 
+    override fun findByAccessToken(accessToken: String): WorkerRegistry? {
+        val entity = workerRegistryJpaRepository.findByAccessToken(accessToken)
+        return entity?.toDomainModel()
+    }
+
     override fun save(workerRegistry: WorkerRegistry): WorkerRegistryId {
         val entityToSave = workerRegistry.toEntity()
-        workerRegistryJpaRepository.save(entityToSave)
-        return WorkerRegistryId(entityToSave.id!!)
+        try {
+            workerRegistryJpaRepository.save(entityToSave)
+            return WorkerRegistryId(entityToSave.id!!)
+        } catch (e: ObjectOptimisticLockingFailureException) {
+            throw OptimisticLockingConflictException()
+        }
     }
 
     override fun delete(id: WorkerRegistryId) {

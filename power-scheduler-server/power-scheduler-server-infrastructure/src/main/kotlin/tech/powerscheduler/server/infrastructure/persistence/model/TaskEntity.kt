@@ -25,6 +25,12 @@ class TaskEntity : BaseEntity() {
     var id: Long? = null
 
     /**
+     * 父任务id
+     */
+    @Column(name = "parent_id", updatable = false)
+    var parentId: Long? = null
+
+    /**
      * 任务id
      */
     @Column(name = "job_id", nullable = false, updatable = false)
@@ -119,10 +125,10 @@ class TaskEntity : BaseEntity() {
     var scheduleType: ScheduleTypeEnum? = null
 
     /**
-     * 任务信息
+     * 任务结果
      */
-    @Column(name = "message", insertable = false, length = 6000)
-    var message: String? = null
+    @Column(name = "result", insertable = false, length = 6000)
+    var result: String? = null
 
     /**
      * 数据时间
@@ -166,4 +172,17 @@ class TaskEntity : BaseEntity() {
      */
     @Column(name = "batch", updatable = false)
     var batch: Int? = null
+
+    /**
+     * 子任务内容(用于存储 Map 和 MapReduce 模式下用户自定义的任务参数)
+     */
+    @Column(name = "task_body", updatable = false, length = 5000)
+    var taskBody: String? = null
+
+    /**
+     * 子任务类型
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "task_type", nullable = false, updatable = false)
+    var taskType: TaskTypeEnum? = null
 }

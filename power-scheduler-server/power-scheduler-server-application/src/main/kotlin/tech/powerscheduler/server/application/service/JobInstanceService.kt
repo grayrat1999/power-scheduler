@@ -3,11 +3,14 @@ package tech.powerscheduler.server.application.service
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
+import tech.powerscheduler.common.dto.response.PageDTO
 import tech.powerscheduler.common.enums.ExecuteModeEnum
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobStatusEnum.*
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
+import tech.powerscheduler.common.enums.TaskTypeEnum
 import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.JobInstanceAssembler
 import tech.powerscheduler.server.application.assembler.TaskAssembler
@@ -17,8 +20,8 @@ import tech.powerscheduler.server.application.dto.request.JobRunRequestDTO
 import tech.powerscheduler.server.application.dto.response.JobInstanceDetailResponseDTO
 import tech.powerscheduler.server.application.dto.response.JobInstanceQueryResponseDTO
 import tech.powerscheduler.server.application.dto.response.JobProgressQueryResponseDTO
-import tech.powerscheduler.server.application.dto.response.PageDTO
 import tech.powerscheduler.server.application.utils.toDTO
+import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.jobinfo.JobId
 import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
 import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
@@ -107,17 +110,22 @@ class JobInstanceService(
         val jobInstanceId = JobInstanceId(param.jobInstanceId!!)
         val jobInstance = jobInstanceRepository.findById(jobInstanceId) ?: return PageDTO.empty()
         val batch = jobInstance.batch!!
-        val pageQuery = param.toDomainQuery()
-        val page = taskRepository.findAllByJobInstanceIdAndBatch(
+        val pageQuery = PageQuery().also {
+            it.pageNo = param.pageNo
+            it.pageSize = param.pageSize
+        }
+        val page = taskRepository.findAllByJobInstanceIdAndBatchAndTaskType(
             jobInstanceId = jobInstanceId,
             batch = batch,
+            taskTypes = TaskTypeEnum.entries,
             pageQuery = pageQuery
         )
         return page.toDTO().map { taskAssembler.toJobProgressQueryResponseDTO(it) }
     }
 
+    @Transactional
     fun updateJobInstanceProgress(jobInstanceId: JobInstanceId) {
-        val jobInstance = jobInstanceRepository.findById(jobInstanceId)
+        val jobInstance = jobInstanceRepository.lockById(jobInstanceId)
         if (jobInstance == null) {
             log.warn("更新任务状态失败: 任务实例[${jobInstanceId.value}]不存在")
             return
@@ -126,7 +134,10 @@ class JobInstanceService(
             log.info("updateProgress cancel, jobInstance [{}] is [{}]", jobInstanceId.value, jobInstance.jobStatus)
             return
         }
-        val tasks = taskRepository.findAllByJobInstanceId(jobInstanceId)
+        val tasks = taskRepository.findAllByJobInstanceIdAndBatchAndTaskType(
+            jobInstanceId = jobInstanceId,
+            batch = jobInstance.batch!!
+        )
         val calculatedJobStatus = jobInstance.calculateJobStatus(tasks)
         // 如果计算出的任务状态与当前一样, 则不需要更新状态
         if (jobInstance.jobStatus == calculatedJobStatus) {
@@ -147,27 +158,26 @@ class JobInstanceService(
                     this.resetStatusForReattempt()
                 } else {
                     if (this.executeMode == ExecuteModeEnum.SINGLE) {
-                        this.message = tasks.mapNotNull { it.message }.firstOrNull { it.isNotBlank() }
+                        this.message = tasks.mapNotNull { it.result }.firstOrNull { it.isNotBlank() }
                     }
                 }
             }
         }
-        transactionTemplate.executeWithoutResult {
-            jobInstanceRepository.save(jobInstance)
-            if (jobInstance.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
-                val jobInfo = jobInfoRepository.lockById(jobInstance.jobId!!)
-                if (jobInfo == null) {
-                    return@executeWithoutResult
-                }
-                jobInfo.lastCompletedAt = jobInstance.endAt
-                if (jobInstance.scheduleType == ScheduleTypeEnum.ONE_TIME) {
-                    jobInfo.enabled = false
-                }
-                if (jobInfo.scheduleType == ScheduleTypeEnum.FIX_DELAY) {
-                    jobInfo.updateNextScheduleTime()
-                }
-                jobInfoRepository.save(jobInfo)
+
+        jobInstanceRepository.save(jobInstance)
+        if (jobInstance.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
+            val jobInfo = jobInfoRepository.lockById(jobInstance.jobId!!)
+            if (jobInfo == null) {
+                return
             }
+            jobInfo.lastCompletedAt = jobInstance.endAt
+            if (jobInstance.scheduleType == ScheduleTypeEnum.ONE_TIME) {
+                jobInfo.enabled = false
+            }
+            if (jobInfo.scheduleType == ScheduleTypeEnum.FIX_DELAY) {
+                jobInfo.updateNextScheduleTime()
+            }
+            jobInfoRepository.save(jobInfo)
         }
         log.info("jobInstance update successfully: id={}, status={}", jobInstanceId.value, jobInstance.jobStatus)
     }

@@ -55,3 +55,11 @@ const val REPORT_PROGRESS_API = "reportProgress"
  * @since 2025/6/16
  */
 const val REPORT_METRICS_API = "reportMetrics"
+
+/**
+ * 拉取任务结果
+ *
+ * @author grayrat
+ * @since 2025/6/19
+ */
+const val FETCH_TASK_RESULT = "fetchTaskResult"

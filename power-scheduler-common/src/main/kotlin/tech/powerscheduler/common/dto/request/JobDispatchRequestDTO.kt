@@ -1,9 +1,6 @@
 package tech.powerscheduler.common.dto.request
 
-import tech.powerscheduler.common.enums.ExecuteModeEnum
-import tech.powerscheduler.common.enums.JobStatusEnum
-import tech.powerscheduler.common.enums.JobTypeEnum
-import tech.powerscheduler.common.enums.ScriptTypeEnum
+import tech.powerscheduler.common.enums.*
 import java.time.LocalDateTime
 
 /**
@@ -29,14 +26,19 @@ class JobDispatchRequestDTO {
     var taskId: Long? = null
 
     /**
+     * 子任务名称
+     */
+    var taskName: String? = null
+
+    /**
+     * 子任务的父任务id
+     */
+    var parentTaskId: Long? = null
+
+    /**
      * 应用编码
      */
     var appCode: String? = null
-
-    /**
-     * 任务名称
-     */
-    var jobName: String? = null
 
     /**
      * 任务类型
@@ -92,4 +94,14 @@ class JobDispatchRequestDTO {
      * 任务优先级
      */
     var priority: Int = 0
+
+    /**
+     * 子任务内容(用于存储 Map 和 MapReduce模式下用户自定义的任务参数)
+     */
+    var taskBody: String? = null
+
+    /**
+     * 子任务类型
+     */
+    var taskType: TaskTypeEnum? = null
 }

@@ -23,6 +23,11 @@ enum class ExecuteModeEnum(
     BROADCAST("广播模式"),
 
     /**
+     * Map模式
+     */
+    MAP("MAP模式"),
+
+    /**
      * MapReduce模式
      */
     MAP_REDUCE("MapReduce模式"),

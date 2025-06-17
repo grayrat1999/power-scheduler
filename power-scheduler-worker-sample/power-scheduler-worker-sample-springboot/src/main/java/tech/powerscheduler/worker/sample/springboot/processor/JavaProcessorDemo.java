@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
-public class MyProcessor extends JavaProcessor {
+public class JavaProcessorDemo extends JavaProcessor {
 
     @Override
     public ProcessResult process(TaskContext context) throws InterruptedException {

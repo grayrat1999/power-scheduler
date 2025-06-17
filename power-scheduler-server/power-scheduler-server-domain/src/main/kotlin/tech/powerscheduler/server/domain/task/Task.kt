@@ -17,6 +17,11 @@ class Task {
     var id: TaskId? = null
 
     /**
+     * 父任务id
+     */
+    var parentId: TaskId? = null
+
+    /**
      * 任务id
      */
     var jobId: JobId? = null
@@ -82,9 +87,9 @@ class Task {
     var scheduleType: ScheduleTypeEnum? = null
 
     /**
-     * 任务信息
+     * 任务结果
      */
-    var message: String? = null
+    var result: String? = null
 
     /**
      * 数据时间
@@ -136,6 +141,16 @@ class Task {
      */
     var batch: Int? = null
 
+    /**
+     * 子任务内容(用于存储 Map 和 MapReduce 模式下用户自定义的任务参数)
+     */
+    var taskBody: String? = null
+
+    /**
+     * 任务类型
+     */
+    var taskType: TaskTypeEnum? = null
+
     val canReattempt
         get() = this.attemptCnt!! < this.maxAttemptCnt!!
 
@@ -146,7 +161,7 @@ class Task {
         this.startAt = this.startAt ?: LocalDateTime.now()
         this.endAt = LocalDateTime.now()
         this.taskStatus = JobStatusEnum.FAILED
-        this.message = message?.take(2000)
+        this.result = message?.take(2000)
     }
 
     fun resetStatusForReattempt() {
@@ -165,5 +180,55 @@ class Task {
             this.endAt = LocalDateTime.now()
         }
         this.taskStatus = JobStatusEnum.CANCELED
+    }
+
+    fun createSubTask(subTaskBodyList: List<String>, subTaskName: String): List<Task> {
+        return subTaskBodyList.map { subTaskBody ->
+            Task().also {
+                it.parentId = this.id
+                it.jobId = this.jobId
+                it.jobInstanceId = this.jobInstanceId
+                it.appCode = this.appCode
+                it.taskName = subTaskName
+                it.jobType = this.jobType
+                it.processor = this.processor
+                it.taskStatus = JobStatusEnum.WAITING_DISPATCH
+                it.scheduleAt = LocalDateTime.now()
+                it.executeParams = this.executeParams
+                it.executeMode = this.executeMode
+                it.scheduleType = this.scheduleType
+                it.dataTime = this.dataTime
+                it.attemptCnt = 0
+                it.maxAttemptCnt = this.maxAttemptCnt
+                it.attemptInterval = this.attemptInterval
+                it.priority = this.priority
+                it.batch = this.batch
+                it.taskBody = subTaskBody
+                it.taskType = TaskTypeEnum.SUB
+            }
+        }
+    }
+
+    fun createReduceTask(): Task {
+        return Task().also {
+            it.jobId = this.jobId
+            it.jobInstanceId = this.jobInstanceId
+            it.appCode = this.appCode
+            it.taskName = "REDUCE_TASK"
+            it.jobType = this.jobType
+            it.processor = this.processor
+            it.taskStatus = JobStatusEnum.WAITING_DISPATCH
+            it.scheduleAt = LocalDateTime.now()
+            it.executeParams = this.executeParams
+            it.executeMode = this.executeMode
+            it.scheduleType = this.scheduleType
+            it.dataTime = this.dataTime
+            it.attemptCnt = 0
+            it.maxAttemptCnt = this.maxAttemptCnt
+            it.attemptInterval = this.attemptInterval
+            it.priority = this.priority
+            it.batch = this.batch
+            it.taskType = TaskTypeEnum.REDUCE
+        }
     }
 }

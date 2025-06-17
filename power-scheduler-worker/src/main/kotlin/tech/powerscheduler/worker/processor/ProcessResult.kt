@@ -14,7 +14,9 @@ sealed class ProcessResult {
      * @author grayrat
      * @since 2025/4/26
      */
-    class Success() : ProcessResult()
+    class Success(
+        val result: Any?,
+    ) : ProcessResult()
 
     /**
      * 任务处理失败的结果
@@ -25,12 +27,29 @@ sealed class ProcessResult {
         val message: String? = null,
     ) : ProcessResult()
 
+    /**
+     * 任务Map的结果
+     *
+     * @property taskList 子任务列表
+     * @property taskName 子任务名称
+     */
+    class Map(
+        val taskList: List<Any>,
+        val taskName: String,
+    ) : ProcessResult()
+
     companion object {
         /**
          * 用于创建成功结果的工厂方法
          */
         @JvmStatic
-        fun success() = Success()
+        fun success() = Success(null)
+
+        /**
+         * 用于创建成功结果的工厂方法
+         */
+        @JvmStatic
+        fun success(result: Any?) = Success(result)
 
         /**
          * 用于创建失败结果的工厂方法

@@ -4,10 +4,9 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import tech.powerscheduler.common.enums.ExecuteModeEnum.*
 import tech.powerscheduler.server.application.service.JobInstanceService
-import tech.powerscheduler.server.domain.domainevent.DomainEvent
-import tech.powerscheduler.server.domain.domainevent.DomainEventRepository
-import tech.powerscheduler.server.domain.domainevent.DomainEventStatusEnum
-import tech.powerscheduler.server.domain.domainevent.DomainEventTypeEnum
+import tech.powerscheduler.server.application.utils.JSON
+import tech.powerscheduler.server.domain.domainevent.*
+import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
 import tech.powerscheduler.server.domain.task.TaskStatusChangeEvent
 
 /**
@@ -23,23 +22,25 @@ class TaskStatusChangeEventListener(
     @EventListener
     fun onTaskStatusChange(event: TaskStatusChangeEvent) {
         when (event.executeMode) {
-            SINGLE, BROADCAST -> updateJobInstanceProgressNow(event)
-            MAP_REDUCE -> persistentEvent(event)
+            SINGLE -> updateJobInstanceProgressNow(event)
+            BROADCAST, MAP, MAP_REDUCE -> persistentEvent(event)
         }
     }
 
     fun persistentEvent(event: TaskStatusChangeEvent) {
         val domainEvent = DomainEvent().apply {
             this.eventStatus = DomainEventStatusEnum.PENDING
-            this.aggregateId = "Task-${event.taskId.value}"
+            this.aggregateId = event.jobInstanceId.toString()
+            this.aggregateType = AggregateTypeEnum.JOB_INSTANCE
             this.eventType = DomainEventTypeEnum.TASK_STATUS_CHANGED
-            this.payload = ""
+            this.body = JSON.writeValueAsString(event)
             this.retryCnt = 0
         }
         domainEventRepository.save(domainEvent)
     }
 
     fun updateJobInstanceProgressNow(event: TaskStatusChangeEvent) {
-        jobInstanceService.updateJobInstanceProgress(event.jobInstanceId)
+        val jobInstanceId = JobInstanceId(event.jobInstanceId)
+        jobInstanceService.updateJobInstanceProgress(jobInstanceId)
     }
 }

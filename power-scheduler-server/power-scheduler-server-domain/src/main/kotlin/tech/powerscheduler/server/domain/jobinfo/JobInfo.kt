@@ -244,24 +244,27 @@ class JobInfo {
 
     fun validScheduleConfig() {
         if (scheduleConfig.isNullOrBlank()) {
-            throw BizException("任务[$id]的调度配置校验失败: 调度配置不能为空")
+            throw BizException("调度配置不能为空")
+        }
+        if (this.jobType == JobTypeEnum.SCRIPT && this.executeMode in arrayOf(MAP, MAP_REDUCE)) {
+            throw BizException("脚本任务不能使用[$executeMode]模式")
         }
         when (scheduleType) {
             CRON -> {
                 if (CronUtils.isValidCron(scheduleConfig!!).not()) {
-                    throw BizException("任务[$id]的调度配置校验失败: 非法cron表达式. 当前值=$scheduleConfig")
+                    throw BizException("非法cron表达式. 当前值=$scheduleConfig")
                 }
             }
 
             FIX_RATE, FIX_DELAY -> {
                 if (isPositiveNumber(scheduleConfig!!).not()) {
-                    throw BizException("任务[$id]的调度配置校验失败: 调度配置不是正整数. 当前值=$scheduleConfig")
+                    throw BizException("调度配置不是正整数. 当前值=$scheduleConfig")
                 }
             }
 
             ONE_TIME -> {
                 if (isDateTimeText(scheduleConfig).not()) {
-                    throw BizException("任务[$id]的调度配置校验失败: 调度配置不是 'yyyy-MM-dd HH:mm:ss'格式. 当前值=$scheduleConfig")
+                    throw BizException("调度配置不是 'yyyy-MM-dd HH:mm:ss'格式. 当前值=$scheduleConfig")
                 }
             }
 
@@ -271,7 +274,7 @@ class JobInfo {
         when (executeMode) {
             SINGLE -> {}
 
-            BROADCAST, MAP_REDUCE -> {
+            BROADCAST, MAP, MAP_REDUCE -> {
                 if (taskMaxAttemptCnt == null || taskMaxAttemptCnt!! < 0) {
                     throw BizException("子任务最大重试次数必须为非负数")
                 }

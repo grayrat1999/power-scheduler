@@ -15,6 +15,8 @@ import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import tech.powerscheduler.common.api.*
 import tech.powerscheduler.common.dto.request.*
+import tech.powerscheduler.common.dto.response.FetchTaskResultResponseDTO
+import tech.powerscheduler.common.dto.response.PageDTO
 import tech.powerscheduler.common.dto.response.ResponseWrapper
 
 /**
@@ -116,6 +118,15 @@ class PowerSchedulerWorkerHttpClient {
     fun reportMetrics(baseUrl: String, param: WorkerMetricsReportRequestDTO): ResponseWrapper<Boolean> {
         val url = buildUrl(baseUrl, REPORT_METRICS_API)
         val result = post<Boolean>(url, param)
+        return result
+    }
+
+    fun fetchTaskResult(
+        baseUrl: String,
+        param: FetchTaskResultRequestDTO
+    ): ResponseWrapper<PageDTO<FetchTaskResultResponseDTO>> {
+        val url = buildUrl(baseUrl, FETCH_TASK_RESULT)
+        val result = post<PageDTO<FetchTaskResultResponseDTO>>(url, param)
         return result
     }
 

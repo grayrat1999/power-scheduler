@@ -2,6 +2,7 @@ package tech.powerscheduler.server.application.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import tech.powerscheduler.common.dto.response.PageDTO
 import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.JobInfoAssembler
 import tech.powerscheduler.server.application.dto.request.JobInfoAddRequestDTO
@@ -10,7 +11,6 @@ import tech.powerscheduler.server.application.dto.request.JobInfoQueryRequestDTO
 import tech.powerscheduler.server.application.dto.request.JobSwitchRequestDTO
 import tech.powerscheduler.server.application.dto.response.JobInfoDetailResponseDTO
 import tech.powerscheduler.server.application.dto.response.JobInfoQueryResponseDTO
-import tech.powerscheduler.server.application.dto.response.PageDTO
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
 import tech.powerscheduler.server.domain.jobinfo.JobId

@@ -289,10 +289,11 @@ class JobSchedulerActor(
     }
 
     private fun doCreateTasks(jobInstance: JobInstance, availableWorkers: List<WorkerRegistry>): List<Task> {
-        val tasks = when (jobInstance.executeMode!!) {
+        val executeMode = jobInstance.executeMode
+        val tasks = when (executeMode!!) {
             // 单机模式创建1个task
             // Map/MapReduce模式 先创建1个task，后续根据任务上报的结果持续创建子task(需要做好幂等)
-            SINGLE, MAP_REDUCE -> {
+            SINGLE, MAP, MAP_REDUCE -> {
                 val targetWorkerAddress = selectWorker(
                     jobInstance = jobInstance,
                     candidateWorkers = availableWorkers,

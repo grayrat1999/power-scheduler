@@ -26,7 +26,9 @@ object TaskProgressRepository {
                 stmt.setString(4, entity.status?.name)
                 stmt.setObject(5, entity.startAt)
                 stmt.setObject(6, entity.endAt)
-                stmt.setString(7, entity.message)
+                stmt.setString(7, entity.result)
+                stmt.setString(8, entity.subTaskListBody)
+                stmt.setString(9, entity.subTaskName)
                 stmt.executeUpdate()
             }
         }
@@ -59,7 +61,9 @@ object TaskProgressRepository {
                                 this.status = rs.getString("status")?.let { JobStatusEnum.valueOf(it) }
                                 this.startAt = rs.getObject("start_at", LocalDateTime::class.java)
                                 this.endAt = rs.getObject("end_at", LocalDateTime::class.java)
-                                this.message = rs.getString("message")
+                                this.result = rs.getString("message")
+                                this.subTaskListBody = rs.getString("sub_task_list_body")
+                                this.subTaskName = rs.getString("sub_task_name")
                             }
                         } else {
                             null

@@ -2,6 +2,8 @@ package tech.powerscheduler.server.application.assembler
 
 import org.springframework.stereotype.Component
 import tech.powerscheduler.common.dto.request.JobDispatchRequestDTO
+import tech.powerscheduler.common.dto.response.FetchTaskResultResponseDTO
+import tech.powerscheduler.common.enums.TaskTypeEnum
 import tech.powerscheduler.server.application.dto.response.JobProgressQueryResponseDTO
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.task.Task
@@ -18,8 +20,9 @@ class TaskAssembler {
             it.jobId = domainModel.jobId!!.value
             it.jobInstanceId = domainModel.jobInstanceId!!.value
             it.taskId = domainModel.id!!.value
+            it.taskName = domainModel.taskName
+            it.parentTaskId = domainModel.parentId?.value
             it.appCode = domainModel.appCode
-            it.jobName = domainModel.taskName
             it.jobType = domainModel.jobType
             it.processor = domainModel.processor
             it.jobStatus = domainModel.taskStatus
@@ -31,6 +34,10 @@ class TaskAssembler {
             it.scriptCode = domainModel.scriptCode
             it.attemptCnt = domainModel.attemptCnt
             it.priority = domainModel.priority ?: 0
+            it.taskType = domainModel.taskType
+            if (it.taskType == TaskTypeEnum.SUB) {
+                it.taskBody = domainModel.taskBody
+            }
         }
     }
 
@@ -43,6 +50,14 @@ class TaskAssembler {
             it.workerAddress = task.workerAddress
             it.startAt = task.startAt
             it.endAt = task.endAt
+        }
+    }
+
+    fun toFetchTaskResultResponseDTO(task: Task): FetchTaskResultResponseDTO {
+        return FetchTaskResultResponseDTO().also {
+            it.taskId = task.id!!.value
+            it.taskName = task.taskName
+            it.result = task.result
         }
     }
 }

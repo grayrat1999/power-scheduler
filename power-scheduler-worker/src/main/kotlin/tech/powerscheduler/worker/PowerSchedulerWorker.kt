@@ -76,7 +76,9 @@ class PowerSchedulerWorker(
         serverDiscoveryService = serverDiscoveryService,
     )
 
-    private val taskExecutorService = TaskExecutorService()
+    private val taskExecutorService = TaskExecutorService(
+        serverDiscoveryService = serverDiscoveryService,
+    )
 
     private val taskProgressReportService = TaskProgressReportService(
         serverDiscoveryService = serverDiscoveryService,

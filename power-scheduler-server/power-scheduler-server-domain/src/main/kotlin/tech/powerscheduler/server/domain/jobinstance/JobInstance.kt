@@ -223,7 +223,7 @@ class JobInstance {
             it.executeParams = this.executeParams
             it.executeMode = this.executeMode
             it.scheduleType = this.scheduleType
-            it.message = this.message
+            it.result = this.message
             it.dataTime = this.dataTime
             it.scriptType = this.scriptType
             it.scriptCode = this.scriptCode
@@ -241,11 +241,20 @@ class JobInstance {
                 SINGLE -> {
                     it.maxAttemptCnt = 0
                     it.attemptInterval = 0
+                    it.taskType = TaskTypeEnum.NORMAL
                 }
 
-                BROADCAST, MAP_REDUCE -> {
+                BROADCAST -> {
                     it.maxAttemptCnt = this.taskMaxAttemptCnt
                     it.attemptInterval = this.taskAttemptInterval
+                    it.taskType = TaskTypeEnum.NORMAL
+                }
+
+                MAP, MAP_REDUCE -> {
+                    it.taskName = "ROOT_TASK"
+                    it.maxAttemptCnt = this.taskMaxAttemptCnt
+                    it.attemptInterval = this.taskAttemptInterval
+                    it.taskType = TaskTypeEnum.ROOT
                 }
             }
         }
@@ -259,9 +268,11 @@ class JobInstance {
         val maxBatch = tasks.maxOfOrNull { it.batch!! }
         return when (this.executeMode!!) {
             SINGLE -> tasks.first { it.batch == maxBatch }.taskStatus!!
-            BROADCAST -> {
+
+            BROADCAST, MAP, MAP_REDUCE -> {
                 val currentTasks = tasks.filter { it.batch == maxBatch }
                 val jobStatusSet = currentTasks.map { it.taskStatus!! }.toSet()
+                // 如果全部任务都已经完成, 则设置成功或者失败状态
                 if ((jobStatusSet - JobStatusEnum.COMPLETED_STATUSES).isEmpty()) {
                     if (jobStatusSet.all { it == JobStatusEnum.SUCCESS }) {
                         return JobStatusEnum.SUCCESS
@@ -269,17 +280,18 @@ class JobInstance {
                     if (jobStatusSet.any { it == JobStatusEnum.FAILED }) {
                         return JobStatusEnum.FAILED
                     }
+                    // 取消状态的任务不会走到这里, 留个未知状态兜底
                     return JobStatusEnum.UNKNOWN
                 } else {
                     return if (jobStatusSet.intersect(JobStatusEnum.COMPLETED_STATUSES).isNotEmpty()) {
+                        // 如果部分完成, 则设置为执行中
                         JobStatusEnum.PROCESSING
                     } else {
+                        // 如果没有任何完成状态的, 则取最大的状态
                         jobStatusSet.maxBy { it.ordinal }
                     }
                 }
             }
-
-            MAP_REDUCE -> TODO()
         }
     }
 

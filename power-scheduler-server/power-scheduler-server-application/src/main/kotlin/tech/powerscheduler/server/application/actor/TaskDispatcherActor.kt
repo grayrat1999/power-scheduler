@@ -237,7 +237,7 @@ class TaskDispatcherActor(
 
     fun publishTaskStatusChangeEvent(task: Task) {
         applicationEventPublisher.publishEvent(
-            TaskStatusChangeEvent(
+            TaskStatusChangeEvent.create(
                 taskId = task.id!!,
                 jobInstanceId = task.jobInstanceId!!,
                 executeMode = task.executeMode!!,

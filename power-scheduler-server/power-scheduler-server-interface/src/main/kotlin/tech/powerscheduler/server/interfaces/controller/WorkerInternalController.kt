@@ -80,4 +80,12 @@ internal class WorkerInternalController(
         )
         return@wrapperResponse true
     }
+
+    @PostMapping(FETCH_TASK_RESULT)
+    fun reportMetrics(
+        @RequestBody @NotNull param: FetchTaskResultRequestDTO?,
+    ) = wrapperResponse {
+        val result = workerLifeCycleService.fetchTaskResult(param = param!!)
+        return@wrapperResponse result
+    }
 }
