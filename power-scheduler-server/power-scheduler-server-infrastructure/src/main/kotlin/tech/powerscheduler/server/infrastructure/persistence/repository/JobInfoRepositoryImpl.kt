@@ -62,7 +62,7 @@ class JobInfoRepositoryImpl(
                 namespaceJoin.get<String>(NamespaceEntity::code.name), query.namespaceCode
             )
             val appCodeEqual = query.appCode.takeUnless { it.isNullOrBlank() }?.let {
-                criteriaBuilder.equal(appGroupJoin.get<String>(JobInfoEntity::appCode.name), it)
+                criteriaBuilder.equal(appGroupJoin.get<String>(AppGroupEntity::code.name), it)
             }
             val jobNameLike = query.jobName.takeUnless { it.isNullOrBlank() }?.let {
                 criteriaBuilder.like(root.get(JobInfoEntity::jobName.name), "%$it%")

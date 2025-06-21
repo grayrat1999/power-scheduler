@@ -39,9 +39,15 @@ class JobInfoRepositoryImplIT(
     private val jobInfoRepositoryImpl: JobInfoRepositoryImpl,
 ) : FunSpec({
 
+    data class Data(
+        val namespaceEntities: List<NamespaceEntity>,
+        val appGroupEntities: List<AppGroupEntity>,
+        val jobInfoEntities: List<JobInfoEntity>,
+    )
+
     context("test ${JobInfoRepositoryImpl::pageQuery.name}") {
 
-        fun prepareData(): List<JobInfoEntity> {
+        fun prepareData(): Data {
             val namespaceEntity = NamespaceEntity().also {
                 it.code = "namespaceCode"
                 it.name = "namespaceName"
@@ -56,7 +62,7 @@ class JobInfoRepositoryImplIT(
                 .map {
                     JobInfoEntity().also {
                         it.appGroupEntity = appGroupEntity
-                        it.appCode = "appCode_" + (0..10).random()
+                        it.appCode = appGroupEntity.code
                         it.jobName = "jobName_$it"
                         it.jobDesc = "jobDesc_$it"
                         it.jobType = JobTypeEnum.entries.random()
@@ -74,12 +80,17 @@ class JobInfoRepositoryImplIT(
             namespaceJpaRepository.save(namespaceEntity)
             appGroupJpaRepository.save(appGroupEntity)
             jobInfoJpaRepository.saveAll(jobInfoEntities)
-            return jobInfoEntities
+            return Data(
+                namespaceEntities = listOf(namespaceEntity),
+                appGroupEntities = listOf(appGroupEntity),
+                jobInfoEntities = jobInfoEntities,
+            )
         }
 
         test("filter by appCode") {
-            val jobInfoEntities = prepareData()
+             val (namespaceEntities, appGroupEntities, jobInfoEntities) = prepareData()
             val query = JobInfoQuery().also {
+                it.namespaceCode = namespaceEntities.random().code
                 it.appCode = jobInfoEntities.random().appCode
                 it.pageSize = jobInfoEntities.size
             }
@@ -92,8 +103,9 @@ class JobInfoRepositoryImplIT(
         }
 
         test("filter by jobName") {
-            val jobInfoEntities = prepareData()
+            val (namespaceEntities, appGroupEntities, jobInfoEntities) = prepareData()
             val query = JobInfoQuery().also {
+                it.namespaceCode = namespaceEntities.random().code
                 it.jobName = jobInfoEntities.random().jobName
                 it.pageSize = jobInfoEntities.size
             }
@@ -104,8 +116,9 @@ class JobInfoRepositoryImplIT(
         }
 
         test("filter by processorLike") {
-            val jobInfoEntities = prepareData()
+            val (namespaceEntities, appGroupEntities, jobInfoEntities) = prepareData()
             val query = JobInfoQuery().also {
+                it.namespaceCode = namespaceEntities.random().code
                 it.processor = jobInfoEntities.random().processor
                 it.pageSize = jobInfoEntities.size
             }
