@@ -6,7 +6,7 @@ import tech.powerscheduler.common.enums.ExecuteModeEnum.*
 import tech.powerscheduler.server.application.service.JobInstanceService
 import tech.powerscheduler.server.application.utils.JSON
 import tech.powerscheduler.server.domain.domainevent.*
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
+import tech.powerscheduler.server.domain.job.JobInstanceId
 import tech.powerscheduler.server.domain.task.TaskStatusChangeEvent
 
 /**

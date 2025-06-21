@@ -5,14 +5,14 @@ import tech.powerscheduler.server.domain.appgroup.AppGroupId
 import tech.powerscheduler.server.domain.common.Page
 import tech.powerscheduler.server.domain.domainevent.DomainEvent
 import tech.powerscheduler.server.domain.domainevent.DomainEventId
-import tech.powerscheduler.server.domain.jobinfo.JobId
-import tech.powerscheduler.server.domain.jobinfo.JobInfo
-import tech.powerscheduler.server.domain.jobinstance.JobInstance
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
+import tech.powerscheduler.server.domain.job.JobId
+import tech.powerscheduler.server.domain.job.JobInfo
+import tech.powerscheduler.server.domain.job.JobInstance
+import tech.powerscheduler.server.domain.job.JobInstanceId
 import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskId
-import tech.powerscheduler.server.domain.workerregistry.WorkerRegistry
-import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryId
+import tech.powerscheduler.server.domain.worker.WorkerRegistry
+import tech.powerscheduler.server.domain.worker.WorkerRegistryId
 import tech.powerscheduler.server.infrastructure.persistence.model.*
 
 /**

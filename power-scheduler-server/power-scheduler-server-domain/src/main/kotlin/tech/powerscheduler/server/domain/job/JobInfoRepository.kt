@@ -1,4 +1,4 @@
-package tech.powerscheduler.server.domain.jobinfo
+package tech.powerscheduler.server.domain.job
 
 import tech.powerscheduler.server.domain.common.Enabled
 import tech.powerscheduler.server.domain.common.Page

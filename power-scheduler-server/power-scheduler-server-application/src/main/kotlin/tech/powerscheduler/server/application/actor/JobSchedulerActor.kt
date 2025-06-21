@@ -21,14 +21,14 @@ import tech.powerscheduler.common.enums.ScheduleTypeEnum
 import tech.powerscheduler.server.application.utils.hostPort
 import tech.powerscheduler.server.application.utils.registerSelfAsService
 import tech.powerscheduler.server.domain.common.PageQuery
-import tech.powerscheduler.server.domain.jobinfo.JobId
-import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
-import tech.powerscheduler.server.domain.jobinstance.JobInstance
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
+import tech.powerscheduler.server.domain.job.JobId
+import tech.powerscheduler.server.domain.job.JobInfoRepository
+import tech.powerscheduler.server.domain.job.JobInstance
+import tech.powerscheduler.server.domain.job.JobInstanceRepository
 import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskRepository
-import tech.powerscheduler.server.domain.workerregistry.WorkerRegistry
-import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryRepository
+import tech.powerscheduler.server.domain.worker.WorkerRegistry
+import tech.powerscheduler.server.domain.worker.WorkerRegistryRepository
 import java.time.Duration
 import java.time.LocalDateTime
 

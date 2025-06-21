@@ -11,8 +11,8 @@ import tech.powerscheduler.common.enums.ScriptTypeEnum
 import tech.powerscheduler.server.application.dto.request.JobInfoAddRequestDTO
 import tech.powerscheduler.server.application.dto.request.JobInfoEditRequestDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroup
-import tech.powerscheduler.server.domain.jobinfo.JobId
-import tech.powerscheduler.server.domain.jobinfo.JobInfo
+import tech.powerscheduler.server.domain.job.JobId
+import tech.powerscheduler.server.domain.job.JobInfo
 import java.time.LocalDateTime
 
 class JobInfoAssemblerTest : FunSpec({

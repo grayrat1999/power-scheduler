@@ -1,4 +1,4 @@
-package tech.powerscheduler.server.domain.jobinstance
+package tech.powerscheduler.server.domain.job
 
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.server.domain.common.PageQuery

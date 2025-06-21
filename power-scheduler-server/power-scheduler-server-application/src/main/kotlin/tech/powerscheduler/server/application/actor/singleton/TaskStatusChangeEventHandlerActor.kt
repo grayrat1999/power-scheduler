@@ -18,9 +18,9 @@ import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.domainevent.DomainEventRepository
 import tech.powerscheduler.server.domain.domainevent.DomainEventStatusEnum
 import tech.powerscheduler.server.domain.domainevent.DomainEventTypeEnum.TASK_STATUS_CHANGED
-import tech.powerscheduler.server.domain.jobinstance.JobInstance
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
+import tech.powerscheduler.server.domain.job.JobInstance
+import tech.powerscheduler.server.domain.job.JobInstanceId
+import tech.powerscheduler.server.domain.job.JobInstanceRepository
 import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskRepository
 import tech.powerscheduler.server.domain.task.TaskStatusChangeEvent

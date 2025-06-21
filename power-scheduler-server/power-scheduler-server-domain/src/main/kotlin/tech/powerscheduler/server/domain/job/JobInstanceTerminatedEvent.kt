@@ -1,4 +1,4 @@
-package tech.powerscheduler.server.domain.jobinstance
+package tech.powerscheduler.server.domain.job
 
 /**
  * @author grayrat

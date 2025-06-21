@@ -17,13 +17,7 @@ import tech.powerscheduler.server.application.dto.request.JobRunRequestDTO
 import tech.powerscheduler.server.application.dto.response.JobInstanceDetailResponseDTO
 import tech.powerscheduler.server.application.dto.response.JobInstanceQueryResponseDTO
 import tech.powerscheduler.server.domain.common.Page
-import tech.powerscheduler.server.domain.jobinfo.JobId
-import tech.powerscheduler.server.domain.jobinfo.JobInfo
-import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
-import tech.powerscheduler.server.domain.jobinstance.JobInstance
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceQuery
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
+import tech.powerscheduler.server.domain.job.*
 import tech.powerscheduler.server.domain.task.TaskRepository
 
 class JobInstanceServiceTest : FunSpec({

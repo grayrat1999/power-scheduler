@@ -5,8 +5,8 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import tech.powerscheduler.common.dto.request.JobTerminateRequestDTO
 import tech.powerscheduler.server.application.utils.CoroutineExecutor
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceTerminatedEvent
+import tech.powerscheduler.server.domain.job.JobInstanceRepository
+import tech.powerscheduler.server.domain.job.JobInstanceTerminatedEvent
 import tech.powerscheduler.server.domain.task.TaskRepository
 import tech.powerscheduler.server.domain.worker.WorkerRemoteService
 

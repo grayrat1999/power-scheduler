@@ -1,6 +1,7 @@
 package tech.powerscheduler.server.application.dto.request
 
 import jakarta.validation.constraints.NotNull
+import tech.powerscheduler.common.dto.request.PageQueryRequestDTO
 
 /**
  * 任务进度查询参数

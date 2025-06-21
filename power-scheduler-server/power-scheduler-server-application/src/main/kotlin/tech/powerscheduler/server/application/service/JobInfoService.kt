@@ -13,9 +13,9 @@ import tech.powerscheduler.server.application.dto.response.JobInfoDetailResponse
 import tech.powerscheduler.server.application.dto.response.JobInfoQueryResponseDTO
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
-import tech.powerscheduler.server.domain.jobinfo.JobId
-import tech.powerscheduler.server.domain.jobinfo.JobInfoQuery
-import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
+import tech.powerscheduler.server.domain.job.JobId
+import tech.powerscheduler.server.domain.job.JobInfoQuery
+import tech.powerscheduler.server.domain.job.JobInfoRepository
 
 /**
  * 任务相关服务

@@ -9,8 +9,8 @@ import jakarta.persistence.EntityManager
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.transaction.annotation.Transactional
 import tech.powerscheduler.common.enums.*
-import tech.powerscheduler.server.domain.jobinfo.JobId
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
+import tech.powerscheduler.server.domain.job.JobId
+import tech.powerscheduler.server.domain.job.JobInstanceId
 import tech.powerscheduler.server.infrastructure.Bootstrap
 import tech.powerscheduler.server.infrastructure.persistence.model.AppGroupEntity
 import tech.powerscheduler.server.infrastructure.persistence.model.JobInstanceEntity

@@ -12,8 +12,8 @@ import tech.powerscheduler.server.application.dto.response.JobInfoDetailResponse
 import tech.powerscheduler.server.application.dto.response.JobInfoQueryResponseDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
 import tech.powerscheduler.server.domain.common.Page
-import tech.powerscheduler.server.domain.jobinfo.JobInfo
-import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
+import tech.powerscheduler.server.domain.job.JobInfo
+import tech.powerscheduler.server.domain.job.JobInfoRepository
 
 /**
  * @author grayrat

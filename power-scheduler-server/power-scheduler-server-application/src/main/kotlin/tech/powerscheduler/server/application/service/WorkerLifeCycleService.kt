@@ -22,15 +22,15 @@ import tech.powerscheduler.server.application.utils.JSON
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
 import tech.powerscheduler.server.domain.common.PageQuery
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
+import tech.powerscheduler.server.domain.job.JobInstanceId
+import tech.powerscheduler.server.domain.job.JobInstanceRepository
 import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskId
 import tech.powerscheduler.server.domain.task.TaskRepository
 import tech.powerscheduler.server.domain.task.TaskStatusChangeEvent
-import tech.powerscheduler.server.domain.workerregistry.WorkerRegistry
-import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryRepository
-import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryUniqueKey
+import tech.powerscheduler.server.domain.worker.WorkerRegistry
+import tech.powerscheduler.server.domain.worker.WorkerRegistryRepository
+import tech.powerscheduler.server.domain.worker.WorkerRegistryUniqueKey
 import java.time.LocalDateTime
 
 /**

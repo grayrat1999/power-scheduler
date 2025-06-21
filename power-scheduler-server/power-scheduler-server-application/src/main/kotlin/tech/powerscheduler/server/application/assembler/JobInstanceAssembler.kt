@@ -5,8 +5,8 @@ import tech.powerscheduler.server.application.dto.request.JobInstanceQueryReques
 import tech.powerscheduler.server.application.dto.response.JobInstanceDetailResponseDTO
 import tech.powerscheduler.server.application.dto.response.JobInstanceQueryResponseDTO
 import tech.powerscheduler.server.application.utils.toDTO
-import tech.powerscheduler.server.domain.jobinstance.JobInstance
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceQuery
+import tech.powerscheduler.server.domain.job.JobInstance
+import tech.powerscheduler.server.domain.job.JobInstanceQuery
 
 /**
  * @author grayrat

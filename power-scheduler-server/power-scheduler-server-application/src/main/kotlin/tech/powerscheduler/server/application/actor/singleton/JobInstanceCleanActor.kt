@@ -11,9 +11,9 @@ import org.springframework.context.ApplicationContext
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.RetentionPolicyEnum
 import tech.powerscheduler.server.domain.common.PageQuery
-import tech.powerscheduler.server.domain.jobinfo.JobInfo
-import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
+import tech.powerscheduler.server.domain.job.JobInfo
+import tech.powerscheduler.server.domain.job.JobInfoRepository
+import tech.powerscheduler.server.domain.job.JobInstanceRepository
 import tech.powerscheduler.server.domain.task.TaskRepository
 import java.time.Duration
 import java.time.LocalDateTime

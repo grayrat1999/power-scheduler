@@ -1,9 +1,8 @@
-package tech.powerscheduler.server.domain.jobinstance
+package tech.powerscheduler.server.domain.job
 
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.server.domain.common.Page
 import tech.powerscheduler.server.domain.common.PageQuery
-import tech.powerscheduler.server.domain.jobinfo.JobId
 import java.time.LocalDateTime
 
 /**

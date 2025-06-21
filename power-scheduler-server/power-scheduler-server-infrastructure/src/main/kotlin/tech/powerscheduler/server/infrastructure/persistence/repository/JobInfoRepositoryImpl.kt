@@ -9,10 +9,10 @@ import org.springframework.stereotype.Repository
 import tech.powerscheduler.server.domain.common.Enabled
 import tech.powerscheduler.server.domain.common.Page
 import tech.powerscheduler.server.domain.common.PageQuery
-import tech.powerscheduler.server.domain.jobinfo.JobId
-import tech.powerscheduler.server.domain.jobinfo.JobInfo
-import tech.powerscheduler.server.domain.jobinfo.JobInfoQuery
-import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
+import tech.powerscheduler.server.domain.job.JobId
+import tech.powerscheduler.server.domain.job.JobInfo
+import tech.powerscheduler.server.domain.job.JobInfoQuery
+import tech.powerscheduler.server.domain.job.JobInfoRepository
 import tech.powerscheduler.server.infrastructure.persistence.model.AppGroupEntity
 import tech.powerscheduler.server.infrastructure.persistence.model.JobInfoEntity
 import tech.powerscheduler.server.infrastructure.persistence.repository.impl.JobInfoJpaRepository

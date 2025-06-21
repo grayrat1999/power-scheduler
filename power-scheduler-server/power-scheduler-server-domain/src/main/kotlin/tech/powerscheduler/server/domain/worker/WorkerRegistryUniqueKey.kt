@@ -1,4 +1,4 @@
-package tech.powerscheduler.server.domain.workerregistry
+package tech.powerscheduler.server.domain.worker
 
 /**
  * 任务注册记录的唯一键

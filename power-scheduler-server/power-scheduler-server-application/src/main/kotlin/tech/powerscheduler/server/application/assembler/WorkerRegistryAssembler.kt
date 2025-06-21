@@ -3,7 +3,7 @@ package tech.powerscheduler.server.application.assembler
 import org.springframework.stereotype.Component
 import tech.powerscheduler.common.dto.request.WorkerRegisterRequestDTO
 import tech.powerscheduler.server.application.dto.response.WorkerQueryResponseDTO
-import tech.powerscheduler.server.domain.workerregistry.WorkerRegistry
+import tech.powerscheduler.server.domain.worker.WorkerRegistry
 import java.time.LocalDateTime
 import java.util.*
 

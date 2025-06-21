@@ -1,4 +1,4 @@
-package tech.powerscheduler.server.domain.workerregistry
+package tech.powerscheduler.server.domain.worker
 
 import java.time.LocalDateTime
 

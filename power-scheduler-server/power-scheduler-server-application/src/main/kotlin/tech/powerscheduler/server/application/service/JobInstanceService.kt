@@ -22,11 +22,7 @@ import tech.powerscheduler.server.application.dto.response.JobInstanceQueryRespo
 import tech.powerscheduler.server.application.dto.response.JobProgressQueryResponseDTO
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.common.PageQuery
-import tech.powerscheduler.server.domain.jobinfo.JobId
-import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceTerminatedEvent
+import tech.powerscheduler.server.domain.job.*
 import tech.powerscheduler.server.domain.task.TaskRepository
 import java.time.LocalDateTime
 

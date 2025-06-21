@@ -8,9 +8,9 @@ import tech.powerscheduler.common.enums.*
 import tech.powerscheduler.server.application.dto.request.JobInstanceQueryRequestDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.appgroup.AppGroupId
-import tech.powerscheduler.server.domain.jobinfo.JobId
-import tech.powerscheduler.server.domain.jobinstance.JobInstance
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
+import tech.powerscheduler.server.domain.job.JobId
+import tech.powerscheduler.server.domain.job.JobInstance
+import tech.powerscheduler.server.domain.job.JobInstanceId
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 

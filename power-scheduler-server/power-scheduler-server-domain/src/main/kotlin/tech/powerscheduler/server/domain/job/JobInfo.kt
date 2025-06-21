@@ -1,11 +1,10 @@
-package tech.powerscheduler.server.domain.jobinfo
+package tech.powerscheduler.server.domain.job
 
 import tech.powerscheduler.common.enums.*
 import tech.powerscheduler.common.enums.ExecuteModeEnum.*
 import tech.powerscheduler.common.enums.ScheduleTypeEnum.*
 import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.domain.appgroup.AppGroup
-import tech.powerscheduler.server.domain.jobinstance.JobInstance
 import tech.powerscheduler.server.domain.utils.CronUtils
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

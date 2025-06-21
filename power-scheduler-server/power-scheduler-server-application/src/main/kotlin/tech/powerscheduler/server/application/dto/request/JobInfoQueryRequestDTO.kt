@@ -1,5 +1,7 @@
 package tech.powerscheduler.server.application.dto.request
 
+import tech.powerscheduler.common.dto.request.PageQueryRequestDTO
+
 /**
  * 任务查询请求参数
  *

@@ -8,7 +8,7 @@ import akka.actor.typed.javadsl.Behaviors
 import akka.actor.typed.javadsl.Receive
 import org.springframework.context.ApplicationContext
 import tech.powerscheduler.server.application.service.WorkerLifeCycleService
-import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryRepository
+import tech.powerscheduler.server.domain.worker.WorkerRegistryRepository
 import java.time.Duration
 import java.time.LocalDateTime
 

@@ -5,10 +5,10 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.stereotype.Repository
 import tech.powerscheduler.server.application.exception.OptimisticLockingConflictException
 import tech.powerscheduler.server.domain.common.AppCode
-import tech.powerscheduler.server.domain.workerregistry.WorkerRegistry
-import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryId
-import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryRepository
-import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryUniqueKey
+import tech.powerscheduler.server.domain.worker.WorkerRegistry
+import tech.powerscheduler.server.domain.worker.WorkerRegistryId
+import tech.powerscheduler.server.domain.worker.WorkerRegistryRepository
+import tech.powerscheduler.server.domain.worker.WorkerRegistryUniqueKey
 import tech.powerscheduler.server.infrastructure.persistence.model.WorkerRegistryEntity
 import tech.powerscheduler.server.infrastructure.persistence.repository.impl.WorkerRegistryJpaRepository
 import tech.powerscheduler.server.infrastructure.utils.toDomainModel

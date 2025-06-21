@@ -10,7 +10,7 @@ import tech.powerscheduler.server.application.dto.response.JobInfoDetailResponse
 import tech.powerscheduler.server.application.dto.response.JobInfoQueryResponseDTO
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroup
-import tech.powerscheduler.server.domain.jobinfo.JobInfo
+import tech.powerscheduler.server.domain.job.JobInfo
 
 /**
  * @author grayrat

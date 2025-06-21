@@ -13,8 +13,8 @@ import tech.powerscheduler.server.application.actor.JobSchedulerActor
 import tech.powerscheduler.server.application.utils.hostPort
 import tech.powerscheduler.server.application.utils.subscribeService
 import tech.powerscheduler.server.domain.common.PageQuery
-import tech.powerscheduler.server.domain.jobinfo.JobId
-import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
+import tech.powerscheduler.server.domain.job.JobId
+import tech.powerscheduler.server.domain.job.JobInfoRepository
 import java.time.Duration
 
 /**

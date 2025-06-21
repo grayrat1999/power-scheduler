@@ -1,4 +1,4 @@
-package tech.powerscheduler.server.domain.jobinstance
+package tech.powerscheduler.server.domain.job
 
 /**
  * 任务实例ID

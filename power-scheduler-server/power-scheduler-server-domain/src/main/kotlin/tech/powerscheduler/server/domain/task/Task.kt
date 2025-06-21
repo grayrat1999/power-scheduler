@@ -1,8 +1,8 @@
 package tech.powerscheduler.server.domain.task
 
 import tech.powerscheduler.common.enums.*
-import tech.powerscheduler.server.domain.jobinfo.JobId
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
+import tech.powerscheduler.server.domain.job.JobId
+import tech.powerscheduler.server.domain.job.JobInstanceId
 import java.time.LocalDateTime
 
 /**

@@ -1,7 +1,7 @@
 package tech.powerscheduler.server.domain.task
 
 import tech.powerscheduler.common.enums.ExecuteModeEnum
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
+import tech.powerscheduler.server.domain.job.JobInstanceId
 
 /**
  * @author grayrat

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 import tech.powerscheduler.server.domain.common.Page
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.domainevent.*
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceId
+import tech.powerscheduler.server.domain.job.JobInstanceId
 import tech.powerscheduler.server.infrastructure.persistence.repository.impl.DomainEventJpaRepository
 import tech.powerscheduler.server.infrastructure.utils.toDomainModel
 import tech.powerscheduler.server.infrastructure.utils.toDomainPage

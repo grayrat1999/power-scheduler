@@ -5,9 +5,9 @@ import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.server.application.dto.request.DashboardStatisticsInfoQueryRequestDTO
 import tech.powerscheduler.server.application.dto.response.DashboardBasicInfoQueryResponseDTO
 import tech.powerscheduler.server.application.dto.response.DashboardStatisticsInfoQueryResponseDTO
-import tech.powerscheduler.server.domain.jobinfo.JobInfoRepository
-import tech.powerscheduler.server.domain.jobinstance.JobInstanceRepository
-import tech.powerscheduler.server.domain.workerregistry.WorkerRegistryRepository
+import tech.powerscheduler.server.domain.job.JobInfoRepository
+import tech.powerscheduler.server.domain.job.JobInstanceRepository
+import tech.powerscheduler.server.domain.worker.WorkerRegistryRepository
 
 /**
  * @author grayrat
