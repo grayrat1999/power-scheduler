@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import tech.powerscheduler.server.application.dto.request.DashboardBasicInfoQueryRequestDTO
 import tech.powerscheduler.server.application.dto.request.DashboardStatisticsInfoQueryRequestDTO
 import tech.powerscheduler.server.application.service.DashboardService
 
@@ -21,8 +22,8 @@ internal class DashboardController(
 
     @Operation(summary = "查询基本信息")
     @GetMapping("/basicInfo")
-    fun queryBasicInfo(appCode: String?) = wrapperResponse {
-        dashboardService.queryBasicInfo(appCode)
+    fun queryBasicInfo(@Validated param: DashboardBasicInfoQueryRequestDTO?) = wrapperResponse {
+        dashboardService.queryBasicInfo(param!!)
     }
 
     @Operation(summary = "查询统计信息")

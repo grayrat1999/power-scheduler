@@ -25,15 +25,19 @@ interface JobInstanceJpaRepository :
         """
         SELECT j.jobStatus, COUNT(j)
         FROM JobInstanceEntity j 
+        JOIN AppGroupEntity a
+        JOIN NamespaceEntity n
         WHERE TRUE
-          AND (:appCode IS NULL OR j.appCode = :appCode)
+          AND (a.code = :appCode or :appCode = '')
+          AND (n.code = :namespaceCode)
           AND j.scheduleAt >= :scheduleAtRangeStart
           AND j.scheduleAt <= :scheduleAtRangeEnd
         GROUP BY j.jobStatus
     """
     )
     fun countGroupedByJobStatusWithAppCode(
-        appCode: String?,
+        namespaceCode: String,
+        appCode: String,
         scheduleAtRangeStart: LocalDateTime,
         scheduleAtRangeEnd: LocalDateTime,
     ): List<Array<Any>>

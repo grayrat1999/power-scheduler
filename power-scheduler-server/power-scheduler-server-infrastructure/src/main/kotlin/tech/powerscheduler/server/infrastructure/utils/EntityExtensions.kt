@@ -9,6 +9,8 @@ import tech.powerscheduler.server.domain.job.JobId
 import tech.powerscheduler.server.domain.job.JobInfo
 import tech.powerscheduler.server.domain.job.JobInstance
 import tech.powerscheduler.server.domain.job.JobInstanceId
+import tech.powerscheduler.server.domain.namespace.Namespace
+import tech.powerscheduler.server.domain.namespace.NamespaceId
 import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskId
 import tech.powerscheduler.server.domain.worker.WorkerRegistry
@@ -29,6 +31,23 @@ fun <T> org.springframework.data.domain.Page<T>.toDomainPage(): Page<T> {
     )
 }
 
+fun NamespaceEntity.toDomainModel(): Namespace {
+    return Namespace().also {
+        it.id = NamespaceId(this.id!!)
+        it.name = this.name
+        it.description = this.description
+    }
+}
+
+fun Namespace.toEntity(): NamespaceEntity {
+    return NamespaceEntity().also {
+        it.id = this.id?.value
+        it.code = this.code
+        it.name = this.name
+        it.description = this.description
+    }
+}
+
 fun AppGroupEntity.toDomainModel(): AppGroup {
     return AppGroup().also {
         it.id = AppGroupId(this.id!!)
@@ -44,9 +63,10 @@ fun AppGroupEntity.toDomainModel(): AppGroup {
 
 fun AppGroup.toEntity(): AppGroupEntity {
     return AppGroupEntity().also {
+        it.namespaceEntity = this.namespace?.toEntity()
         it.id = this.id?.value
-        it.code = this.code
         it.name = this.name
+        it.code = this.code
         it.secret = this.secret
     }
 }
@@ -182,6 +202,7 @@ fun WorkerRegistry.toEntity(): WorkerRegistryEntity {
     return WorkerRegistryEntity().also {
         it.id = this.id?.value
         it.appCode = this.appCode
+        it.namespaceCode = this.namespaceCode
         it.host = this.host
         it.port = this.port
         it.lastHeartbeatAt = this.lastHeartbeatAt
@@ -196,6 +217,7 @@ fun WorkerRegistryEntity.toDomainModel(): WorkerRegistry {
     return WorkerRegistry().also {
         it.id = WorkerRegistryId(this.id!!)
         it.appCode = this.appCode
+        it.namespaceCode = this.namespaceCode
         it.host = this.host
         it.port = this.port
         it.accessToken = this.accessToken

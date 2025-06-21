@@ -24,6 +24,7 @@ import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.job.JobInstanceId
 import tech.powerscheduler.server.domain.job.JobInstanceRepository
+import tech.powerscheduler.server.domain.namespace.NamespaceRepository
 import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskId
 import tech.powerscheduler.server.domain.task.TaskRepository
@@ -44,6 +45,7 @@ class WorkerLifeCycleService(
     private val taskAssembler: TaskAssembler,
     private val taskRepository: TaskRepository,
     private val appGroupRepository: AppGroupRepository,
+    private val namespaceRepository: NamespaceRepository,
     private val transactionTemplate: TransactionTemplate,
     private val jobInstanceRepository: JobInstanceRepository,
     private val workerRegistryRepository: WorkerRegistryRepository,
@@ -64,11 +66,14 @@ class WorkerLifeCycleService(
         backoff = Backoff(delay = 0)
     )
     fun register(param: WorkerRegisterRequestDTO, remoteHost: String): String {
-        checkAppCertificate(appCode = param.appCode!!, appSecret = param.appSecret!!)
+        checkAppCertificate(
+            namespaceCode = param.namespaceCode!!,
+            appCode = param.appCode!!,
+            appSecret = param.appSecret!!
+        )
         return transactionTemplate.execute {
             val existWorkerRegistry = workerRegistryRepository.findByUk(
                 WorkerRegistryUniqueKey(
-                    appCode = param.appCode!!,
                     host = param.host?.takeIf { it.isNotBlank() } ?: remoteHost,
                     port = param.port!!,
                 )
@@ -94,7 +99,6 @@ class WorkerLifeCycleService(
     fun handleHeartbeat(param: WorkerHeartbeatRequestDTO, remoteAddr: String) {
         val existWorkerRegistry = workerRegistryRepository.findByUk(
             WorkerRegistryUniqueKey(
-                appCode = param.appCode!!,
                 host = param.host ?: remoteAddr,
                 port = param.port!!,
             )
@@ -112,7 +116,6 @@ class WorkerLifeCycleService(
 
     fun unregister(param: WorkerUnregisterRequestDTO, remoteAddr: String) {
         val uk = WorkerRegistryUniqueKey(
-            appCode = param.appCode!!,
             host = param.host ?: remoteAddr,
             port = param.port!!,
         )
@@ -213,8 +216,10 @@ class WorkerLifeCycleService(
         }
     }
 
-    fun checkAppCertificate(appCode: String, appSecret: String) {
-        val appGroup = appGroupRepository.findByCode(appCode)
+    fun checkAppCertificate(namespaceCode: String, appCode: String, appSecret: String) {
+        val namespace = namespaceRepository.findByCode(namespaceCode)
+            ?: throw BizException("namespace is invalid")
+        val appGroup = appGroupRepository.findByCode(namespace = namespace, code = appCode)
             ?: throw BizException(message = "appCode is invalid")
         if (appSecret != appGroup.secret) {
             throw BizException(message = "Invalid appCode or appSecret")
@@ -228,7 +233,6 @@ class WorkerLifeCycleService(
     )
     fun updateWorkerMetrics(param: WorkerMetricsReportRequestDTO, remoteAddr: String) {
         val uk = WorkerRegistryUniqueKey(
-            appCode = param.appCode!!,
             host = param.host ?: remoteAddr,
             port = param.port!!,
         )
@@ -248,7 +252,7 @@ class WorkerLifeCycleService(
     fun fetchTaskResult(param: FetchTaskResultRequestDTO): PageDTO<FetchTaskResultResponseDTO> {
         val jobInstance = jobInstanceRepository.findById(JobInstanceId(param.jobInstanceId!!))
         if (jobInstance == null) {
-            return PageDTO.empty(number = param.pageNo, size = param.pageSize,)
+            return PageDTO.empty(number = param.pageNo, size = param.pageSize)
         }
         val page = taskRepository.findAllByJobInstanceIdAndBatchAndTaskType(
             jobInstanceId = jobInstance.id!!,

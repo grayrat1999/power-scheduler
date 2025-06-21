@@ -1,5 +1,6 @@
 package tech.powerscheduler.server.domain.appgroup
 
+import tech.powerscheduler.server.domain.namespace.Namespace
 import java.time.LocalDateTime
 
 /**
@@ -9,6 +10,12 @@ import java.time.LocalDateTime
  * @since 2025/4/16
  */
 class AppGroup {
+
+    /**
+     * 命名空间
+     */
+    var namespace: Namespace? = null
+
     /**
      * 应用分组id
      */

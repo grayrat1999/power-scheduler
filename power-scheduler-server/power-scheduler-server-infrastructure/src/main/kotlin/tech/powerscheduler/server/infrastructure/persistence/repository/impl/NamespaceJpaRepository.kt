@@ -3,20 +3,16 @@ package tech.powerscheduler.server.infrastructure.persistence.repository.impl
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.stereotype.Repository
-import tech.powerscheduler.server.infrastructure.persistence.model.AppGroupEntity
 import tech.powerscheduler.server.infrastructure.persistence.model.NamespaceEntity
 
 /**
  * @author grayrat
- * @since 2025/4/16
+ * @since 2025/6/21
  */
 @Repository
-interface AppGroupJpaRepository :
-    JpaRepository<AppGroupEntity, Long>, JpaSpecificationExecutor<AppGroupEntity> {
+interface NamespaceJpaRepository :
+    JpaRepository<NamespaceEntity, Long>, JpaSpecificationExecutor<NamespaceEntity> {
 
-    fun findByNamespaceEntityAndCode(
-        namespaceEntity: NamespaceEntity,
-        code: String
-    ): AppGroupEntity?
+    fun findByCode(code: String): NamespaceEntity?
 
 }

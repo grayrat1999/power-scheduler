@@ -66,7 +66,6 @@ class WorkerMetricsReportService(
             return
         }
         val param = WorkerMetricsReportRequestDTO().also {
-            it.appCode = workerRegisterService.appCode
             it.accessToken = workerRegisterService.accessToken
             it.host = host
             it.port = port

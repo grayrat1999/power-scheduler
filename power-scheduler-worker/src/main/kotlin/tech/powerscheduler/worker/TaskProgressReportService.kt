@@ -102,7 +102,6 @@ class TaskProgressReportService(
             this.endAt = latestJobProgress.endAt
             this.taskStatus = latestJobProgress.status
             this.result = latestJobProgress.result
-            this.appCode = workerRegisterService.appCode
             this.accessToken = workerRegisterService.accessToken
             this.subTaskBodyList = latestJobProgress.subTaskListBody
             this.subTaskName = latestJobProgress.subTaskName

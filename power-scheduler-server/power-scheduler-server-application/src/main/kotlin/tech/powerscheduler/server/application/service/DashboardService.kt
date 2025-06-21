@@ -2,6 +2,7 @@ package tech.powerscheduler.server.application.service
 
 import org.springframework.stereotype.Service
 import tech.powerscheduler.common.enums.JobStatusEnum
+import tech.powerscheduler.server.application.dto.request.DashboardBasicInfoQueryRequestDTO
 import tech.powerscheduler.server.application.dto.request.DashboardStatisticsInfoQueryRequestDTO
 import tech.powerscheduler.server.application.dto.response.DashboardBasicInfoQueryResponseDTO
 import tech.powerscheduler.server.application.dto.response.DashboardStatisticsInfoQueryResponseDTO
@@ -20,14 +21,13 @@ class DashboardService(
     private val workerRegistryRepository: WorkerRegistryRepository,
 ) {
 
-    fun queryBasicInfo(appCode: String?): DashboardBasicInfoQueryResponseDTO {
-        val onlineWorkerCount = if (appCode.isNullOrEmpty()) {
-            workerRegistryRepository.count()
-        } else {
-            workerRegistryRepository.countByAppCode(appCode)
-        }
+    fun queryBasicInfo(param: DashboardBasicInfoQueryRequestDTO): DashboardBasicInfoQueryResponseDTO {
+        val appCode = param.appCode.orEmpty()
+        val namespaceCode = param.namespaceCode!!
+        val onlineWorkerCount = workerRegistryRepository.countByNamespaceCodeAndAppCode(namespaceCode, appCode)
         val enabled2JobInfoCount = jobInfoRepository.countGroupedByEnabledWithAppCode(
-            appCode = appCode.takeUnless { it.isNullOrBlank() },
+            namespaceCode = namespaceCode,
+            appCode = appCode,
         )
         return DashboardBasicInfoQueryResponseDTO(
             onlineWorkerCount = onlineWorkerCount,
@@ -37,8 +37,11 @@ class DashboardService(
     }
 
     fun queryStatisticsInfo(param: DashboardStatisticsInfoQueryRequestDTO): DashboardStatisticsInfoQueryResponseDTO {
+        val appCode = param.appCode.orEmpty()
+        val namespaceCode = param.namespaceCode!!
         val jobStatus2JobInstanceCount = jobInstanceRepository.countGroupedByJobStatusWithAppCode(
-            appCode = param.appCode.takeUnless { it.isNullOrBlank() },
+            namespaceCode = namespaceCode,
+            appCode = appCode,
             scheduleAtRange = param.scheduleAtRange!!
         )
         return DashboardStatisticsInfoQueryResponseDTO(

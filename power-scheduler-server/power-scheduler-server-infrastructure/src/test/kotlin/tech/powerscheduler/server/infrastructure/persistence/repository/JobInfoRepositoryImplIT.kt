@@ -21,8 +21,10 @@ import tech.powerscheduler.server.domain.job.JobInfoQuery
 import tech.powerscheduler.server.infrastructure.Bootstrap
 import tech.powerscheduler.server.infrastructure.persistence.model.AppGroupEntity
 import tech.powerscheduler.server.infrastructure.persistence.model.JobInfoEntity
+import tech.powerscheduler.server.infrastructure.persistence.model.NamespaceEntity
 import tech.powerscheduler.server.infrastructure.persistence.repository.impl.AppGroupJpaRepository
 import tech.powerscheduler.server.infrastructure.persistence.repository.impl.JobInfoJpaRepository
+import tech.powerscheduler.server.infrastructure.persistence.repository.impl.NamespaceJpaRepository
 
 /**
  * @author grayrat
@@ -31,15 +33,21 @@ import tech.powerscheduler.server.infrastructure.persistence.repository.impl.Job
 @Transactional
 @SpringBootTest(classes = [Bootstrap::class])
 class JobInfoRepositoryImplIT(
+    private val namespaceJpaRepository: NamespaceJpaRepository,
     private val appGroupJpaRepository: AppGroupJpaRepository,
     private val jobInfoJpaRepository: JobInfoJpaRepository,
-    private val jobInfoRepositoryImpl: JobInfoRepositoryImpl
+    private val jobInfoRepositoryImpl: JobInfoRepositoryImpl,
 ) : FunSpec({
 
     context("test ${JobInfoRepositoryImpl::pageQuery.name}") {
 
         fun prepareData(): List<JobInfoEntity> {
+            val namespaceEntity = NamespaceEntity().also {
+                it.code = "namespaceCode"
+                it.name = "namespaceName"
+            }
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "appCode"
                 it.name = "appGroupName"
             }
@@ -63,6 +71,7 @@ class JobInfoRepositoryImplIT(
                     }
                 }
                 .toList()
+            namespaceJpaRepository.save(namespaceEntity)
             appGroupJpaRepository.save(appGroupEntity)
             jobInfoJpaRepository.saveAll(jobInfoEntities)
             return jobInfoEntities
@@ -116,7 +125,12 @@ class JobInfoRepositoryImplIT(
         }
 
         test("should return domain model when id exists") {
+            val namespaceEntity = NamespaceEntity().also {
+                it.code = "namespaceCode"
+                it.name = "namespaceName"
+            }
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "appCode"
                 it.name = "appGroupName"
             }
@@ -135,6 +149,7 @@ class JobInfoRepositoryImplIT(
                 it.enabled = false
                 it.maxConcurrentNum = 1
             }
+            namespaceJpaRepository.save(namespaceEntity)
             appGroupJpaRepository.save(appGroupEntity)
             jobInfoJpaRepository.save(jobInfoEntity)
             val result = shouldNotThrowAny {
@@ -153,7 +168,12 @@ class JobInfoRepositoryImplIT(
         }
 
         test("should return list when any id exists") {
+            val namespaceEntity = NamespaceEntity().also {
+                it.code = "namespaceCode"
+                it.name = "namespaceName"
+            }
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "appCode"
                 it.name = "appGroupName"
             }
@@ -177,6 +197,7 @@ class JobInfoRepositoryImplIT(
                     }
                 }
                 .toList()
+            namespaceJpaRepository.save(namespaceEntity)
             appGroupJpaRepository.save(appGroupEntity)
             jobInfoJpaRepository.saveAll(jobInfoEntities)
             val result = shouldNotThrowAny {
@@ -233,10 +254,16 @@ class JobInfoRepositoryImplIT(
 
     context("test ${JobInfoRepositoryImpl::save.name}") {
         test("should succeed when invoke 'insert' operation") {
+            val namespaceEntity = NamespaceEntity().also {
+                it.code = "namespaceCode"
+                it.name = "namespaceName"
+            }
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "appCode"
                 it.name = "appGroupName"
             }
+            namespaceJpaRepository.save(namespaceEntity)
             appGroupJpaRepository.save(appGroupEntity)
 
             val appGroup = AppGroup().also {
@@ -267,7 +294,12 @@ class JobInfoRepositoryImplIT(
 
         test("should succeed when invoke 'update' operation") {
             // initialize test data
+            val namespaceEntity = NamespaceEntity().also {
+                it.code = "namespaceCode"
+                it.name = "namespaceName"
+            }
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "appCode"
                 it.name = "appGroupName"
             }
@@ -288,6 +320,7 @@ class JobInfoRepositoryImplIT(
                 it.scriptType = ScriptTypeEnum.entries.random()
                 it.scriptCode = "old-scriptCode"
             }
+            namespaceJpaRepository.save(namespaceEntity)
             appGroupJpaRepository.save(appGroupEntity)
             jobInfoJpaRepository.save(jobInfoEntity)
 
@@ -331,7 +364,12 @@ class JobInfoRepositoryImplIT(
 
         test("should not throw when id exists") {
             // initialize test data
+            val namespaceEntity = NamespaceEntity().also {
+                it.code = "namespaceCode"
+                it.name = "namespaceName"
+            }
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "appCode"
                 it.name = "appGroupName"
             }
@@ -352,6 +390,7 @@ class JobInfoRepositoryImplIT(
                 it.scriptType = ScriptTypeEnum.entries.random()
                 it.scriptCode = "old-scriptCode"
             }
+            namespaceJpaRepository.save(namespaceEntity)
             appGroupJpaRepository.save(appGroupEntity)
             jobInfoJpaRepository.save(jobInfoEntity)
 

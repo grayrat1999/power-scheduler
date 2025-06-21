@@ -28,10 +28,12 @@ class JobInstanceRepositoryImpl(
 ) : JobInstanceRepository {
 
     override fun countGroupedByJobStatusWithAppCode(
-        appCode: String?,
+        namespaceCode: String,
+        appCode: String,
         scheduleAtRange: Array<LocalDateTime>
     ): Map<JobStatusEnum, Long> {
         val countResult = jobInstanceJpaRepository.countGroupedByJobStatusWithAppCode(
+            namespaceCode = namespaceCode,
             appCode = appCode,
             scheduleAtRangeStart = scheduleAtRange[0],
             scheduleAtRangeEnd = scheduleAtRange[1],

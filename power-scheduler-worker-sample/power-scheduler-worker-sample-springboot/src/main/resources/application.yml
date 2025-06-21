@@ -7,6 +7,7 @@ server:
 
 power-scheduler-worker:
   enabled: ${POWER_SCHEDULER_WORKER_ENABLED:true}
+  namespace-code: ${POWER_SCHEDULER_WORKER_NAMESPACE_CODE:}
   app-code: ${POWER_SCHEDULER_WORKER_APP_CODE:}
   # app-secret从控制台页面获取
   app-secret: ${POWER_SCHEDULER_WORKER_APP_SECRET:}

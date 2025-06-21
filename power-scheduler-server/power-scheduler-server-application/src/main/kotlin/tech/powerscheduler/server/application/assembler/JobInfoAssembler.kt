@@ -6,11 +6,13 @@ import tech.powerscheduler.common.enums.JobTypeEnum.SCRIPT
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
 import tech.powerscheduler.server.application.dto.request.JobInfoAddRequestDTO
 import tech.powerscheduler.server.application.dto.request.JobInfoEditRequestDTO
+import tech.powerscheduler.server.application.dto.request.JobInfoQueryRequestDTO
 import tech.powerscheduler.server.application.dto.response.JobInfoDetailResponseDTO
 import tech.powerscheduler.server.application.dto.response.JobInfoQueryResponseDTO
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.job.JobInfo
+import tech.powerscheduler.server.domain.job.JobInfoQuery
 
 /**
  * @author grayrat
@@ -18,6 +20,15 @@ import tech.powerscheduler.server.domain.job.JobInfo
  */
 @Component
 class JobInfoAssembler {
+
+    fun toDomainQuery(param: JobInfoQueryRequestDTO): JobInfoQuery {
+        return JobInfoQuery().apply {
+            this.namespaceCode = param.namespaceCode
+            this.appCode = param.appCode
+            this.jobName = param.jobName
+            this.processor = param.processor
+        }
+    }
 
     fun toJobInfoQueryResponseDTO(jobInfo: JobInfo): JobInfoQueryResponseDTO {
         return JobInfoQueryResponseDTO().apply {

@@ -14,8 +14,8 @@ import tech.powerscheduler.server.application.dto.response.JobInfoQueryResponseD
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
 import tech.powerscheduler.server.domain.job.JobId
-import tech.powerscheduler.server.domain.job.JobInfoQuery
 import tech.powerscheduler.server.domain.job.JobInfoRepository
+import tech.powerscheduler.server.domain.namespace.NamespaceRepository
 
 /**
  * 任务相关服务
@@ -25,17 +25,14 @@ import tech.powerscheduler.server.domain.job.JobInfoRepository
  */
 @Service
 class JobInfoService(
+    private val namespaceRepository: NamespaceRepository,
     private val appGroupRepository: AppGroupRepository,
     private val jobInfoRepository: JobInfoRepository,
     private val jobInfoAssembler: JobInfoAssembler,
 ) {
 
     fun query(param: JobInfoQueryRequestDTO): PageDTO<JobInfoQueryResponseDTO> {
-        val query = JobInfoQuery().apply {
-            this.appCode = param.appCode
-            this.jobName = param.jobName
-            this.processor = param.processor
-        }
+        val query = jobInfoAssembler.toDomainQuery(param)
         val page = jobInfoRepository.pageQuery(query)
         return page.toDTO().map { jobInfoAssembler.toJobInfoQueryResponseDTO(it) }
     }
@@ -46,7 +43,11 @@ class JobInfoService(
     }
 
     fun add(param: JobInfoAddRequestDTO): Long {
-        val appGroup = appGroupRepository.findByCode(param.appCode!!)
+        val appCode = param.appCode!!
+        val namespaceCode = param.namespaceCode!!
+        val namespace = namespaceRepository.findByCode(namespaceCode)
+            ?: throw BizException("任务新增失败: 命名空间[$namespaceCode]不存在")
+        val appGroup = appGroupRepository.findByCode(namespace, appCode)
             ?: throw BizException(message = "任务新增失败: 应用分组不存在")
         val jobInfo = jobInfoAssembler.toDomainModel4AddRequest(param, appGroup).apply {
             validScheduleConfig()

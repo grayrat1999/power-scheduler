@@ -11,9 +11,7 @@ import java.time.LocalDateTime
  */
 interface WorkerRegistryRepository {
 
-    fun count(): Long
-
-    fun countByAppCode(appCode: String): Long
+    fun countByNamespaceCodeAndAppCode(namespaceCode: String, appCode: String): Long
 
     fun lockById(id: WorkerRegistryId): WorkerRegistry?
 

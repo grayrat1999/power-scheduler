@@ -11,6 +11,7 @@ import tech.powerscheduler.server.application.dto.request.AppGroupQueryRequestDT
 import tech.powerscheduler.server.application.dto.response.AppGroupQueryResponseDTO
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
+import tech.powerscheduler.server.domain.namespace.NamespaceRepository
 
 /**
  * @author grayrat
@@ -19,6 +20,7 @@ import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
 @Service
 class AppGroupService(
     private val appGroupRepository: AppGroupRepository,
+    private val namespaceRepository: NamespaceRepository,
     private val appGroupAssembler: AppGroupAssembler,
 ) {
 
@@ -29,18 +31,26 @@ class AppGroupService(
     }
 
     fun add(param: AppGroupAddRequestDTO, userContext: UserContext): Long {
-        val exist = appGroupRepository.existsByCode(param.code!!)
-        if (exist) {
-            throw BizException(message = "应用保存失败, 应用编码[${param.code}]已存在")
+        val appCode = param.code!!
+        val namespaceCode = param.namespaceCode!!
+        val namespace = namespaceRepository.findByCode(namespaceCode)
+            ?: throw BizException(message = "应用保存失败, 命名空间[${namespaceCode}]不存在")
+        val existAppGroup = appGroupRepository.findByCode(namespace, appCode)
+        if (existAppGroup != null) {
+            throw BizException(message = "应用保存失败, 应用编码[${appCode}]已存在")
         }
-        val appGroupToSave = appGroupAssembler.toDomainModel4AddRequest(param, userContext)
+        val appGroupToSave = appGroupAssembler.toDomainModel4AddRequest(param, namespace, userContext)
         val appGroupSaved = appGroupRepository.save(appGroupToSave)
         return appGroupSaved.id?.value!!
     }
 
     fun edit(param: AppGroupEditRequestDTO, userContext: UserContext) {
-        val appGroup = appGroupRepository.findByCode(param.code!!)
-            ?: throw BizException(message = "应用保存失败, 应用分组不存在")
+        val appCode = param.code!!
+        val namespaceCode = param.namespaceCode!!
+        val namespace = namespaceRepository.findByCode(namespaceCode)
+            ?: throw BizException(message = "应用保存失败, 命名空间[${namespaceCode}]不存在")
+        val appGroup = appGroupRepository.findByCode(namespace = namespace, code = appCode)
+            ?: throw BizException(message = "应用保存失败, 应用[$appCode]不存在")
         val appGroupToEdit = appGroupAssembler.toDomainModel4EditRequest(
             model = appGroup,
             param = param,

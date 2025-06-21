@@ -10,6 +10,12 @@ import jakarta.validation.constraints.NotBlank
  */
 class AppGroupEditRequestDTO {
     /**
+     * 命名空间编码
+     */
+    @NotBlank
+    var namespaceCode: String? = null
+
+    /**
      * 应用分组编码
      */
     @NotBlank

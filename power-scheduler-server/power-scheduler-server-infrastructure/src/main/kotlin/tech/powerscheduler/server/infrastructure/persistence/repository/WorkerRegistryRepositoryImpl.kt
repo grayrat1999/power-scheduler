@@ -25,12 +25,15 @@ class WorkerRegistryRepositoryImpl(
     private val workerRegistryJpaRepository: WorkerRegistryJpaRepository
 ) : WorkerRegistryRepository {
 
-    override fun count(): Long {
-        return workerRegistryJpaRepository.count()
-    }
-
-    override fun countByAppCode(appCode: String): Long {
-        return workerRegistryJpaRepository.countByAppCode(appCode)
+    override fun countByNamespaceCodeAndAppCode(namespaceCode: String, appCode: String): Long {
+        return if (appCode.isEmpty()) {
+            workerRegistryJpaRepository.countByNamespaceCode(namespaceCode)
+        } else {
+            workerRegistryJpaRepository.countByNamespaceCodeAndAppCode(
+                namespaceCode = namespaceCode,
+                appCode = appCode
+            )
+        }
     }
 
     override fun lockById(id: WorkerRegistryId): WorkerRegistry? {
@@ -63,10 +66,6 @@ class WorkerRegistryRepositoryImpl(
 
     override fun findByUk(uniqueKey: WorkerRegistryUniqueKey): WorkerRegistry? {
         val specification = Specification<WorkerRegistryEntity> { root, _, criteriaBuilder ->
-            val appCodeEqual = criteriaBuilder.equal(
-                root.get<WorkerRegistryEntity>(WorkerRegistryEntity::appCode.name),
-                uniqueKey.appCode,
-            )
             val hostEqual = criteriaBuilder.equal(
                 root.get<WorkerRegistryEntity>(WorkerRegistryEntity::host.name),
                 uniqueKey.host,
@@ -75,7 +74,7 @@ class WorkerRegistryRepositoryImpl(
                 root.get<WorkerRegistryEntity>(WorkerRegistryEntity::port.name),
                 uniqueKey.port,
             )
-            val predicates = listOfNotNull(appCodeEqual, hostEqual, portEqual)
+            val predicates = listOfNotNull(hostEqual, portEqual)
             criteriaBuilder.and(*predicates.toTypedArray())
         }
         val workerRegistryEntity = workerRegistryJpaRepository.findOne(specification).getOrNull()
