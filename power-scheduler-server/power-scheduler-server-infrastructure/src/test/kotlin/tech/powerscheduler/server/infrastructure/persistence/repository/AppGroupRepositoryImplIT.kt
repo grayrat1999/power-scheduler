@@ -37,7 +37,7 @@ class AppGroupRepositoryImplIT(
             NamespaceEntity().apply {
                 this.code = "namespaceCode"
                 this.name = "namespaceName"
-                this.desc = "namespaceDescription"
+                this.description = "namespaceDescription"
             }
         }
 
