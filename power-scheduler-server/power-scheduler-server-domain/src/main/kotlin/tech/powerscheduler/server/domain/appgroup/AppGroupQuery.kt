@@ -10,6 +10,11 @@ import tech.powerscheduler.server.domain.common.PageQuery
  */
 class AppGroupQuery : PageQuery() {
     /**
+     * 命名空间编码
+     */
+    var namespaceCode: String? = null
+
+    /**
      * 应用编码
      */
     var code: String? = null

@@ -30,6 +30,7 @@ class JobInfo {
     /**
      * 应用编码
      */
+    @Deprecated(message = "replace with appGroup")
     var appCode: String? = null
 
     /**
@@ -172,7 +173,6 @@ class JobInfo {
             it.scheduleType = this.scheduleType
             it.executeMode = this.executeMode
             it.executeParams = this.executeParams
-            it.appCode = this.appCode
             it.scriptType = this.scriptType
             it.scriptCode = this.scriptCode
 

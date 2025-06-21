@@ -23,6 +23,11 @@ open class PowerSchedulerWorkerProperties {
     var serverEndpoint: Set<String>? = null
 
     /**
+     * 命名空间编码
+     */
+    var namespaceCode: String? = null
+
+    /**
      * 应用编码
      */
     var appCode: String? = null
@@ -69,6 +74,7 @@ open class PowerSchedulerWorkerProperties {
                     ?.takeIf { it.isNotBlank() }
                     ?.split(',')
                     ?.toSet()
+                this.namespaceCode = properties.getProperty("power-scheduler-worker.namespace-code")
                 this.appCode = properties.getProperty("power-scheduler-worker.app-code")
                 this.appSecret = properties.getProperty("power-scheduler-worker.app-secret")
                 this.port = properties.getProperty("power-scheduler-worker.port")?.toInt() ?: DEFAULT_PORT

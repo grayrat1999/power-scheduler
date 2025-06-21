@@ -13,6 +13,8 @@ import tech.powerscheduler.server.application.dto.request.AppGroupEditRequestDTO
 import tech.powerscheduler.server.application.dto.request.AppGroupQueryRequestDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.appgroup.AppGroupId
+import tech.powerscheduler.server.domain.namespace.Namespace
+import tech.powerscheduler.server.domain.namespace.NamespaceId
 import java.time.LocalDateTime
 
 class AppGroupAssemblerTest : FunSpec({
@@ -62,13 +64,18 @@ class AppGroupAssemblerTest : FunSpec({
                 it.code = "code"
                 it.name = "name"
             }
+            val namespace = Namespace().also {
+                it.id = NamespaceId(1L)
+                it.code = "code"
+                it.name = "name"
+            }
             val userContext = UserContext().also {
                 it.userId = 1L
                 it.userNo = "userNo"
                 it.userName = "userName"
             }
             val result = shouldNotThrowAny {
-                appGroupAssembler.toDomainModel4AddRequest(appGroupAddRequestDTO, userContext)
+                appGroupAssembler.toDomainModel4AddRequest(appGroupAddRequestDTO, namespace, userContext)
             }
             result.id.shouldBeNull()
             result.code.shouldNotBeNull() shouldBeEqual appGroupAddRequestDTO.code!!
@@ -92,7 +99,6 @@ class AppGroupAssemblerTest : FunSpec({
                 it.updatedAt = LocalDateTime.now().minusMonths(2)
             }
             val appGroupEditRequestDTO = AppGroupEditRequestDTO().also {
-                it.code = "code"
                 it.name = "name"
             }
             val userContext = UserContext().also {

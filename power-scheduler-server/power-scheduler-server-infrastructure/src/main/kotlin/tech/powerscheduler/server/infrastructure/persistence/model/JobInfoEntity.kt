@@ -22,12 +22,6 @@ class JobInfoEntity : BaseEntity() {
     var id: Long? = null
 
     /**
-     * 应用编码
-     */
-    @Column(name = "app_code", nullable = false, updatable = false)
-    var appCode: String? = null
-
-    /**
      * 任务名称
      */
     @Column(name = "job_name", nullable = false)

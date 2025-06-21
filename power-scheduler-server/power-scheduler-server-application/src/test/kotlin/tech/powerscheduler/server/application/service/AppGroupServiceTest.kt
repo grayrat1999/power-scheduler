@@ -10,7 +10,6 @@ import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.AppGroupAssembler
 import tech.powerscheduler.server.application.context.UserContext
 import tech.powerscheduler.server.application.dto.request.AppGroupAddRequestDTO
-import tech.powerscheduler.server.application.dto.request.AppGroupEditRequestDTO
 import tech.powerscheduler.server.application.dto.request.AppGroupQueryRequestDTO
 import tech.powerscheduler.server.application.dto.response.AppGroupQueryResponseDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroup
@@ -18,6 +17,8 @@ import tech.powerscheduler.server.domain.appgroup.AppGroupId
 import tech.powerscheduler.server.domain.appgroup.AppGroupQuery
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
 import tech.powerscheduler.server.domain.common.Page
+import tech.powerscheduler.server.domain.namespace.Namespace
+import tech.powerscheduler.server.domain.namespace.NamespaceRepository
 
 /**
  * @author grayrat
@@ -27,8 +28,10 @@ class AppGroupServiceTest : FunSpec({
 
     val appGroupRepository = mockk<AppGroupRepository>()
     val appGroupAssembler = mockk<AppGroupAssembler>()
+    val namespaceRepository = mockk<NamespaceRepository>()
     val appGroupService = AppGroupService(
         appGroupRepository = appGroupRepository,
+        namespaceRepository = namespaceRepository,
         appGroupAssembler = appGroupAssembler,
     )
 
@@ -49,64 +52,45 @@ class AppGroupServiceTest : FunSpec({
         }
     }
 
-    context("appGroupService#add") {
+    context("AppGroupService#add") {
         test("should throw BizException when appGroup exists") {
             val param = AppGroupAddRequestDTO().apply {
+                this.namespaceCode = "namespaceCode"
                 this.code = "code"
             }
+            val appGroup = AppGroup()
+            val namespace = Namespace()
             val userContext = UserContext()
 
-            every { appGroupRepository.existsByCode(param.code!!) } returns true
+            every { namespaceRepository.findByCode(param.namespaceCode!!) } returns namespace
+            every { appGroupRepository.findByCode(namespace, param.code!!) } returns appGroup
             shouldThrow<BizException> { appGroupService.add(param, userContext) }
         }
 
-        test("should succeed when appGroup exists") {
+        test("should succeed when appGroup not exists") {
             val param = AppGroupAddRequestDTO().apply {
+                this.namespaceCode = "namespaceCode"
                 this.code = "code"
             }
+            val namespace = Namespace()
             val userContext = UserContext()
 
             val mockToDomainModelReturn = AppGroup()
             val mockSaveReturn = AppGroup().apply {
                 this.id = AppGroupId(1L)
             }
-            every { appGroupRepository.existsByCode(param.code!!) } returns false
-            every { appGroupAssembler.toDomainModel4AddRequest(param, userContext) } returns mockToDomainModelReturn
-            every { appGroupRepository.save(mockToDomainModelReturn) } returns mockSaveReturn
-            val result = shouldNotThrowAny { appGroupService.add(param, userContext) }
-            result shouldBe mockSaveReturn.id?.value!!
-        }
-    }
-
-    context("appGroupService#edit") {
-        test("should throw BizException when appGroup not exists") {
-            val param = AppGroupEditRequestDTO().also {
-                it.code = "code"
-            }
-            val userContext = UserContext()
-            every { appGroupRepository.findByCode(any()) } returns null
-            shouldThrow<BizException> { appGroupService.edit(param, userContext) }
-        }
-
-        test("should succeed when appGroup exists") {
-            val param = AppGroupEditRequestDTO().also {
-                it.code = "code"
-            }
-            val userContext = UserContext()
-            val mockFindByCodeReturn = AppGroup()
-            val mockToDomainModelReturn = AppGroup()
-            val mockSaveReturn = AppGroup()
-
-            every { appGroupRepository.findByCode(param.code!!) } returns mockFindByCodeReturn
+            every { namespaceRepository.findByCode(param.namespaceCode!!) } returns namespace
+            every { appGroupRepository.findByCode(namespace, param.code!!) } returns null
             every {
-                appGroupAssembler.toDomainModel4EditRequest(
-                    mockFindByCodeReturn,
+                appGroupAssembler.toDomainModel4AddRequest(
                     param,
+                    any(),
                     userContext
                 )
             } returns mockToDomainModelReturn
             every { appGroupRepository.save(mockToDomainModelReturn) } returns mockSaveReturn
-            shouldNotThrowAny { appGroupService.edit(param, userContext) }
+            val result = shouldNotThrowAny { appGroupService.add(param, userContext) }
+            result shouldBe mockSaveReturn.id?.value!!
         }
     }
 

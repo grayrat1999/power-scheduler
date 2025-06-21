@@ -35,12 +35,6 @@ class JobInstanceEntity() : BaseEntity() {
     var jobId: Long? = null
 
     /**
-     * 应用编码
-     */
-    @Column(name = "app_code", nullable = false, updatable = false)
-    var appCode: String? = null
-
-    /**
      * worker地址(指定机器运行时使用)
      */
     @Column(name = "worker_address")

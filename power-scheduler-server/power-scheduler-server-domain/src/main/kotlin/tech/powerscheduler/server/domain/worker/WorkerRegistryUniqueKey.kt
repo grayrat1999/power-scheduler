@@ -7,7 +7,12 @@ package tech.powerscheduler.server.domain.worker
  * @since 2025/5/21
  */
 data class WorkerRegistryUniqueKey(
-    val appCode: String,
+    /**
+     * 主机地址
+     */
     val host: String,
+    /**
+     * 端口
+     */
     val port: Int,
 )

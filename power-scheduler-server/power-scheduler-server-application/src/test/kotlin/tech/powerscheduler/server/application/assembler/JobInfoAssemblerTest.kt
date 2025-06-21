@@ -28,7 +28,6 @@ class JobInfoAssemblerTest : FunSpec({
             val jobInfo = JobInfo().also {
                 it.id = JobId(1)
                 it.appGroup = appGroup
-                it.appCode = "appCode"
                 it.jobName = "jobName"
                 it.jobDesc = "jobDesc"
                 it.jobType = JobTypeEnum.JAVA
@@ -47,7 +46,6 @@ class JobInfoAssemblerTest : FunSpec({
                 jobInfoAssembler.toJobInfoQueryResponseDTO(jobInfo)
             }
             result.id shouldBe jobInfo.id?.value
-            result.appCode shouldBe jobInfo.appCode
             result.jobName shouldBe jobInfo.jobName
             result.jobDesc shouldBe jobInfo.jobDesc
             result.jobType!!.code shouldBe jobInfo.jobType?.code
@@ -93,7 +91,6 @@ class JobInfoAssemblerTest : FunSpec({
             }
             result.id.shouldBeNull()
             result.appGroup shouldBe appGroup
-            result.appCode shouldBe jobInfoAddRequestDTO.appCode
             result.jobName shouldBe jobInfoAddRequestDTO.jobName
             result.jobDesc shouldBe jobInfoAddRequestDTO.jobDesc
             result.jobType shouldBe jobInfoAddRequestDTO.jobType
@@ -119,7 +116,6 @@ class JobInfoAssemblerTest : FunSpec({
             val jobInfoToEdit = JobInfo().also {
                 it.appGroup = appGroup
                 it.id = JobId(1L)
-                it.appCode = "old-appCode"
                 it.jobName = "old-jobName"
                 it.jobDesc = "old-jobDesc"
                 it.jobType = JobTypeEnum.SCRIPT
@@ -156,7 +152,6 @@ class JobInfoAssemblerTest : FunSpec({
             }
             result.id shouldBe jobInfoToEdit.id
             result.appGroup shouldBe appGroup
-            result.appCode shouldBe jobInfoToEdit.appCode
             result.jobName shouldBe jobInfoEditRequestDTO.jobName
             result.jobDesc shouldBe jobInfoEditRequestDTO.jobDesc
             result.jobType shouldBe jobInfoEditRequestDTO.jobType

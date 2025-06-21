@@ -15,6 +15,7 @@ import tech.powerscheduler.server.domain.job.JobInfoQuery
 import tech.powerscheduler.server.domain.job.JobInfoRepository
 import tech.powerscheduler.server.infrastructure.persistence.model.AppGroupEntity
 import tech.powerscheduler.server.infrastructure.persistence.model.JobInfoEntity
+import tech.powerscheduler.server.infrastructure.persistence.model.NamespaceEntity
 import tech.powerscheduler.server.infrastructure.persistence.repository.impl.JobInfoJpaRepository
 import tech.powerscheduler.server.infrastructure.utils.toDomainModel
 import tech.powerscheduler.server.infrastructure.utils.toDomainPage
@@ -30,8 +31,14 @@ class JobInfoRepositoryImpl(
     private val jobInfoJpaRepository: JobInfoJpaRepository
 ) : JobInfoRepository {
 
-    override fun countGroupedByEnabledWithAppCode(appCode: String?): Map<Enabled, Long> {
-        val countResult = jobInfoJpaRepository.countGroupedByEnabledWithAppCode(appCode)
+    override fun countGroupedByEnabledWithAppCode(
+        namespaceCode: String,
+        appCode: String
+    ): Map<Enabled, Long> {
+        val countResult = jobInfoJpaRepository.countGroupedByEnabledWithAppCode(
+            namespaceCode = namespaceCode,
+            appCode = appCode,
+        )
         return countResult.associate { it[0] as Boolean to it[1] as Long }
     }
 
@@ -45,9 +52,17 @@ class JobInfoRepositoryImpl(
             query.pageNo - 1, query.pageSize, Sort.by(JobInfoEntity::id.name).descending()
         )
         val specification = Specification<JobInfoEntity> { root, _, criteriaBuilder ->
-            root.join<JobInfoEntity, AppGroupEntity>(JobInfoEntity::appGroupEntity.name, JoinType.LEFT)
+            val appGroupJoin = root.join<JobInfoEntity, AppGroupEntity>(
+                JobInfoEntity::appGroupEntity.name, JoinType.INNER
+            )
+            val namespaceJoin = appGroupJoin.join<AppGroupEntity, NamespaceEntity>(
+                AppGroupEntity::namespaceEntity.name, JoinType.INNER
+            )
+            val namespaceCodeEquals = criteriaBuilder.equal(
+                namespaceJoin.get<String>(NamespaceEntity::code.name), query.namespaceCode
+            )
             val appCodeEqual = query.appCode.takeUnless { it.isNullOrBlank() }?.let {
-                criteriaBuilder.equal(root.get<Long>(JobInfoEntity::appCode.name), it)
+                criteriaBuilder.equal(appGroupJoin.get<String>(AppGroupEntity::code.name), it)
             }
             val jobNameLike = query.jobName.takeUnless { it.isNullOrBlank() }?.let {
                 criteriaBuilder.like(root.get(JobInfoEntity::jobName.name), "%$it%")
@@ -55,7 +70,7 @@ class JobInfoRepositoryImpl(
             val processorLike = query.processor.takeUnless { it.isNullOrBlank() }?.let {
                 criteriaBuilder.like(root.get(JobInfoEntity::processor.name), "%$it%")
             }
-            val predicates = listOfNotNull(appCodeEqual, jobNameLike, processorLike)
+            val predicates = listOfNotNull(namespaceCodeEquals, appCodeEqual, jobNameLike, processorLike)
             criteriaBuilder.and(*predicates.toTypedArray())
         }
         val page = jobInfoJpaRepository.findAll(specification, pageable)
@@ -114,7 +129,8 @@ class JobInfoRepositoryImpl(
         val specification = Specification<JobInfoEntity> { root, _, cb ->
             val idIn = root.get<Long>(JobInfoEntity::id.name).`in`(ids.map { it.value })
             val isEnabled = cb.equal(root.get<Boolean>(JobInfoEntity::enabled.name), true)
-            val nextScheduleAtGreatEquals = cb.lessThanOrEqualTo(root.get(JobInfoEntity::nextScheduleAt.name), nextScheduleAt)
+            val nextScheduleAtGreatEquals =
+                cb.lessThanOrEqualTo(root.get(JobInfoEntity::nextScheduleAt.name), nextScheduleAt)
             cb.and(
                 isEnabled,
                 idIn,

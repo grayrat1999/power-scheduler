@@ -1,6 +1,7 @@
 package tech.powerscheduler.server.domain.appgroup
 
 import tech.powerscheduler.server.domain.common.Page
+import tech.powerscheduler.server.domain.namespace.Namespace
 
 /**
  * 应用分组持久化仓库
@@ -12,9 +13,9 @@ interface AppGroupRepository {
 
     fun pageQuery(query: AppGroupQuery): Page<AppGroup>
 
-    fun existsByCode(code: String): Boolean
+    fun findById(appGroupId: AppGroupId): AppGroup?
 
-    fun findByCode(code: String): AppGroup?
+    fun findByCode(namespace: Namespace, code: String): AppGroup?
 
     fun save(model: AppGroup): AppGroup
 

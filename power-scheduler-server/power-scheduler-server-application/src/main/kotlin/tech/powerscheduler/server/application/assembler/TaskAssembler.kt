@@ -22,7 +22,7 @@ class TaskAssembler {
             it.taskId = domainModel.id!!.value
             it.taskName = domainModel.taskName
             it.parentTaskId = domainModel.parentId?.value
-            it.appCode = domainModel.appCode
+            it.appCode = domainModel.appGroup?.code
             it.jobType = domainModel.jobType
             it.processor = domainModel.processor
             it.jobStatus = domainModel.taskStatus

@@ -16,6 +16,7 @@ class WorkerRegistryAssembler {
 
     fun toDomainModel4RegisterRequestDTO(param: WorkerRegisterRequestDTO, remoteHost: String): WorkerRegistry {
         return WorkerRegistry().apply {
+            this.namespaceCode = param.namespaceCode
             this.appCode = param.appCode
             this.host = param.host.takeUnless { it.isNullOrBlank() } ?: remoteHost
             this.port = param.port
@@ -26,6 +27,7 @@ class WorkerRegistryAssembler {
 
     fun toWorkerQueryResponseDTO(workerRegistry: WorkerRegistry): WorkerQueryResponseDTO {
         return WorkerQueryResponseDTO().apply {
+            this.namespaceCode = workerRegistry.namespaceCode
             this.appCode = workerRegistry.appCode
             this.host = workerRegistry.host
             this.port = workerRegistry.port

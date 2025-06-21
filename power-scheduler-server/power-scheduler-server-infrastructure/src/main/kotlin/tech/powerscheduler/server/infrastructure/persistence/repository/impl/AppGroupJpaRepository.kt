@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.stereotype.Repository
 import tech.powerscheduler.server.infrastructure.persistence.model.AppGroupEntity
+import tech.powerscheduler.server.infrastructure.persistence.model.NamespaceEntity
 
 /**
  * @author grayrat
@@ -13,8 +14,9 @@ import tech.powerscheduler.server.infrastructure.persistence.model.AppGroupEntit
 interface AppGroupJpaRepository :
     JpaRepository<AppGroupEntity, Long>, JpaSpecificationExecutor<AppGroupEntity> {
 
-    fun existsByCode(code: String): Boolean
-
-    fun findByCode(code: String): AppGroupEntity?
+    fun findByNamespaceEntityAndCode(
+        namespaceEntity: NamespaceEntity,
+        code: String
+    ): AppGroupEntity?
 
 }

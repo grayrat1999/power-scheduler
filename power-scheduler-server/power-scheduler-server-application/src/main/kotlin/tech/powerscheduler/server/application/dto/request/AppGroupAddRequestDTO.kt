@@ -10,13 +10,19 @@ import jakarta.validation.constraints.NotBlank
  */
 class AppGroupAddRequestDTO {
     /**
-     * 应用分组编码
+     * 命名空间编码
+     */
+    @NotBlank
+    var namespaceCode: String? = null
+
+    /**
+     * 应用编码
      */
     @NotBlank
     var code: String? = null
 
     /**
-     * 应用分组名称
+     * 应用名称
      */
     @NotBlank
     var name: String? = null

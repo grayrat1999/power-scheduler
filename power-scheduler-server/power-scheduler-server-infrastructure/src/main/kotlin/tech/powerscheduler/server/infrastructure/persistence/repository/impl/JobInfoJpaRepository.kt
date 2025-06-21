@@ -20,11 +20,15 @@ interface JobInfoJpaRepository :
         """
         SELECT t.enabled, count(t) 
         FROM JobInfoEntity t 
-        WHERE (:appCode IS NULL OR t.appCode = :appCode)
+        JOIN t.appGroupEntity a
+        JOIN a.namespaceEntity n         
+        WHERE TRUE 
+        AND (:appCode = '' OR a.code = :appCode)
+        AND n.code = :namespaceCode
         GROUP BY t.enabled
     """
     )
-    fun countGroupedByEnabledWithAppCode(appCode: String?): List<Array<Any>>
+    fun countGroupedByEnabledWithAppCode(namespaceCode: String, appCode: String): List<Array<Any>>
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT t FROM JobInfoEntity t WHERE t.id = :id")

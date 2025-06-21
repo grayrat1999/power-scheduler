@@ -14,8 +14,10 @@ import tech.powerscheduler.server.domain.job.JobInstanceId
 import tech.powerscheduler.server.infrastructure.Bootstrap
 import tech.powerscheduler.server.infrastructure.persistence.model.AppGroupEntity
 import tech.powerscheduler.server.infrastructure.persistence.model.JobInstanceEntity
+import tech.powerscheduler.server.infrastructure.persistence.model.NamespaceEntity
 import tech.powerscheduler.server.infrastructure.persistence.repository.impl.AppGroupJpaRepository
 import tech.powerscheduler.server.infrastructure.persistence.repository.impl.JobInstanceJpaRepository
+import tech.powerscheduler.server.infrastructure.persistence.repository.impl.NamespaceJpaRepository
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -26,19 +28,26 @@ import java.time.temporal.ChronoUnit
 @Transactional
 @SpringBootTest(classes = [Bootstrap::class])
 class JobInstanceRepositoryImplIT(
-    val appGroupJpaRepository: AppGroupJpaRepository,
-    val jobInstanceJpaRepository: JobInstanceJpaRepository,
-    val jobInstanceRepositoryImpl: JobInstanceRepositoryImpl,
-    val entityManager: EntityManager,
+    private val namespaceJpaRepository: NamespaceJpaRepository,
+    private val appGroupJpaRepository: AppGroupJpaRepository,
+    private val jobInstanceJpaRepository: JobInstanceJpaRepository,
+    private val jobInstanceRepositoryImpl: JobInstanceRepositoryImpl,
+    private val entityManager: EntityManager,
 ) : FunSpec({
 
     context("test ${JobInstanceRepositoryImpl::countByJobIdAndJobStatus}") {
         test("count correctly") {
+            val namespaceEntity = NamespaceEntity().apply {
+                code = "namespaceCode"
+                name = "namespaceName"
+            }
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "code"
                 it.name = "name"
                 it.secret = "secret"
             }
+            namespaceJpaRepository.save(namespaceEntity)
             appGroupJpaRepository.save(appGroupEntity)
             val jobInstanceEntitiesToSave = generateSequence(0) { it + 1 }
                 .take(20)
@@ -46,7 +55,6 @@ class JobInstanceRepositoryImplIT(
                     JobInstanceEntity().also {
                         it.appGroupEntity = appGroupEntity
                         it.jobId = (1L..10L).random()
-                        it.appCode = "appCode"
                         it.schedulerAddress = "schedulerIp"
                         it.jobName = "jobName"
                         it.jobType = JobTypeEnum.entries.random()
@@ -89,16 +97,21 @@ class JobInstanceRepositoryImplIT(
 
     context("test ${JobInstanceRepositoryImpl::findById}") {
         test("return entity when id exist") {
+            val namespaceEntity = NamespaceEntity().apply {
+                code = "namespaceCode"
+                name = "namespaceName"
+            }
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "code"
                 it.name = "name"
                 it.secret = "secret"
             }
+            namespaceJpaRepository.save(namespaceEntity)
             appGroupJpaRepository.save(appGroupEntity)
             val entityToSave = JobInstanceEntity().also {
                 it.appGroupEntity = appGroupEntity
                 it.jobId = (1L..10L).random()
-                it.appCode = "appCode"
                 it.schedulerAddress = "schedulerIp"
                 it.jobName = "jobName"
                 it.jobType = JobTypeEnum.entries.random()
