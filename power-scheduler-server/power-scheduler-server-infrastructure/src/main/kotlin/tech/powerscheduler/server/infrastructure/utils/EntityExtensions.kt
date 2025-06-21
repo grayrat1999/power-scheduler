@@ -50,6 +50,7 @@ fun Namespace.toEntity(): NamespaceEntity {
 
 fun AppGroupEntity.toDomainModel(): AppGroup {
     return AppGroup().also {
+        it.namespace = this.namespaceEntity!!.toDomainModel()
         it.id = AppGroupId(this.id!!)
         it.code = this.code
         it.name = this.name
@@ -230,6 +231,7 @@ fun WorkerRegistryEntity.toDomainModel(): WorkerRegistry {
 
 fun Task.toEntity(): TaskEntity {
     return TaskEntity().also {
+        it.appGroupEntity = this.appGroup!!.toEntity()
         it.id = this.id?.value
         it.parentId = this.parentId?.value
         it.jobId = this.jobId!!.value
@@ -262,6 +264,7 @@ fun Task.toEntity(): TaskEntity {
 
 fun TaskEntity.toDomainModel(): Task {
     return Task().also {
+        it.appGroup = this.appGroupEntity?.toDomainModel()
         it.id = TaskId(this.id!!)
         it.parentId = this.parentId?.let { parentId -> TaskId(parentId) }
         it.jobId = JobId(this.jobId!!)

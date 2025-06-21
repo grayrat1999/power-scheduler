@@ -37,6 +37,7 @@ class JobInstanceEntity() : BaseEntity() {
     /**
      * 应用编码
      */
+    @Deprecated(message = "replaced by appGroup")
     @Column(name = "app_code", nullable = false, updatable = false)
     var appCode: String? = null
 

@@ -16,10 +16,12 @@ import tech.powerscheduler.common.enums.TaskTypeEnum
 import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.TaskAssembler
 import tech.powerscheduler.server.application.assembler.WorkerRegistryAssembler
+import tech.powerscheduler.server.application.dto.request.WorkerQueryRequestDTO
 import tech.powerscheduler.server.application.dto.response.WorkerQueryResponseDTO
 import tech.powerscheduler.server.application.exception.OptimisticLockingConflictException
 import tech.powerscheduler.server.application.utils.JSON
 import tech.powerscheduler.server.application.utils.toDTO
+import tech.powerscheduler.server.domain.appgroup.AppGroupKey
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.job.JobInstanceId
@@ -55,8 +57,12 @@ class WorkerLifeCycleService(
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    fun list(appCode: String): List<WorkerQueryResponseDTO> {
-        val workerRegistries = workerRegistryRepository.findAllByAppCode(appCode)
+    fun list(param: WorkerQueryRequestDTO): List<WorkerQueryResponseDTO> {
+        val appGroupKey = AppGroupKey(
+            namespaceCode = param.namespaceCode!!,
+            appCode = param.appCode!!,
+        )
+        val workerRegistries = workerRegistryRepository.findAllByAppGroupKey(appGroupKey)
         return workerRegistries.map { workerRegistryAssembler.toWorkerQueryResponseDTO(it) }
     }
 

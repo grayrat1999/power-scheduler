@@ -4,7 +4,7 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.stereotype.Repository
 import tech.powerscheduler.server.application.exception.OptimisticLockingConflictException
-import tech.powerscheduler.server.domain.common.AppCode
+import tech.powerscheduler.server.domain.appgroup.AppGroupKey
 import tech.powerscheduler.server.domain.worker.WorkerRegistry
 import tech.powerscheduler.server.domain.worker.WorkerRegistryId
 import tech.powerscheduler.server.domain.worker.WorkerRegistryRepository
@@ -41,14 +41,36 @@ class WorkerRegistryRepositoryImpl(
         return entity?.toDomainModel()
     }
 
-    override fun findAllByAppCode(appCode: String): List<WorkerRegistry> {
-        val entities = workerRegistryJpaRepository.findAllByAppCodeIn(listOf(appCode))
-        return entities.map { it.toDomainModel() }
+    override fun findAllByAppGroupKey(groupKey: AppGroupKey): List<WorkerRegistry> {
+        return findAllByAppGroupKeys(listOf(groupKey)).values.firstOrNull().orEmpty()
     }
 
-    override fun findAllByAppCodes(appCodes: Iterable<String>): Map<AppCode, List<WorkerRegistry>> {
-        val entities = workerRegistryJpaRepository.findAllByAppCodeIn(appCodes)
-        return entities.map { it.toDomainModel() }.groupBy { it.appCode!! }
+    override fun findAllByAppGroupKeys(
+        groupKeys: Collection<AppGroupKey>
+    ): Map<AppGroupKey, List<WorkerRegistry>> {
+        if (groupKeys.isEmpty()) {
+            return emptyMap()
+        }
+        val specification = Specification<WorkerRegistryEntity> { root, _, criteriaBuilder ->
+            val predicates = groupKeys.map {
+                criteriaBuilder.and(
+                    criteriaBuilder.equal(
+                        root.get<String>(WorkerRegistryEntity::namespaceCode.name), it.namespaceCode
+                    ),
+                    criteriaBuilder.equal(
+                        root.get<String>(WorkerRegistryEntity::appCode.name), it.appCode
+                    ),
+                )
+            }
+            criteriaBuilder.or(*predicates.toTypedArray())
+        }
+        val entities = workerRegistryJpaRepository.findAll(specification)
+        return entities.map { it.toDomainModel() }.groupBy {
+            AppGroupKey(
+                namespaceCode = it.namespaceCode!!,
+                appCode = it.appCode!!
+            )
+        }
     }
 
     override fun findAllExpired(expiredAt: LocalDateTime): List<WorkerRegistry> {

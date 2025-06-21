@@ -24,7 +24,6 @@ interface WorkerRegistryJpaRepository :
     @Query("SELECT t FROM WorkerRegistryEntity t WHERE t.id = :id")
     fun findByIdForUpdate(id: Long): WorkerRegistryEntity?
 
-    fun findAllByAppCodeIn(appCodes: Iterable<String>): List<WorkerRegistryEntity>
     fun findByAccessToken(accessToken: String): WorkerRegistryEntity?
 
 }

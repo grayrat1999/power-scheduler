@@ -32,6 +32,7 @@ class JobInstance {
     /**
      * 应用编码
      */
+    @Deprecated(message = "replaced by appGroup")
     var appCode: String? = null
 
     /**

@@ -1,6 +1,6 @@
 package tech.powerscheduler.server.domain.worker
 
-import tech.powerscheduler.server.domain.common.AppCode
+import tech.powerscheduler.server.domain.appgroup.AppGroupKey
 import java.time.LocalDateTime
 
 /**
@@ -15,9 +15,11 @@ interface WorkerRegistryRepository {
 
     fun lockById(id: WorkerRegistryId): WorkerRegistry?
 
-    fun findAllByAppCode(appCode: String): List<WorkerRegistry>
+    fun findAllByAppGroupKey(groupKey: AppGroupKey): List<WorkerRegistry>
 
-    fun findAllByAppCodes(appCodes: Iterable<String>): Map<AppCode, List<WorkerRegistry>>
+    fun findAllByAppGroupKeys(
+        groupKeys: Collection<AppGroupKey>
+    ): Map<AppGroupKey, List<WorkerRegistry>>
 
     fun findAllExpired(expiredAt: LocalDateTime): List<WorkerRegistry>
 
