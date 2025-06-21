@@ -24,10 +24,10 @@ class AppGroupEntity : BaseEntity() {
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     var id: Long? = null
 
-    @Column(name = "code", nullable = false)
+    @Column(name = "code", nullable = false, updatable = false)
     var code: String? = null
 
-    @Column(name = "secret")
+    @Column(name = "secret", updatable = false)
     var secret: String? = null
 
     @Column(name = "name", nullable = false)
