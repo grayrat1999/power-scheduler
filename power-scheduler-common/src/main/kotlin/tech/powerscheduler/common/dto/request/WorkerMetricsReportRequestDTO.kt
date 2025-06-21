@@ -10,12 +10,6 @@ import jakarta.validation.constraints.Positive
  */
 class WorkerMetricsReportRequestDTO {
     /**
-     * 应用编码
-     */
-    @NotBlank
-    var appCode: String? = null
-
-    /**
      * 访问凭证
      */
     @NotBlank

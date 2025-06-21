@@ -11,6 +11,15 @@ import java.time.LocalDateTime
  * @since 2025/4/19
  */
 class JobInstanceQuery : PageQuery() {
+    /**
+     * 命名空间编码
+     */
+    var namespaceCode: String? = null
+
+    /**
+     * 应用编码
+     */
+    var appCode: String? = null
 
     /**
      * 任务id
@@ -21,11 +30,6 @@ class JobInstanceQuery : PageQuery() {
      * 任务实例id
      */
     var jobInstanceId: Long? = null
-
-    /**
-     * 应用编码
-     */
-    var appCode: String? = null
 
     /**
      * 任务名称

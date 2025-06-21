@@ -11,8 +11,15 @@ import tech.powerscheduler.common.enums.*
  * @since 2025/4/16
  */
 class JobInfoAddRequestDTO {
+
     /**
-     * 应用分组
+     * 命名空间编码
+     */
+    @NotBlank
+    var namespaceCode: String? = null
+
+    /**
+     * 应用编码
      */
     @NotBlank
     var appCode: String? = null

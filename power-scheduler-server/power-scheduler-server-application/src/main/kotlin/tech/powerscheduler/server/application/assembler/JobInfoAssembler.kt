@@ -6,11 +6,13 @@ import tech.powerscheduler.common.enums.JobTypeEnum.SCRIPT
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
 import tech.powerscheduler.server.application.dto.request.JobInfoAddRequestDTO
 import tech.powerscheduler.server.application.dto.request.JobInfoEditRequestDTO
+import tech.powerscheduler.server.application.dto.request.JobInfoQueryRequestDTO
 import tech.powerscheduler.server.application.dto.response.JobInfoDetailResponseDTO
 import tech.powerscheduler.server.application.dto.response.JobInfoQueryResponseDTO
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.job.JobInfo
+import tech.powerscheduler.server.domain.job.JobInfoQuery
 
 /**
  * @author grayrat
@@ -19,9 +21,19 @@ import tech.powerscheduler.server.domain.job.JobInfo
 @Component
 class JobInfoAssembler {
 
+    fun toDomainQuery(param: JobInfoQueryRequestDTO): JobInfoQuery {
+        return JobInfoQuery().apply {
+            this.namespaceCode = param.namespaceCode
+            this.appCode = param.appCode
+            this.jobName = param.jobName
+            this.processor = param.processor
+        }
+    }
+
     fun toJobInfoQueryResponseDTO(jobInfo: JobInfo): JobInfoQueryResponseDTO {
         return JobInfoQueryResponseDTO().apply {
             this.id = jobInfo.id!!.value
+            this.namespaceCode = jobInfo.appGroup?.namespace?.code
             this.appCode = jobInfo.appGroup?.code
             this.appName = jobInfo.appGroup?.name
             this.jobName = jobInfo.jobName
@@ -52,7 +64,7 @@ class JobInfoAssembler {
     fun toJobInfoDetailResponseDTO(jobInfo: JobInfo): JobInfoDetailResponseDTO {
         return JobInfoDetailResponseDTO().apply {
             this.id = jobInfo.id!!.value
-            this.appCode = jobInfo.appCode
+            this.appCode = jobInfo.appGroup!!.code
             this.jobName = jobInfo.jobName
             this.jobDesc = jobInfo.jobDesc
             this.jobType = jobInfo.jobType.toDTO()
@@ -83,7 +95,6 @@ class JobInfoAssembler {
     fun toDomainModel4AddRequest(param: JobInfoAddRequestDTO, appGroup: AppGroup): JobInfo {
         return JobInfo().apply {
             this.appGroup = appGroup
-            this.appCode = param.appCode
             this.jobName = param.jobName
             this.jobDesc = param.jobDesc
             this.jobType = param.jobType
@@ -114,7 +125,6 @@ class JobInfoAssembler {
         return JobInfo().apply {
             this.id = jobInfo.id
             this.appGroup = jobInfo.appGroup
-            this.appCode = jobInfo.appCode
             this.jobName = param.jobName
             this.jobDesc = param.jobDesc
             this.jobType = param.jobType

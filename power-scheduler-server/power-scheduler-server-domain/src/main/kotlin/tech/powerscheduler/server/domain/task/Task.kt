@@ -1,6 +1,7 @@
 package tech.powerscheduler.server.domain.task
 
 import tech.powerscheduler.common.enums.*
+import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.job.JobId
 import tech.powerscheduler.server.domain.job.JobInstanceId
 import java.time.LocalDateTime
@@ -10,6 +11,11 @@ import java.time.LocalDateTime
  * @since 2025/6/6
  */
 class Task {
+
+    /**
+     * 应用分组信息
+     */
+    var appGroup: AppGroup? = null
 
     /**
      * 主键
@@ -34,6 +40,7 @@ class Task {
     /**
      * 应用编码
      */
+    @Deprecated(message = "replaced by appGroup")
     var appCode: String? = null
 
     /**
@@ -185,10 +192,10 @@ class Task {
     fun createSubTask(subTaskBodyList: List<String>, subTaskName: String): List<Task> {
         return subTaskBodyList.map { subTaskBody ->
             Task().also {
+                it.appGroup = this.appGroup
                 it.parentId = this.id
                 it.jobId = this.jobId
                 it.jobInstanceId = this.jobInstanceId
-                it.appCode = this.appCode
                 it.taskName = subTaskName
                 it.jobType = this.jobType
                 it.processor = this.processor
@@ -211,9 +218,9 @@ class Task {
 
     fun createReduceTask(): Task {
         return Task().also {
+            it.appGroup = this.appGroup
             it.jobId = this.jobId
             it.jobInstanceId = this.jobInstanceId
-            it.appCode = this.appCode
             it.taskName = "REDUCE_TASK"
             it.jobType = this.jobType
             it.processor = this.processor

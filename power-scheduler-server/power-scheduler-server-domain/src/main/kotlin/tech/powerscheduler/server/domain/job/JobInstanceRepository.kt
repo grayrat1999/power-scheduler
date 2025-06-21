@@ -14,7 +14,8 @@ import java.time.LocalDateTime
 interface JobInstanceRepository {
 
     fun countGroupedByJobStatusWithAppCode(
-        appCode: String?,
+        namespaceCode: String,
+        appCode: String,
         scheduleAtRange: Array<LocalDateTime>
     ): Map<JobStatusEnum, Long>
 

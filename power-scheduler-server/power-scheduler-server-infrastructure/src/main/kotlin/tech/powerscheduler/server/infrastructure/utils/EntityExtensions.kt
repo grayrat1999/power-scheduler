@@ -9,6 +9,8 @@ import tech.powerscheduler.server.domain.job.JobId
 import tech.powerscheduler.server.domain.job.JobInfo
 import tech.powerscheduler.server.domain.job.JobInstance
 import tech.powerscheduler.server.domain.job.JobInstanceId
+import tech.powerscheduler.server.domain.namespace.Namespace
+import tech.powerscheduler.server.domain.namespace.NamespaceId
 import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskId
 import tech.powerscheduler.server.domain.worker.WorkerRegistry
@@ -29,8 +31,29 @@ fun <T> org.springframework.data.domain.Page<T>.toDomainPage(): Page<T> {
     )
 }
 
+fun NamespaceEntity.toDomainModel(): Namespace {
+    return Namespace().also {
+        it.id = NamespaceId(this.id!!)
+        it.code = this.code
+        it.name = this.name
+        it.description = this.description
+        it.createdBy = this.createdBy
+        it.createdAt = this.createdAt
+    }
+}
+
+fun Namespace.toEntity(): NamespaceEntity {
+    return NamespaceEntity().also {
+        it.id = this.id?.value
+        it.code = this.code
+        it.name = this.name
+        it.description = this.description
+    }
+}
+
 fun AppGroupEntity.toDomainModel(): AppGroup {
     return AppGroup().also {
+        it.namespace = this.namespaceEntity!!.toDomainModel()
         it.id = AppGroupId(this.id!!)
         it.code = this.code
         it.name = this.name
@@ -44,9 +67,10 @@ fun AppGroupEntity.toDomainModel(): AppGroup {
 
 fun AppGroup.toEntity(): AppGroupEntity {
     return AppGroupEntity().also {
+        it.namespaceEntity = this.namespace?.toEntity()
         it.id = this.id?.value
-        it.code = this.code
         it.name = this.name
+        it.code = this.code
         it.secret = this.secret
     }
 }
@@ -55,7 +79,6 @@ fun JobInfoEntity.toDomainModel(): JobInfo {
     return JobInfo().also {
         it.appGroup = this.appGroupEntity!!.toDomainModel()
         it.id = JobId(this.id!!)
-        it.appCode = this.appCode
         it.jobName = this.jobName
         it.jobDesc = this.jobDesc
         it.jobType = this.jobType
@@ -91,7 +114,6 @@ fun JobInfo.toEntity(): JobInfoEntity {
     return JobInfoEntity().also {
         it.appGroupEntity = this.appGroup?.toEntity()
         it.id = this.id?.value
-        it.appCode = this.appCode
         it.jobName = this.jobName
         it.jobDesc = this.jobDesc
         it.jobType = this.jobType
@@ -123,7 +145,6 @@ fun JobInstance.toEntity(): JobInstanceEntity {
         it.appGroupEntity = this.appGroup?.toEntity()
         it.id = this.id?.value
         it.jobId = this.jobId?.value
-        it.appCode = this.appCode
         it.workerAddress = this.workerAddress
         it.schedulerAddress = this.schedulerAddress
         it.jobName = this.jobName
@@ -153,7 +174,6 @@ fun JobInstanceEntity.toDomainModel(): JobInstance {
         it.appGroup = this.appGroupEntity?.toDomainModel()
         it.id = JobInstanceId(this.id!!)
         it.jobId = JobId(this.jobId!!)
-        it.appCode = this.appCode
         it.workerAddress = this.workerAddress
         it.schedulerAddress = this.schedulerAddress
         it.jobName = this.jobName
@@ -182,6 +202,7 @@ fun WorkerRegistry.toEntity(): WorkerRegistryEntity {
     return WorkerRegistryEntity().also {
         it.id = this.id?.value
         it.appCode = this.appCode
+        it.namespaceCode = this.namespaceCode
         it.host = this.host
         it.port = this.port
         it.lastHeartbeatAt = this.lastHeartbeatAt
@@ -196,6 +217,7 @@ fun WorkerRegistryEntity.toDomainModel(): WorkerRegistry {
     return WorkerRegistry().also {
         it.id = WorkerRegistryId(this.id!!)
         it.appCode = this.appCode
+        it.namespaceCode = this.namespaceCode
         it.host = this.host
         it.port = this.port
         it.accessToken = this.accessToken
@@ -208,11 +230,11 @@ fun WorkerRegistryEntity.toDomainModel(): WorkerRegistry {
 
 fun Task.toEntity(): TaskEntity {
     return TaskEntity().also {
+        it.appGroupEntity = this.appGroup!!.toEntity()
         it.id = this.id?.value
         it.parentId = this.parentId?.value
         it.jobId = this.jobId!!.value
         it.jobInstanceId = this.jobInstanceId!!.value
-        it.appCode = this.appCode
         it.schedulerAddress = this.schedulerAddress
         it.workerAddress = this.workerAddress
         it.taskName = this.taskName
@@ -240,11 +262,11 @@ fun Task.toEntity(): TaskEntity {
 
 fun TaskEntity.toDomainModel(): Task {
     return Task().also {
+        it.appGroup = this.appGroupEntity?.toDomainModel()
         it.id = TaskId(this.id!!)
         it.parentId = this.parentId?.let { parentId -> TaskId(parentId) }
         it.jobId = JobId(this.jobId!!)
         it.jobInstanceId = JobInstanceId(this.jobInstanceId!!)
-        it.appCode = this.appCode
         it.schedulerAddress = this.schedulerAddress
         it.workerAddress = this.workerAddress
         it.taskName = this.taskName

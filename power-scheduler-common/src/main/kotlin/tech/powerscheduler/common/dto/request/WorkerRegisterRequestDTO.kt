@@ -9,6 +9,13 @@ import jakarta.validation.constraints.NotBlank
  * @since 2025/5/20
  */
 class WorkerRegisterRequestDTO {
+
+    /**
+     * 命名空间编码
+     */
+    @NotBlank
+    var namespaceCode: String? = null
+
     /**
      * 应用编码
      */

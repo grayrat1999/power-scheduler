@@ -18,6 +18,7 @@ import tech.powerscheduler.common.enums.ExecuteModeEnum
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.server.application.assembler.TaskAssembler
 import tech.powerscheduler.server.application.utils.hostPort
+import tech.powerscheduler.server.domain.appgroup.AppGroupKey
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.job.JobId
 import tech.powerscheduler.server.domain.job.JobInfoRepository
@@ -67,7 +68,7 @@ class TaskDispatcherActor(
             val applicationEventPublisher = applicationContext as ApplicationEventPublisher
             return Behaviors.setup { context ->
                 return@setup Behaviors.withTimers { timer ->
-                    timer.startTimerAtFixedRate(
+                    timer.startTimerWithFixedDelay(
                         Command.DispatchJobs,
                         Duration.ofSeconds(1)
                     )
@@ -132,9 +133,9 @@ class TaskDispatcherActor(
         if (dispatchableList.isEmpty()) {
             return
         }
-        val appCode2DispatchableList = dispatchableList.groupBy { it.appCode!! }.toMutableMap()
-        val appCodes = appCode2DispatchableList.keys
-        val appCode2WorkerRegistry = workerRegistryRepository.findAllByAppCodes(appCodes)
+        val appGroupKey2DispatchableList = dispatchableList.groupBy { AppGroupKey(it.appGroup!!) }
+        val appGroupKeys = appGroupKey2DispatchableList.keys
+        val appGroupKey2WorkerRegistries = workerRegistryRepository.findAllByAppGroupKeys(appGroupKeys)
 
         // 使用管道限制最大并发数量, 为了避免并发大量的请求导致系统资源不足
         val channel = Channel<Unit>(20)
@@ -142,8 +143,8 @@ class TaskDispatcherActor(
             val asyncDispatchJobs = dispatchableList.map { task ->
                 async {
                     channel.send(Unit)
-                    val appCode = task.appCode
-                    val candidateWorkers = appCode2WorkerRegistry[appCode].orEmpty().toSet()
+                    val appGroupKey = AppGroupKey(task.appGroup!!)
+                    val candidateWorkers = appGroupKey2WorkerRegistries[appGroupKey].orEmpty().toSet()
                     try {
                         dispatchOne(task, candidateWorkers)
                     } catch (e: Exception) {

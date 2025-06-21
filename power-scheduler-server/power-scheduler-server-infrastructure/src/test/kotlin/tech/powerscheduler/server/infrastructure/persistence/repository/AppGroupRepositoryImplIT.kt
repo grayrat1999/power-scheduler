@@ -15,7 +15,10 @@ import tech.powerscheduler.server.domain.appgroup.AppGroupQuery
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
 import tech.powerscheduler.server.infrastructure.Bootstrap
 import tech.powerscheduler.server.infrastructure.persistence.model.AppGroupEntity
+import tech.powerscheduler.server.infrastructure.persistence.model.NamespaceEntity
 import tech.powerscheduler.server.infrastructure.persistence.repository.impl.AppGroupJpaRepository
+import tech.powerscheduler.server.infrastructure.persistence.repository.impl.NamespaceJpaRepository
+import tech.powerscheduler.server.infrastructure.utils.toDomainModel
 
 /**
  * @author grayrat
@@ -24,11 +27,20 @@ import tech.powerscheduler.server.infrastructure.persistence.repository.impl.App
 @Transactional
 @SpringBootTest(classes = [Bootstrap::class])
 class AppGroupRepositoryImplIT(
+    val namespaceJpaRepository: NamespaceJpaRepository,
     val appGroupJpaRepository: AppGroupJpaRepository,
     val appGroupRepository: AppGroupRepository,
 ) : FunSpec({
 
     context("test ${AppGroupRepositoryImpl::pageQuery.name}") {
+        val namespaceSupplier = {
+            NamespaceEntity().apply {
+                this.code = "namespaceCode"
+                this.name = "namespaceName"
+                this.description = "namespaceDescription"
+            }
+        }
+
         val appGroupSupplier = {
             generateSequence(1) { it + 1 }
                 .take(15)
@@ -42,11 +54,16 @@ class AppGroupRepositoryImplIT(
         }
 
         test("should succeed and return correct page") {
-            val appGroupEntities = appGroupSupplier()
+            val namespace = namespaceSupplier()
+            namespaceJpaRepository.save(namespace)
+            val appGroupEntities = appGroupSupplier().onEach {
+                it.namespaceEntity = namespace
+            }
             appGroupJpaRepository.saveAll(appGroupEntities)
             val query = AppGroupQuery().apply {
                 this.pageNo = 1
                 this.pageSize = 10
+                this.namespaceCode = namespace.code
             }
             val queryResult = shouldNotThrowAny {
                 appGroupRepository.pageQuery(query)
@@ -69,11 +86,16 @@ class AppGroupRepositoryImplIT(
         }
 
         test("should succeed and filter by code") {
-            val appGroupEntities = appGroupSupplier()
+            val namespace = namespaceSupplier()
+            namespaceJpaRepository.save(namespace)
+            val appGroupEntities = appGroupSupplier().onEach {
+                it.namespaceEntity = namespace
+            }
             appGroupJpaRepository.saveAll(appGroupEntities)
             val query = AppGroupQuery().apply {
                 this.pageNo = 1
                 this.pageSize = 10
+                this.namespaceCode = namespace.code
                 this.code = appGroupEntities.random().code
             }
             val queryResult = shouldNotThrowAny {
@@ -85,11 +107,16 @@ class AppGroupRepositoryImplIT(
         }
 
         test("should succeed and filter by name") {
-            val appGroupEntities = appGroupSupplier()
+            val namespace = namespaceSupplier()
+            namespaceJpaRepository.save(namespace)
+            val appGroupEntities = appGroupSupplier().onEach {
+                it.namespaceEntity = namespace
+            }
             appGroupJpaRepository.saveAll(appGroupEntities)
             val query = AppGroupQuery().apply {
                 this.pageNo = 1
                 this.pageSize = 10
+                this.namespaceCode = namespace.code
                 this.name = appGroupEntities.random().name
             }
             val queryResult = shouldNotThrowAny {
@@ -101,45 +128,34 @@ class AppGroupRepositoryImplIT(
         }
     }
 
-    context("test ${AppGroupRepositoryImpl::existsByCode.name}") {
-        test("should return false when code not exists") {
-            val result = shouldNotThrowAny {
-                appGroupRepository.existsByCode("")
-            }
-            result shouldBe false
-        }
-
-        test("should return true when code exists") {
-            val appGroupEntity = AppGroupEntity().also {
-                it.code = "testCode"
-                it.name = "testName"
-            }
-            appGroupJpaRepository.save(appGroupEntity)
-
-            val result = shouldNotThrowAny {
-                appGroupRepository.existsByCode(appGroupEntity.code!!)
-            }
-            result shouldBe true
-        }
-    }
-
     context("test ${AppGroupRepositoryImpl::findByCode.name}") {
         test("should return null when code not exists") {
+            val namespaceEntity = NamespaceEntity().apply {
+                code = "namespaceCode"
+                name = "namespaceName"
+            }
+            namespaceJpaRepository.save(namespaceEntity)
             val result = shouldNotThrowAny {
-                appGroupRepository.findByCode("")
+                appGroupRepository.findByCode(namespaceEntity.toDomainModel(), "")
             }
             result.shouldBeNull()
         }
 
         test("should return true when code exists") {
+            val namespaceEntity = NamespaceEntity().apply {
+                this.code = "namespaceCode"
+                this.name = "namespaceName"
+            }
+            namespaceJpaRepository.save(namespaceEntity)
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "testCode"
                 it.name = "testName"
             }
             appGroupJpaRepository.save(appGroupEntity)
 
             val result = shouldNotThrowAny {
-                appGroupRepository.findByCode(appGroupEntity.code!!)
+                appGroupRepository.findByCode(namespaceEntity.toDomainModel(), appGroupEntity.code!!)
             }
             result.shouldNotBeNull()
             result.id!!.value shouldBe appGroupEntity.id
@@ -150,7 +166,13 @@ class AppGroupRepositoryImplIT(
 
     context("test ${AppGroupRepositoryImpl::save.name}") {
         test("should succeed when invoke 'insert' operation") {
+            val namespaceEntity = NamespaceEntity().apply {
+                this.code = "namespaceCode"
+                this.name = "namespaceName"
+            }
+            namespaceJpaRepository.save(namespaceEntity)
             val appGroup = AppGroup().also {
+                it.namespace = namespaceEntity.toDomainModel()
                 it.code = "testCode"
                 it.name = "testName"
             }
@@ -162,13 +184,20 @@ class AppGroupRepositoryImplIT(
         }
 
         test("should succeed when invoke 'edit' operation") {
+            val namespaceEntity = NamespaceEntity().apply {
+                this.code = "namespaceCode"
+                this.name = "namespaceName"
+            }
+            namespaceJpaRepository.save(namespaceEntity)
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "old-testCode"
                 it.name = "old-testName"
             }
             appGroupJpaRepository.save(appGroupEntity)
 
             val appGroup = AppGroup().also {
+                it.namespace = namespaceEntity.toDomainModel()
                 it.id = AppGroupId(appGroupEntity.id!!)
                 it.code = "testCode"
                 it.name = "testName"

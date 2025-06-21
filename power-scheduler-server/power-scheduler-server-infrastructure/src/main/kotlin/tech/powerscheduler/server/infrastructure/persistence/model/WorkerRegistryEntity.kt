@@ -11,7 +11,7 @@ import java.time.LocalDateTime
 @Table(
     name = "worker_registry",
     uniqueConstraints = [
-        UniqueConstraint(columnNames = ["app_code", "addr", "port"]),
+        UniqueConstraint(columnNames = ["addr", "port"]),
     ]
 )
 class WorkerRegistryEntity : BaseEntity() {
@@ -24,21 +24,27 @@ class WorkerRegistryEntity : BaseEntity() {
     var id: Long? = null
 
     /**
+     * 命名空间编码
+     */
+    @Column(name = "namespace_code", nullable = false, updatable = false)
+    var namespaceCode: String? = null
+
+    /**
      * 应用编码
      */
-    @Column(name = "app_code")
+    @Column(name = "app_code", nullable = false, updatable = false)
     var appCode: String? = null
 
     /**
      * ip地址
      */
-    @Column(name = "addr", nullable = false)
+    @Column(name = "addr", nullable = false, updatable = false)
     var host: String? = null
 
     /**
      * 端口
      */
-    @Column(name = "port", nullable = false)
+    @Column(name = "port", nullable = false, updatable = false)
     var port: Int? = null
 
     /**

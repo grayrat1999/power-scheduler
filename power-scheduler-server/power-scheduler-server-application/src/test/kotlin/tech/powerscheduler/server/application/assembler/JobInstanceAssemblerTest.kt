@@ -44,7 +44,6 @@ class JobInstanceAssemblerTest : FunSpec({
                 it.appGroup = appGroup
                 it.id = JobInstanceId(1L)
                 it.jobId = JobId(2L)
-                it.appCode = "appCode"
                 it.jobName = "jobName"
                 it.jobType = JobTypeEnum.JAVA
                 it.processor = "processor"
@@ -102,7 +101,6 @@ class JobInstanceAssemblerTest : FunSpec({
                 it.appGroup = appGroup
                 it.id = JobInstanceId(1L)
                 it.jobId = JobId(2L)
-                it.appCode = "appCode"
                 it.jobName = "jobName"
                 it.jobType = JobTypeEnum.JAVA
                 it.processor = "processor"

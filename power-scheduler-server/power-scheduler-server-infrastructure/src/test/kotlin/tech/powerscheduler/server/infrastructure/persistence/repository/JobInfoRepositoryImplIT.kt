@@ -21,8 +21,10 @@ import tech.powerscheduler.server.domain.job.JobInfoQuery
 import tech.powerscheduler.server.infrastructure.Bootstrap
 import tech.powerscheduler.server.infrastructure.persistence.model.AppGroupEntity
 import tech.powerscheduler.server.infrastructure.persistence.model.JobInfoEntity
+import tech.powerscheduler.server.infrastructure.persistence.model.NamespaceEntity
 import tech.powerscheduler.server.infrastructure.persistence.repository.impl.AppGroupJpaRepository
 import tech.powerscheduler.server.infrastructure.persistence.repository.impl.JobInfoJpaRepository
+import tech.powerscheduler.server.infrastructure.persistence.repository.impl.NamespaceJpaRepository
 
 /**
  * @author grayrat
@@ -31,15 +33,27 @@ import tech.powerscheduler.server.infrastructure.persistence.repository.impl.Job
 @Transactional
 @SpringBootTest(classes = [Bootstrap::class])
 class JobInfoRepositoryImplIT(
+    private val namespaceJpaRepository: NamespaceJpaRepository,
     private val appGroupJpaRepository: AppGroupJpaRepository,
     private val jobInfoJpaRepository: JobInfoJpaRepository,
-    private val jobInfoRepositoryImpl: JobInfoRepositoryImpl
+    private val jobInfoRepositoryImpl: JobInfoRepositoryImpl,
 ) : FunSpec({
+
+    data class Data(
+        val namespaceEntities: List<NamespaceEntity>,
+        val appGroupEntities: List<AppGroupEntity>,
+        val jobInfoEntities: List<JobInfoEntity>,
+    )
 
     context("test ${JobInfoRepositoryImpl::pageQuery.name}") {
 
-        fun prepareData(): List<JobInfoEntity> {
+        fun prepareData(): Data {
+            val namespaceEntity = NamespaceEntity().also {
+                it.code = "namespaceCode"
+                it.name = "namespaceName"
+            }
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "appCode"
                 it.name = "appGroupName"
             }
@@ -48,7 +62,6 @@ class JobInfoRepositoryImplIT(
                 .map {
                     JobInfoEntity().also {
                         it.appGroupEntity = appGroupEntity
-                        it.appCode = "appCode_" + (0..10).random()
                         it.jobName = "jobName_$it"
                         it.jobDesc = "jobDesc_$it"
                         it.jobType = JobTypeEnum.entries.random()
@@ -63,19 +76,25 @@ class JobInfoRepositoryImplIT(
                     }
                 }
                 .toList()
+            namespaceJpaRepository.save(namespaceEntity)
             appGroupJpaRepository.save(appGroupEntity)
             jobInfoJpaRepository.saveAll(jobInfoEntities)
-            return jobInfoEntities
+            return Data(
+                namespaceEntities = listOf(namespaceEntity),
+                appGroupEntities = listOf(appGroupEntity),
+                jobInfoEntities = jobInfoEntities,
+            )
         }
 
         test("filter by appCode") {
-            val jobInfoEntities = prepareData()
+            val (namespaceEntities, appGroupEntities, jobInfoEntities) = prepareData()
             val query = JobInfoQuery().also {
-                it.appCode = jobInfoEntities.random().appCode
+                it.namespaceCode = namespaceEntities.random().code
+                it.appCode = jobInfoEntities.random().appGroupEntity?.code
                 it.pageSize = jobInfoEntities.size
             }
             val result = jobInfoRepositoryImpl.pageQuery(query)
-            val filterEntityIdSet = jobInfoEntities.filter { it.appCode == query.appCode }
+            val filterEntityIdSet = jobInfoEntities.filter { it.appGroupEntity!!.code == query.appCode }
                 .map { it.id }
                 .toSet()
             result.totalElements shouldBe filterEntityIdSet.size
@@ -83,8 +102,9 @@ class JobInfoRepositoryImplIT(
         }
 
         test("filter by jobName") {
-            val jobInfoEntities = prepareData()
+            val (namespaceEntities, appGroupEntities, jobInfoEntities) = prepareData()
             val query = JobInfoQuery().also {
+                it.namespaceCode = namespaceEntities.random().code
                 it.jobName = jobInfoEntities.random().jobName
                 it.pageSize = jobInfoEntities.size
             }
@@ -95,8 +115,9 @@ class JobInfoRepositoryImplIT(
         }
 
         test("filter by processorLike") {
-            val jobInfoEntities = prepareData()
+            val (namespaceEntities, appGroupEntities, jobInfoEntities) = prepareData()
             val query = JobInfoQuery().also {
+                it.namespaceCode = namespaceEntities.random().code
                 it.processor = jobInfoEntities.random().processor
                 it.pageSize = jobInfoEntities.size
             }
@@ -116,13 +137,17 @@ class JobInfoRepositoryImplIT(
         }
 
         test("should return domain model when id exists") {
+            val namespaceEntity = NamespaceEntity().also {
+                it.code = "namespaceCode"
+                it.name = "namespaceName"
+            }
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "appCode"
                 it.name = "appGroupName"
             }
             val jobInfoEntity = JobInfoEntity().also {
                 it.appGroupEntity = appGroupEntity
-                it.appCode = appGroupEntity.code
                 it.jobName = "jobName"
                 it.jobDesc = "jobDesc"
                 it.jobType = JobTypeEnum.entries.random()
@@ -135,6 +160,7 @@ class JobInfoRepositoryImplIT(
                 it.enabled = false
                 it.maxConcurrentNum = 1
             }
+            namespaceJpaRepository.save(namespaceEntity)
             appGroupJpaRepository.save(appGroupEntity)
             jobInfoJpaRepository.save(jobInfoEntity)
             val result = shouldNotThrowAny {
@@ -153,7 +179,12 @@ class JobInfoRepositoryImplIT(
         }
 
         test("should return list when any id exists") {
+            val namespaceEntity = NamespaceEntity().also {
+                it.code = "namespaceCode"
+                it.name = "namespaceName"
+            }
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "appCode"
                 it.name = "appGroupName"
             }
@@ -162,7 +193,6 @@ class JobInfoRepositoryImplIT(
                 .map {
                     JobInfoEntity().also {
                         it.appGroupEntity = appGroupEntity
-                        it.appCode = "appCode"
                         it.jobName = "jobName"
                         it.jobDesc = "jobDesc"
                         it.jobType = JobTypeEnum.entries.random()
@@ -177,6 +207,7 @@ class JobInfoRepositoryImplIT(
                     }
                 }
                 .toList()
+            namespaceJpaRepository.save(namespaceEntity)
             appGroupJpaRepository.save(appGroupEntity)
             jobInfoJpaRepository.saveAll(jobInfoEntities)
             val result = shouldNotThrowAny {
@@ -187,56 +218,18 @@ class JobInfoRepositoryImplIT(
         }
     }
 
-//    context("test ") {
-//        test("should return empty list when no enabled jobInfo exists") {
-//            val result = shouldNotThrowAny {
-//                jobInfoRepositoryImpl.listEnabledIds()
-//            }
-//            result.shouldBeEmpty()
-//        }
-//
-//        test("should return list when any id exists") {
-//            val appGroupEntity = AppGroupEntity().also {
-//                it.code = "appCode"
-//                it.name = "appGroupName"
-//            }
-//            val jobInfoEntities = generateSequence(1L) { it + 1 }
-//                .take(20)
-//                .map {
-//                    JobInfoEntity().also {
-//                        it.appGroupEntity = appGroupEntity
-//                        it.appCode = "appCode"
-//                        it.jobName = "jobName"
-//                        it.jobDesc = "jobDesc"
-//                        it.jobType = JobTypeEnum.entries.random()
-//                        it.scheduleType = ScheduleTypeEnum.entries.random()
-//                        it.scheduleConfig = "scheduleConfig"
-//                        it.processor = "processor"
-//                        it.executeMode = ExecuteModeEnum.entries.random()
-//                        it.executeParams = "executeParams"
-//                        it.nextScheduleAt = null
-//                        it.enabled = listOf(true, false).random()
-//                        it.maxConcurrentNum = 1
-//                    }
-//                }
-//                .toList()
-//            appGroupJpaRepository.save(appGroupEntity)
-//            jobInfoJpaRepository.saveAll(jobInfoEntities)
-//            val result = shouldNotThrowAny {
-//                jobInfoRepositoryImpl.listEnabledIds()
-//            }
-//            val enabledIds = jobInfoEntities.filter { it.enabled == true }.map { it.id }.toSet()
-//            result.shouldNotBeEmpty()
-//            result.mapTo(mutableSetOf()) { it.value } shouldBe enabledIds
-//        }
-//    }
-
     context("test ${JobInfoRepositoryImpl::save.name}") {
         test("should succeed when invoke 'insert' operation") {
+            val namespaceEntity = NamespaceEntity().also {
+                it.code = "namespaceCode"
+                it.name = "namespaceName"
+            }
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "appCode"
                 it.name = "appGroupName"
             }
+            namespaceJpaRepository.save(namespaceEntity)
             appGroupJpaRepository.save(appGroupEntity)
 
             val appGroup = AppGroup().also {
@@ -246,7 +239,6 @@ class JobInfoRepositoryImplIT(
             }
             val jobInfo = JobInfo().also {
                 it.appGroup = appGroup
-                it.appCode = "appCode"
                 it.jobName = "jobName"
                 it.jobDesc = "jobDesc"
                 it.jobType = JobTypeEnum.entries.random()
@@ -267,13 +259,17 @@ class JobInfoRepositoryImplIT(
 
         test("should succeed when invoke 'update' operation") {
             // initialize test data
+            val namespaceEntity = NamespaceEntity().also {
+                it.code = "namespaceCode"
+                it.name = "namespaceName"
+            }
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "appCode"
                 it.name = "appGroupName"
             }
             val jobInfoEntity = JobInfoEntity().also {
                 it.appGroupEntity = appGroupEntity
-                it.appCode = "appCode"
                 it.jobName = "old-jobName"
                 it.jobDesc = "old-jobDesc"
                 it.jobType = JobTypeEnum.entries.random()
@@ -288,6 +284,7 @@ class JobInfoRepositoryImplIT(
                 it.scriptType = ScriptTypeEnum.entries.random()
                 it.scriptCode = "old-scriptCode"
             }
+            namespaceJpaRepository.save(namespaceEntity)
             appGroupJpaRepository.save(appGroupEntity)
             jobInfoJpaRepository.save(jobInfoEntity)
 
@@ -299,7 +296,6 @@ class JobInfoRepositoryImplIT(
             val jobInfo = JobInfo().also {
                 it.id = JobId(jobInfoEntity.id!!)
                 it.appGroup = appGroup
-                it.appCode = "appCode"
                 it.jobName = "jobName"
                 it.jobDesc = "jobDesc"
                 it.jobType = (JobTypeEnum.entries - jobInfoEntity.jobType).random()
@@ -331,13 +327,17 @@ class JobInfoRepositoryImplIT(
 
         test("should not throw when id exists") {
             // initialize test data
+            val namespaceEntity = NamespaceEntity().also {
+                it.code = "namespaceCode"
+                it.name = "namespaceName"
+            }
             val appGroupEntity = AppGroupEntity().also {
+                it.namespaceEntity = namespaceEntity
                 it.code = "appCode"
                 it.name = "appGroupName"
             }
             val jobInfoEntity = JobInfoEntity().also {
                 it.appGroupEntity = appGroupEntity
-                it.appCode = "appCode"
                 it.jobName = "old-jobName"
                 it.jobDesc = "old-jobDesc"
                 it.jobType = JobTypeEnum.entries.random()
@@ -352,6 +352,7 @@ class JobInfoRepositoryImplIT(
                 it.scriptType = ScriptTypeEnum.entries.random()
                 it.scriptCode = "old-scriptCode"
             }
+            namespaceJpaRepository.save(namespaceEntity)
             appGroupJpaRepository.save(appGroupEntity)
             jobInfoJpaRepository.save(jobInfoEntity)
 

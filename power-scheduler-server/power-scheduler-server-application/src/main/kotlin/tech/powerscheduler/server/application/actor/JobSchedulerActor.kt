@@ -20,6 +20,7 @@ import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
 import tech.powerscheduler.server.application.utils.hostPort
 import tech.powerscheduler.server.application.utils.registerSelfAsService
+import tech.powerscheduler.server.domain.appgroup.AppGroupKey
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.job.JobId
 import tech.powerscheduler.server.domain.job.JobInfoRepository
@@ -66,11 +67,11 @@ class JobSchedulerActor(
             val transactionTemplate = applicationContext.getBean(TransactionTemplate::class.java)
             return Behaviors.setup { context ->
                 return@setup Behaviors.withTimers { timer ->
-                    timer.startTimerAtFixedRate(
+                    timer.startTimerWithFixedDelay(
                         Command.ScheduleJobs,
                         Duration.ofSeconds(1)
                     )
-                    timer.startTimerAtFixedRate(
+                    timer.startTimerWithFixedDelay(
                         Command.CreateTasks,
                         Duration.ofSeconds(1)
                     )
@@ -183,8 +184,8 @@ class JobSchedulerActor(
                 return@executeWithoutResult
             }
             // 检查当前可用机器, 如果没有可用机器，则跳过本次调度(TODO: 系统告警)
-            val appCode = jobInfoToSchedule.appCode
-            val availableWorkers = workerRegistryRepository.findAllByAppCode(appCode!!)
+            val appGroupKey = AppGroupKey(jobInfoToSchedule.appGroup!!)
+            val availableWorkers = workerRegistryRepository.findAllByAppGroupKey(appGroupKey)
             if (availableWorkers.isEmpty()) {
                 jobInfoToSchedule.apply {
                     // 固定延迟的调度模式由于调度取消无法更新上次完成时间, 所以用本次调度时间为基准设置下次调度时间
@@ -256,7 +257,7 @@ class JobSchedulerActor(
                 break
             }
             val jobInstanceIds = jobInstanceIdPage.content
-            val appCode2AvailableWorkers = mutableMapOf<String, List<WorkerRegistry>>()
+            val appCode2AvailableWorkers = mutableMapOf<AppGroupKey, List<WorkerRegistry>>()
             jobInstanceIds.forEach { jobInstanceId ->
                 transactionTemplate.executeWithoutResult {
                     val jobInstance = jobInstanceRepository.lockById(jobInstanceId)
@@ -266,9 +267,9 @@ class JobSchedulerActor(
                     if (jobInstance.jobStatus != JobStatusEnum.WAITING_SCHEDULE) {
                         return@executeWithoutResult
                     }
-                    val appCode = jobInstance.appCode!!
-                    val workerRegistries = appCode2AvailableWorkers.computeIfAbsent(appCode) { appCode ->
-                        workerRegistryRepository.findAllByAppCode(appCode)
+                    val appGroupKey = AppGroupKey(jobInstance.appGroup!!)
+                    val workerRegistries = appCode2AvailableWorkers.computeIfAbsent(appGroupKey) { appGroupKey ->
+                        workerRegistryRepository.findAllByAppGroupKey(appGroupKey)
                     }
                     if (workerRegistries.isEmpty()) {
                         if (jobInstance.canReattempt) {

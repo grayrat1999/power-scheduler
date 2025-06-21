@@ -16,13 +16,13 @@ import tech.powerscheduler.server.infrastructure.persistence.model.WorkerRegistr
 interface WorkerRegistryJpaRepository :
     JpaRepository<WorkerRegistryEntity, Long>, JpaSpecificationExecutor<WorkerRegistryEntity> {
 
-    fun countByAppCode(appCode: String): Long
+    fun countByNamespaceCode(namespaceCode: String): Long
+
+    fun countByNamespaceCodeAndAppCode(namespaceCode: String, appCode: String): Long
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT t FROM WorkerRegistryEntity t WHERE t.id = :id")
     fun findByIdForUpdate(id: Long): WorkerRegistryEntity?
-
-    fun findAllByAppCodeIn(appCodes: Iterable<String>): List<WorkerRegistryEntity>
 
     fun findByAccessToken(accessToken: String): WorkerRegistryEntity?
 

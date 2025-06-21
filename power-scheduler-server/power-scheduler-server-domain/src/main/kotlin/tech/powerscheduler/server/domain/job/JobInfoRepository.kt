@@ -13,7 +13,7 @@ import java.time.LocalDateTime
  */
 interface JobInfoRepository {
 
-    fun countGroupedByEnabledWithAppCode(appCode: String?): Map<Enabled, Long>
+    fun countGroupedByEnabledWithAppCode(namespaceCode: String, appCode: String): Map<Enabled, Long>
 
     fun lockById(id: JobId): JobInfo?
 

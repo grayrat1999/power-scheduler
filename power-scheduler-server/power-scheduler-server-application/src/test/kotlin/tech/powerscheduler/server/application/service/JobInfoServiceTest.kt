@@ -13,7 +13,9 @@ import tech.powerscheduler.server.application.dto.response.JobInfoQueryResponseD
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
 import tech.powerscheduler.server.domain.common.Page
 import tech.powerscheduler.server.domain.job.JobInfo
+import tech.powerscheduler.server.domain.job.JobInfoQuery
 import tech.powerscheduler.server.domain.job.JobInfoRepository
+import tech.powerscheduler.server.domain.namespace.NamespaceRepository
 
 /**
  * @author grayrat
@@ -24,8 +26,10 @@ class JobInfoServiceTest : FunSpec({
     val appGroupRepository = mockk<AppGroupRepository>()
     val jobInfoRepository = mockk<JobInfoRepository>()
     val jobInfoAssembler = mockk<JobInfoAssembler>()
+    val namespaceRepository = mockk<NamespaceRepository>()
 
     val jobInfoService = JobInfoService(
+        namespaceRepository = namespaceRepository,
         appGroupRepository = appGroupRepository,
         jobInfoRepository = jobInfoRepository,
         jobInfoAssembler = jobInfoAssembler,
@@ -38,7 +42,7 @@ class JobInfoServiceTest : FunSpec({
             val jobInfo2 = JobInfo()
             val jobInfoQueryResponseDTO1 = JobInfoQueryResponseDTO()
             val jobInfoQueryResponseDTO2 = JobInfoQueryResponseDTO()
-
+            val jobInfoQuery = JobInfoQuery()
             val mockPage = Page(
                 number = 1,
                 size = 10,
@@ -46,7 +50,8 @@ class JobInfoServiceTest : FunSpec({
                 totalPages = 1,
                 content = listOf(jobInfo1, jobInfo2),
             )
-            every { jobInfoRepository.pageQuery(any()) } returns mockPage
+            every { jobInfoAssembler.toDomainQuery(any()) } returns  jobInfoQuery
+            every { jobInfoRepository.pageQuery(jobInfoQuery) } returns mockPage
             every { jobInfoAssembler.toJobInfoQueryResponseDTO(jobInfo1) } returns jobInfoQueryResponseDTO1
             every { jobInfoAssembler.toJobInfoQueryResponseDTO(jobInfo2) } returns jobInfoQueryResponseDTO2
             val result = jobInfoService.query(jobInfoQueryRequestDTO)

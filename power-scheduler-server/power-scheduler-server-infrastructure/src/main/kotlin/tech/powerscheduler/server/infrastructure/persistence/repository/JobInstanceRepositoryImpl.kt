@@ -12,6 +12,7 @@ import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.job.*
 import tech.powerscheduler.server.infrastructure.persistence.model.AppGroupEntity
 import tech.powerscheduler.server.infrastructure.persistence.model.JobInstanceEntity
+import tech.powerscheduler.server.infrastructure.persistence.model.NamespaceEntity
 import tech.powerscheduler.server.infrastructure.persistence.repository.impl.JobInstanceJpaRepository
 import tech.powerscheduler.server.infrastructure.utils.toDomainModel
 import tech.powerscheduler.server.infrastructure.utils.toDomainPage
@@ -28,10 +29,12 @@ class JobInstanceRepositoryImpl(
 ) : JobInstanceRepository {
 
     override fun countGroupedByJobStatusWithAppCode(
-        appCode: String?,
+        namespaceCode: String,
+        appCode: String,
         scheduleAtRange: Array<LocalDateTime>
     ): Map<JobStatusEnum, Long> {
         val countResult = jobInstanceJpaRepository.countGroupedByJobStatusWithAppCode(
+            namespaceCode = namespaceCode,
             appCode = appCode,
             scheduleAtRangeStart = scheduleAtRange[0],
             scheduleAtRangeEnd = scheduleAtRange[1],
@@ -54,15 +57,23 @@ class JobInstanceRepositoryImpl(
             query.pageNo - 1, query.pageSize, Sort.by(JobInstanceEntity::id.name).descending()
         )
         val specification = Specification<JobInstanceEntity> { root, _, criteriaBuilder ->
-            root.join<JobInstanceEntity, AppGroupEntity>(JobInstanceEntity::appGroupEntity.name, JoinType.LEFT)
+            val joinAppGroup = root.join<JobInstanceEntity, AppGroupEntity>(
+                JobInstanceEntity::appGroupEntity.name, JoinType.INNER
+            )
+            val joinNamespace = joinAppGroup.join<AppGroupEntity, NamespaceEntity>(
+                AppGroupEntity::namespaceEntity.name, JoinType.INNER
+            )
+            val namespaceCodeEqual = query.namespaceCode.takeUnless { it.isNullOrBlank() }?.let {
+                criteriaBuilder.equal(joinNamespace.get<String>(NamespaceEntity::code.name), it)
+            }
+            val appGroupEqual = query.appCode.takeUnless { it.isNullOrBlank() }?.let {
+                criteriaBuilder.equal(joinAppGroup.get<String>(AppGroupEntity::code.name), it)
+            }
             val jobIdEqual = query.jobId?.let {
                 criteriaBuilder.equal(root.get<Long>(JobInstanceEntity::jobId.name), it)
             }
             val jobInstanceIdEqual = query.jobInstanceId?.let {
                 criteriaBuilder.equal(root.get<Long>(JobInstanceEntity::id.name), it)
-            }
-            val appGroupEqual = query.appCode.takeUnless { it.isNullOrBlank() }?.let {
-                criteriaBuilder.equal(root.get<Long>(JobInstanceEntity::appCode.name), it)
             }
             val jobNameLike = query.jobName.takeUnless { it.isNullOrBlank() }?.let {
                 criteriaBuilder.like(root.get(JobInstanceEntity::jobName.name), "%$it%")
@@ -77,7 +88,8 @@ class JobInstanceRepositoryImpl(
                 criteriaBuilder.between(root.get(JobInstanceEntity::endAt.name), it[0], it[1])
             }
             val predicates = listOfNotNull(
-                jobIdEqual, jobInstanceIdEqual, appGroupEqual, jobNameLike,
+                namespaceCodeEqual, appGroupEqual,
+                jobIdEqual, jobInstanceIdEqual, jobNameLike,
                 jobStatusEquals, startAtBetween, endAtBetween,
             )
             criteriaBuilder.and(*predicates.toTypedArray())

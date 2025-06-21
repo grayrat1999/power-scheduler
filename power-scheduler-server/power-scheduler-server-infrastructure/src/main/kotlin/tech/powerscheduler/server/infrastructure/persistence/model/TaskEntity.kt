@@ -19,6 +19,13 @@ import java.time.LocalDateTime
 )
 class TaskEntity : BaseEntity() {
 
+    /**
+     * 应用分组信息
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "app_group_id", nullable = false)
+    var appGroupEntity: AppGroupEntity? = null
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false, updatable = false)
@@ -41,12 +48,6 @@ class TaskEntity : BaseEntity() {
      */
     @Column(name = "job_instance_id", nullable = false, updatable = false)
     var jobInstanceId: Long? = null
-
-    /**
-     * 应用编码
-     */
-    @Column(name = "app_code", nullable = false, updatable = false)
-    var appCode: String? = null
 
     /**
      * 调度端ip

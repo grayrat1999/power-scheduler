@@ -43,9 +43,6 @@ class TaskProgressReportRequestDTO {
     var result: String? = null
 
     @NotBlank
-    var appCode: String? = null
-
-    @NotBlank
     var accessToken: String? = null
 
     /**

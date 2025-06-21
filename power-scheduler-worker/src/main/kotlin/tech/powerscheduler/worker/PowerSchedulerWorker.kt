@@ -21,6 +21,10 @@ class PowerSchedulerWorker(
      */
     private val endpoint: Set<String>,
     /**
+     * 命名空间编码
+     */
+    private val namespaceCode: String,
+    /**
      * 应用编码
      */
     private val appCode: String,
@@ -52,6 +56,7 @@ class PowerSchedulerWorker(
     constructor(properties: PowerSchedulerWorkerProperties) : this(
         enabled = properties.enabled ?: true,
         endpoint = properties.serverEndpoint ?: emptySet(),
+        namespaceCode = properties.namespaceCode ?: "",
         appCode = properties.appCode ?: "",
         appSecret = properties.appSecret ?: "",
         port = properties.port!!,
@@ -62,6 +67,7 @@ class PowerSchedulerWorker(
     private val serverDiscoveryService = ServerDiscoveryService(endpoint)
 
     private val workerRegisterService = WorkerRegisterService(
+        namespaceCode = namespaceCode,
         appCode = appCode,
         appSecret = appSecret,
         host = externalHost,
@@ -86,8 +92,7 @@ class PowerSchedulerWorker(
     )
 
     private val embedServer = EmbedServer(
-        port = port,
-        taskExecutorService = taskExecutorService
+        port = port, taskExecutorService = taskExecutorService
     )
 
     fun init() {
@@ -96,6 +101,9 @@ class PowerSchedulerWorker(
         }
         if (endpoint.isEmpty()) {
             throw IllegalArgumentException("[PowerScheduler] endpoint cannot be empty")
+        }
+        if (namespaceCode.isBlank()) {
+            throw IllegalArgumentException("[PowerScheduler] namespaceCode is required")
         }
         if (appCode.isBlank()) {
             throw IllegalArgumentException("[PowerScheduler] appCode is required")

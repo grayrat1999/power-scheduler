@@ -30,11 +30,6 @@ class JobInstance {
     var jobId: JobId? = null
 
     /**
-     * 应用编码
-     */
-    var appCode: String? = null
-
-    /**
      * 任务名称
      */
     var jobName: String? = null
@@ -189,7 +184,6 @@ class JobInstance {
         val newInstance = JobInstance().also {
             it.appGroup = this.appGroup
             it.jobId = this.jobId
-            it.appCode = this.appCode
             it.jobName = this.jobName
             it.jobType = this.jobType
             it.processor = this.processor
@@ -211,9 +205,9 @@ class JobInstance {
 
     fun createTask(workerAddress: String?): Task {
         val task = Task().also {
+            it.appGroup = this.appGroup
             it.jobId = this.jobId
             it.jobInstanceId = this.id
-            it.appCode = this.appCode
             it.taskName = this.jobName
             it.jobType = this.jobType
             it.processor = this.processor

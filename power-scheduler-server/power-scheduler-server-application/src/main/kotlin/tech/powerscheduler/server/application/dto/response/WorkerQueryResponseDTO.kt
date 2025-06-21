@@ -8,6 +8,11 @@ import java.time.LocalDateTime
  */
 class WorkerQueryResponseDTO {
     /**
+     * 命名空间编码
+     */
+    var namespaceCode: String? = null
+
+    /**
      * 应用编码
      */
     var appCode: String? = null

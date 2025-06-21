@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import tech.powerscheduler.server.application.context.UserContext
 import tech.powerscheduler.server.application.dto.request.AppGroupAddRequestDTO
+import tech.powerscheduler.server.application.dto.request.AppGroupEditRequestDTO
 import tech.powerscheduler.server.application.dto.request.AppGroupQueryRequestDTO
 import tech.powerscheduler.server.application.service.AppGroupService
 
@@ -34,5 +35,11 @@ internal class AppGroupController(
     @PostMapping("/add")
     fun addAppGroup(@RequestBody @Validated param: AppGroupAddRequestDTO) = wrapperResponse {
         return@wrapperResponse appGroupService.add(param, UserContext())
+    }
+
+    @Operation(summary = "编辑应用分组")
+    @PostMapping("/edit")
+    fun editAppGroup(@RequestBody @Validated param: AppGroupEditRequestDTO) = wrapperResponse {
+        return@wrapperResponse appGroupService.edit(param, UserContext())
     }
 }

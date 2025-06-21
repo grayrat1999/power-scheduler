@@ -6,8 +6,10 @@ import tech.powerscheduler.server.application.dto.request.AppGroupAddRequestDTO
 import tech.powerscheduler.server.application.dto.request.AppGroupEditRequestDTO
 import tech.powerscheduler.server.application.dto.request.AppGroupQueryRequestDTO
 import tech.powerscheduler.server.application.dto.response.AppGroupQueryResponseDTO
+import tech.powerscheduler.server.application.utils.randomString
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.appgroup.AppGroupQuery
+import tech.powerscheduler.server.domain.namespace.Namespace
 import java.time.LocalDateTime
 
 /**
@@ -21,6 +23,7 @@ class AppGroupAssembler {
 
     fun toDomainQuery(param: AppGroupQueryRequestDTO): AppGroupQuery {
         return AppGroupQuery().apply {
+            this.namespaceCode = param.namespaceCode
             this.name = param.name
             this.code = param.code
         }
@@ -28,6 +31,8 @@ class AppGroupAssembler {
 
     fun toAppGroupQueryResponseDTO(model: AppGroup): AppGroupQueryResponseDTO {
         return AppGroupQueryResponseDTO().apply {
+            this.id = model.id!!.value
+            this.namespaceCode = model.namespace?.code
             this.code = model.code
             this.name = model.name
             this.secret = model.secret
@@ -38,10 +43,13 @@ class AppGroupAssembler {
 
     fun toDomainModel4AddRequest(
         param: AppGroupAddRequestDTO,
+        namespace: Namespace,
         userContext: UserContext,
     ): AppGroup {
         return AppGroup().apply {
+            this.namespace = namespace
             this.code = param.code
+            this.secret = randomString(32)
             this.name = param.name
             this.createdBy = userContext.userNo
             this.createdAt = LocalDateTime.now()
@@ -56,6 +64,7 @@ class AppGroupAssembler {
         userContext: UserContext,
     ): AppGroup {
         return AppGroup().apply {
+            this.namespace = model.namespace
             this.id = model.id
             this.code = model.code
             this.name = param.name

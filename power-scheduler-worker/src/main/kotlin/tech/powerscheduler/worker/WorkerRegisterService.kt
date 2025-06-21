@@ -15,6 +15,10 @@ import java.util.concurrent.TimeUnit
  */
 class WorkerRegisterService(
     /**
+     * 命名空间编码
+     */
+    private val namespaceCode: String,
+    /**
      * 应用编码
      */
     val appCode: String,
@@ -99,6 +103,7 @@ class WorkerRegisterService(
             return
         }
         val param = WorkerRegisterRequestDTO().also {
+            it.namespaceCode = namespaceCode
             it.appCode = appCode
             it.appSecret = appSecret
             it.host = host
