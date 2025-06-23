@@ -15,6 +15,9 @@ class WorkflowNodeSaveDagRequestDTO {
     @NotEmpty
     var dagNodes: List<DagNode> = emptyList()
 
+    val flattenedNodes: List<DagNode>
+        get() = dagNodes.flatMap { it.flatten() }
+
     data class DagNode(
         /**
          * 工作流节点ID
@@ -26,7 +29,11 @@ class WorkflowNodeSaveDagRequestDTO {
          * 子节点列表
          */
         var children: List<DagNode>? = null,
-    )
+    ) {
+        fun flatten(): Set<DagNode> {
+            return setOf(this) + children.orEmpty().flatMap { it.flatten() }
+        }
+    }
 
     private enum class VisitState { UNVISITED, VISITING, VISITED }
 

@@ -53,19 +53,18 @@ class WorkflowNodeService(
         if (param.isDag().not()) {
             throw BizException("exist circle in graph")
         }
-        val rootNodes = param.dagNodes
-        val descendants = rootNodes.flatMap { it.children.orEmpty() }.distinct()
-        val workflowNodeId2ChildrenIds = sequenceOf(rootNodes, descendants)
-            .flatten()
-            .associateBy({ WorkflowNodeId(it.workflowNodeId!!) }) {
-                it.children.orEmpty().map { node -> node.workflowNodeId!! }
-            }
+        val workflowNodeId2ChildrenIds = param.flattenedNodes.associate {
+            Pair(
+                WorkflowNodeId(it.workflowNodeId!!),
+                it.children.orEmpty().map { child -> WorkflowNodeId(child.workflowNodeId!!) }
+            )
+        }
         val allIds = workflowNodeId2ChildrenIds.keys
         val workflowNodes = workflowNodeRepository.findAllByIds(allIds)
         val id2WorkflowNode = workflowNodes.associateBy { it.id!! }
         for (workflowNode in workflowNodes) {
-            val childrenIds = workflowNodeId2ChildrenIds[workflowNode.id] ?: emptySet()
-            workflowNode.children = childrenIds.mapNotNull { id2WorkflowNode[workflowNode.id] }.toSet()
+            val childrenIds = workflowNodeId2ChildrenIds[workflowNode.id].orEmpty()
+            workflowNode.children = childrenIds.mapNotNull { id2WorkflowNode[it] }.toSet()
         }
         workflowNodeRepository.saveAll(workflowNodes)
     }
