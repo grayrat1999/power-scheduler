@@ -175,6 +175,8 @@ class JobInstanceService(
             }
             jobInfoRepository.save(jobInfo)
         }
+        // 如果是工作流的任务实例, 则更新工作流节点状态
+        applicationEventPublisher.publishEvent(JobInstanceStatusChangeEvent)
         log.info("jobInstance update successfully: id={}, status={}", jobInstanceId.value, jobInstance.jobStatus)
     }
 }

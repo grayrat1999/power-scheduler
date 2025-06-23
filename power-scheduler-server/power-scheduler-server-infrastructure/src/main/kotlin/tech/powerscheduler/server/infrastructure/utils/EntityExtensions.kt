@@ -15,6 +15,9 @@ import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskId
 import tech.powerscheduler.server.domain.worker.WorkerRegistry
 import tech.powerscheduler.server.domain.worker.WorkerRegistryId
+import tech.powerscheduler.server.domain.workflow.Workflow
+import tech.powerscheduler.server.domain.workflow.WorkflowNode
+import tech.powerscheduler.server.domain.workflow.WorkflowNodeInstance
 import tech.powerscheduler.server.infrastructure.persistence.model.*
 
 /**
@@ -313,5 +316,46 @@ fun DomainEventEntity.toDomainModel(): DomainEvent {
         it.eventStatus = this.eventStatus
         it.body = this.body
         it.retryCnt = this.retryCnt
+    }
+}
+
+fun Workflow.toEntity(): WorkflowEntity {
+    return WorkflowEntity().also {
+        it.appGroupEntity = this.appGroup!!.toEntity()
+        it.id = this.id?.value
+        it.name = this.name
+        it.description = this.description
+        it.scheduleType = this.scheduleType
+        it.scheduleConfig = this.scheduleConfig
+        it.nextScheduleAt = this.nextScheduleAt
+        it.enabled = this.enabled
+        it.maxConcurrentNum = this.maxConcurrentNum
+        it.lastCompletedAt = this.lastCompletedAt
+        it.retentionPolicy = this.retentionPolicy
+        it.retentionValue = this.retentionValue
+    }
+}
+
+fun WorkflowEntity.toDomainModel(): Workflow {
+    return Workflow().also {
+
+    }
+}
+
+fun WorkflowNode.toEntity(): WorkflowNodeEntity {
+    return WorkflowNodeEntity().also {
+
+    }
+}
+
+fun WorkflowNodeEntity.toDomainModel(): WorkflowNode {
+    return WorkflowNode().also {
+
+    }
+}
+
+fun WorkflowNodeInstance.toEntity(): WorkflowNodeInstanceEntity {
+    return WorkflowNodeInstanceEntity().also {
+
     }
 }
