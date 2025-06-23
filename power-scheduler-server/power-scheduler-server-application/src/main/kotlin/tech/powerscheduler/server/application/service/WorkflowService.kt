@@ -9,8 +9,9 @@ import tech.powerscheduler.server.application.dto.request.WorkflowAddRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowEditRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowQueryRequestDTO
 import tech.powerscheduler.server.application.dto.response.WorkflowQueryResponseDTO
+import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
-import tech.powerscheduler.server.domain.workflow.Workflow
+import tech.powerscheduler.server.domain.namespace.NamespaceRepository
 import tech.powerscheduler.server.domain.workflow.WorkflowId
 import tech.powerscheduler.server.domain.workflow.WorkflowNodeRepository
 import tech.powerscheduler.server.domain.workflow.WorkflowRepository
@@ -21,6 +22,7 @@ import tech.powerscheduler.server.domain.workflow.WorkflowRepository
  */
 @Service
 class WorkflowService(
+    private val namespaceRepository: NamespaceRepository,
     private val appGroupRepository: AppGroupRepository,
     private val workflowAssembler: WorkflowAssembler,
     private val workflowRepository: WorkflowRepository,
@@ -29,11 +31,17 @@ class WorkflowService(
 ) {
 
     fun list(param: WorkflowQueryRequestDTO): PageDTO<WorkflowQueryResponseDTO> {
-        TODO("Not yet implemented")
+        val query = workflowAssembler.toDomainQuery(param)
+        val page = workflowRepository.pageQuery(query)
+        return page.toDTO().map { workflowAssembler.toWorkflowQueryResponseDTO(it) }
     }
 
     fun add(param: WorkflowAddRequestDTO): Long {
-        val workflow = workflowAssembler.toDomainModel4AddRequest(param)
+        val namespace = namespaceRepository.findByCode(param.namespaceCode!!)
+            ?: throw BizException("namespace not found")
+        val appGroup = appGroupRepository.findByCode(namespace, param.appCode!!)
+            ?: throw BizException("appGroup not found")
+        val workflow = workflowAssembler.toDomainModel4AddRequest(appGroup = appGroup, param = param)
         val workflowId = workflowRepository.save(workflow)
         return workflowId.value
     }
@@ -42,7 +50,7 @@ class WorkflowService(
         val workflowId = WorkflowId(param.workflowId!!)
         val workflow = workflowRepository.findById(workflowId)
             ?: throw BizException("Workflow not found")
-        val workflowToSave: Workflow = workflowAssembler.toDomainModel4EditRequest(workflow, param)
+        val workflowToSave = workflowAssembler.toDomainModel4EditRequest(workflow = workflow, param = param)
         workflowRepository.save(workflowToSave)
     }
 
