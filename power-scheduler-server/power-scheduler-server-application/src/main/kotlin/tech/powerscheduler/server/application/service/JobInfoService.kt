@@ -3,6 +3,7 @@ package tech.powerscheduler.server.application.service
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import tech.powerscheduler.common.dto.response.PageDTO
+import tech.powerscheduler.common.enums.JobTypeEnum
 import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.JobInfoAssembler
 import tech.powerscheduler.server.application.dto.request.JobInfoAddRequestDTO
@@ -43,6 +44,9 @@ class JobInfoService(
     }
 
     fun add(param: JobInfoAddRequestDTO): Long {
+        if (param.jobType == JobTypeEnum.SCRIPT) {
+            throw BizException(message = "为了保证系统安全, 在线试用不允许用户创建脚本的类型任务")
+        }
         val appCode = param.appCode!!
         val namespaceCode = param.namespaceCode!!
         val namespace = namespaceRepository.findByCode(namespaceCode)
@@ -61,6 +65,11 @@ class JobInfoService(
         val jobId = JobId(param.jobId!!)
         val jobInfo = jobInfoRepository.lockById(jobId)
             ?: throw BizException(message = "任务保存失败: 任务不存在")
+        if (param.jobType == JobTypeEnum.SCRIPT) {
+            if (jobInfo.scriptCode != param.scriptCode) {
+                throw BizException(message = "为了保证系统安全, 在线试用不允许用户修改脚本内容")
+            }
+        }
         val jobInfoToSave = jobInfoAssembler.toDomainModel4EditRequest(jobInfo, param).apply {
             validScheduleConfig()
         }
