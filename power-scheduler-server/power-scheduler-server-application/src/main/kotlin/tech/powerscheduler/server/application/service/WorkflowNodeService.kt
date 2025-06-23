@@ -5,6 +5,7 @@ import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.WorkflowNodeAssembler
 import tech.powerscheduler.server.application.dto.request.WorkflowNodeAddRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowNodeEditRequestDTO
+import tech.powerscheduler.server.application.dto.request.WorkflowNodeSaveDagRequestDTO
 import tech.powerscheduler.server.application.dto.response.WorkflowNodeQueryResponseDTO
 import tech.powerscheduler.server.domain.workflow.WorkflowId
 import tech.powerscheduler.server.domain.workflow.WorkflowNodeId
@@ -46,6 +47,27 @@ class WorkflowNodeService(
             ?: throw BizException("workflowNode not found")
         val workflowNodeToSave = workflowNodeAssembler.toDomainModel4EditRequest(workflowNode, param)
         workflowNodeRepository.save(workflowNodeToSave)
+    }
+
+    fun saveDag(param: WorkflowNodeSaveDagRequestDTO) {
+        if (param.isDag().not()) {
+            throw BizException("exist circle in graph")
+        }
+        val rootNodes = param.dagNodes
+        val descendants = rootNodes.flatMap { it.children.orEmpty() }.distinct()
+        val workflowNodeId2ChildrenIds = sequenceOf(rootNodes, descendants)
+            .flatten()
+            .associateBy({ WorkflowNodeId(it.workflowNodeId!!) }) {
+                it.children.orEmpty().map { node -> node.workflowNodeId!! }
+            }
+        val allIds = workflowNodeId2ChildrenIds.keys
+        val workflowNodes = workflowNodeRepository.findAllByIds(allIds)
+        val id2WorkflowNode = workflowNodes.associateBy { it.id!! }
+        for (workflowNode in workflowNodes) {
+            val childrenIds = workflowNodeId2ChildrenIds[workflowNode.id] ?: emptySet()
+            workflowNode.children = childrenIds.mapNotNull { id2WorkflowNode[workflowNode.id] }.toSet()
+        }
+        workflowNodeRepository.saveAll(workflowNodes)
     }
 
     fun delete(id: Long) {

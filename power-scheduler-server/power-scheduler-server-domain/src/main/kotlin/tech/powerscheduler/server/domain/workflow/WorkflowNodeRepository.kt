@@ -6,13 +6,17 @@ package tech.powerscheduler.server.domain.workflow
  */
 interface WorkflowNodeRepository {
 
-    fun findById(workflowNodeId: WorkflowNodeId): WorkflowNode?
+    fun findById(id: WorkflowNodeId): WorkflowNode?
+
+    fun findAllByIds(ids: Iterable<WorkflowNodeId>): List<WorkflowNode>
 
     fun findAllByWorkflow(workflow: Workflow): List<WorkflowNode>
 
     fun save(workflowNode: WorkflowNode): WorkflowNodeId
 
-    fun deleteById(workflowNodeId: WorkflowNodeId)
+    fun saveAll(workflowNodes: Iterable<WorkflowNode>)
+
+    fun deleteById(id: WorkflowNodeId)
 
     fun deleteByIds(ids: Iterable<WorkflowNodeId>)
 

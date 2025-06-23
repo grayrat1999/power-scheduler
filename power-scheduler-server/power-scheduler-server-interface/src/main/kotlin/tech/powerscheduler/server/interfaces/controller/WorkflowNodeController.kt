@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import tech.powerscheduler.server.application.dto.request.WorkflowNodeAddRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowNodeEditRequestDTO
+import tech.powerscheduler.server.application.dto.request.WorkflowNodeSaveDagRequestDTO
 import tech.powerscheduler.server.application.service.WorkflowNodeService
 
 /**
@@ -43,5 +44,11 @@ class WorkflowNodeController(
     @PostMapping("/delete")
     fun deleteWorkflow(@RequestBody @Validated @NotNull workflowNodeId: Long?) = wrapperResponse {
         workflowNodeService.delete(workflowNodeId!!)
+    }
+
+    @Operation(summary = "保存有向无环图")
+    @PostMapping("/saveDag")
+    fun saveDag(@RequestBody @Validated @NotNull param: WorkflowNodeSaveDagRequestDTO?) = wrapperResponse {
+        workflowNodeService.saveDag(param!!)
     }
 }

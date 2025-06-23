@@ -19,9 +19,14 @@ class WorkflowNodeRepositoryImpl(
     private val workflowNodeJpaRepository: WorkflowNodeJpaRepository
 ) : WorkflowNodeRepository {
 
-    override fun findById(workflowNodeId: WorkflowNodeId): WorkflowNode? {
-        val entity = workflowNodeJpaRepository.findByIdOrNull(workflowNodeId.value)
+    override fun findById(id: WorkflowNodeId): WorkflowNode? {
+        val entity = workflowNodeJpaRepository.findByIdOrNull(id.value)
         return entity?.toDomainModel()
+    }
+
+    override fun findAllByIds(ids: Iterable<WorkflowNodeId>): List<WorkflowNode> {
+        val entities = workflowNodeJpaRepository.findAllById(ids.map { it.value })
+        return entities.map { it.toDomainModel() }
     }
 
     override fun findAllByWorkflow(workflow: Workflow): List<WorkflowNode> {
@@ -36,8 +41,13 @@ class WorkflowNodeRepositoryImpl(
         return WorkflowNodeId(entity.id!!)
     }
 
-    override fun deleteById(workflowNodeId: WorkflowNodeId) {
-        workflowNodeJpaRepository.deleteById(workflowNodeId.value)
+    override fun saveAll(workflowNodes: Iterable<WorkflowNode>) {
+        val entities = workflowNodes.map { it.toEntity() }
+        workflowNodeJpaRepository.saveAll(entities)
+    }
+
+    override fun deleteById(id: WorkflowNodeId) {
+        workflowNodeJpaRepository.deleteById(id.value)
     }
 
     override fun deleteByIds(ids: Iterable<WorkflowNodeId>) {
