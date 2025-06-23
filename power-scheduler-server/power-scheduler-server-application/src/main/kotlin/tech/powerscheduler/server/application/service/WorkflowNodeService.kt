@@ -44,7 +44,7 @@ class WorkflowNodeService(
         val workflowNodeId = WorkflowNodeId(param.workflowNodeId!!)
         val workflowNode = workflowNodeRepository.findById(workflowNodeId)
             ?: throw BizException("workflowNode not found")
-        val workflowNodeToSave = workflowNodeAssembler.toDomainModel4EditRequest(workflowNode,param)
+        val workflowNodeToSave = workflowNodeAssembler.toDomainModel4EditRequest(workflowNode, param)
         workflowNodeRepository.save(workflowNodeToSave)
     }
 
