@@ -55,7 +55,7 @@ class WorkflowService(
         val workflowNodes = workflowNodeRepository.findAllByWorkflow(workflow)
         val workflowNodeIds = workflowNodes.mapNotNull { it.id }
         transactionTemplate.executeWithoutResult {
-            workflowRepository.delete(workflow)
+            workflowRepository.deleteById(workflow.id!!)
             workflowNodeRepository.deleteByIds(workflowNodeIds)
         }
     }

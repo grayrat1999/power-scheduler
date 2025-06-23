@@ -319,7 +319,6 @@ fun DomainEventEntity.toDomainModel(): DomainEvent {
     }
 }
 
-
 fun Workflow.toEntity(): WorkflowEntity {
     return WorkflowEntity().also {
         it.appGroupEntity = this.appGroup!!.toEntity()
@@ -334,6 +333,12 @@ fun Workflow.toEntity(): WorkflowEntity {
         it.lastCompletedAt = this.lastCompletedAt
         it.retentionPolicy = this.retentionPolicy
         it.retentionValue = this.retentionValue
+    }
+}
+
+fun WorkflowEntity.toDomainModel(): Workflow {
+    return Workflow().also {
+
     }
 }
 

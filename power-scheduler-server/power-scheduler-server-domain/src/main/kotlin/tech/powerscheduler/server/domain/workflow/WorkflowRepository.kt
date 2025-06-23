@@ -10,6 +10,6 @@ interface WorkflowRepository {
 
     fun save(workflow: Workflow): WorkflowId
 
-    fun delete(workflow: Workflow)
+    fun deleteById(workflowId: WorkflowId)
 
 }
