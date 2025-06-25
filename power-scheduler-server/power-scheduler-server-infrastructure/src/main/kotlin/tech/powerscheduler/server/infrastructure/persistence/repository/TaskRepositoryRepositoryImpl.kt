@@ -30,6 +30,11 @@ class TaskRepositoryRepositoryImpl(
     private val taskRepositoryJpaRepository: TaskRepositoryJpaRepository,
 ) : TaskRepository {
 
+    override fun lockById(taskId: TaskId): Task? {
+        val entity = taskRepositoryJpaRepository.findByIdForUpdate(taskId.value)
+        return entity?.toDomainModel()
+    }
+
     override fun findById(taskId: TaskId): Task? {
         val entity = taskRepositoryJpaRepository.findByIdOrNull(taskId.value)
         return entity?.toDomainModel()

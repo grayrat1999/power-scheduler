@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.common.dto.request.*
 import tech.powerscheduler.common.dto.response.FetchTaskResultResponseDTO
@@ -137,9 +138,10 @@ class WorkerLifeCycleService(
         }
     }
 
+    @Transactional
     fun updateProgress(param: TaskProgressReportRequestDTO) {
         val taskId = TaskId(param.taskId!!)
-        val task = taskRepository.findById(taskId)
+        val task = taskRepository.lockById(taskId)
         if (task == null) {
             log.warn("updateProgress cancel: task [{}] not exist", taskId.value)
             return
@@ -163,14 +165,12 @@ class WorkerLifeCycleService(
             jobInstanceId = task.jobInstanceId!!,
             executeMode = task.executeMode!!,
         )
-        transactionTemplate.executeWithoutResult {
-            taskRepository.save(task)
-            if (followingTasks.isNotEmpty()) {
-                taskRepository.saveAll(followingTasks)
-            }
-            log.info("updateProgress successfully: taskId={}, status={}", taskId.value, task.taskStatus)
-            applicationEventPublisher.publishEvent(taskStatusChangeEvent)
+        taskRepository.save(task)
+        if (followingTasks.isNotEmpty()) {
+            taskRepository.saveAll(followingTasks)
         }
+        log.info("updateProgress successfully: taskId={}, status={}", taskId.value, task.taskStatus)
+        applicationEventPublisher.publishEvent(taskStatusChangeEvent)
     }
 
     private fun createFollowingTasks(

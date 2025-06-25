@@ -12,6 +12,8 @@ import tech.powerscheduler.server.domain.job.JobInstanceId
  */
 interface TaskRepository {
 
+    fun lockById(taskId: TaskId): Task?
+
     fun findById(taskId: TaskId): Task?
 
     fun findAllByJobInstanceId(jobInstanceId: JobInstanceId): List<Task>

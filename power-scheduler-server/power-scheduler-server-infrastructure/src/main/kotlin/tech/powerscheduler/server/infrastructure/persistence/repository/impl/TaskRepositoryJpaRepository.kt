@@ -1,9 +1,11 @@
 package tech.powerscheduler.server.infrastructure.persistence.repository.impl
 
+import jakarta.persistence.LockModeType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
+import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import tech.powerscheduler.common.enums.JobStatusEnum
@@ -17,6 +19,10 @@ import tech.powerscheduler.server.infrastructure.persistence.model.TaskEntity
 @Repository
 interface TaskRepositoryJpaRepository
     : JpaRepository<TaskEntity, Long>, JpaSpecificationExecutor<TaskEntity> {
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT t FROM TaskEntity t WHERE t.id = :id")
+    fun findByIdForUpdate(id: Long): TaskEntity?
 
     fun findAllByJobInstanceId(jobInstanceId: Long): List<TaskEntity>
 
