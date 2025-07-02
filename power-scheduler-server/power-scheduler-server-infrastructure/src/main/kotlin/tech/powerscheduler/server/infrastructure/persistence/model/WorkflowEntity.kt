@@ -40,6 +40,12 @@ class WorkflowEntity : BaseEntity() {
     var description: String? = null
 
     /**
+     * 有向无环图的UI数据
+     */
+    @Column(name = "graph_data", nullable = false)
+    var graphData: String? = null
+
+    /**
      * 调度类型
      */
     @Enumerated(EnumType.STRING)

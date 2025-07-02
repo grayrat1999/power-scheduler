@@ -31,6 +31,11 @@ class Workflow : Schedulable() {
      */
     var description: String? = null
 
+    /**
+     * 有向无环图的UI数据
+     */
+    var graphData: String? = null
+
 //    /**
 //     * 调度类型
 //     */

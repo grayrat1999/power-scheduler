@@ -25,6 +25,8 @@ class WorkflowNodeSaveDagRequestDTO {
         @NotNull
         var workflowNodeId: Long? = null,
 
+        var uuid: String? = null,
+
         /**
          * 子节点列表
          */

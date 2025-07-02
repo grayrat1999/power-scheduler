@@ -325,6 +325,7 @@ fun Workflow.toEntity(): WorkflowEntity {
         it.id = this.id?.value
         it.name = this.name
         it.description = this.description
+        it.graphData = this.graphData
         it.scheduleType = this.scheduleType
         it.scheduleConfig = this.scheduleConfig
         it.nextScheduleAt = this.nextScheduleAt
