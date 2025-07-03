@@ -31,6 +31,7 @@ class WorkflowAssembler {
             this.appName = workflow.appGroup?.name
             this.id = workflow.id!!.value
             this.name = workflow.name
+            this.enabled = workflow.enabled
             this.scheduleType = workflow.scheduleType.toDTO()
             this.scheduleConfig = workflow.scheduleConfig
             this.scheduleConfigDesc = when (workflow.scheduleType!!) {

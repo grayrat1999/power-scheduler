@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*
 import tech.powerscheduler.server.application.dto.request.WorkflowAddRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowEditRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowQueryRequestDTO
+import tech.powerscheduler.server.application.dto.request.WorkflowSwitchRequestDTO
 import tech.powerscheduler.server.application.service.WorkflowService
 
 /**
@@ -25,24 +26,30 @@ class WorkflowController(
     @Operation(summary = "查询工作流列表")
     @GetMapping("/list")
     fun listWorkflow(@Validated @NotNull param: WorkflowQueryRequestDTO?) = wrapperResponse {
-        workflowService.list(param!!)
+        return@wrapperResponse workflowService.list(param!!)
     }
 
     @Operation(summary = "新增工作流")
     @PostMapping("/add")
     fun addWorkflow(@RequestBody @Validated @NotNull param: WorkflowAddRequestDTO?) = wrapperResponse {
-        workflowService.add(param!!)
+        return@wrapperResponse workflowService.add(param!!)
     }
 
     @Operation(summary = "编辑工作流")
     @PostMapping("/edit")
     fun editWorkflow(@RequestBody @Validated @NotNull param: WorkflowEditRequestDTO?) = wrapperResponse {
-        workflowService.edit(param!!)
+        return@wrapperResponse workflowService.edit(param!!)
+    }
+
+    @Operation(summary = "修改工作流启用状态")
+    @PostMapping("/switch")
+    fun switchWorkflowEnable(@Validated @RequestBody param: WorkflowSwitchRequestDTO) = wrapperResponse {
+        return@wrapperResponse workflowService.switch(param)
     }
 
     @Operation(summary = "删除工作流")
     @PostMapping("/delete")
     fun deleteWorkflow(@RequestBody @Validated @NotNull workflowId: Long?) = wrapperResponse {
-        workflowService.delete(workflowId!!)
+        return@wrapperResponse workflowService.delete(workflowId!!)
     }
 }

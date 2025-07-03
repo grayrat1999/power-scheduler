@@ -8,6 +8,7 @@ import tech.powerscheduler.server.application.assembler.WorkflowAssembler
 import tech.powerscheduler.server.application.dto.request.WorkflowAddRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowEditRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowQueryRequestDTO
+import tech.powerscheduler.server.application.dto.request.WorkflowSwitchRequestDTO
 import tech.powerscheduler.server.application.dto.response.WorkflowQueryResponseDTO
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
@@ -52,6 +53,24 @@ class WorkflowService(
             ?: throw BizException("Workflow not found")
         val workflowToSave = workflowAssembler.toDomainModel4EditRequest(workflow = workflow, param = param)
         workflowRepository.save(workflowToSave)
+    }
+
+    fun switch(param: WorkflowSwitchRequestDTO) {
+        val workflowId = WorkflowId(param.workflowId!!)
+        val workflow = workflowRepository.findById(workflowId)
+            ?: throw BizException("Workflow not found")
+        if (workflow.enabled == param.enabled) {
+            return
+        }
+        workflow.apply {
+            this.enabled = param.enabled
+            if (this.enabled == true) {
+                this.initNextScheduleTime()
+            } else {
+                this.nextScheduleAt = null
+            }
+        }
+        workflowRepository.save(workflow)
     }
 
     fun delete(id: Long) {

@@ -21,6 +21,11 @@ class WorkflowQueryResponseDTO {
     var name: String? = null
 
     /**
+     * 启用状态
+     */
+    var enabled: Boolean? = null
+
+    /**
      * 调度类型
      */
     var scheduleType: ScheduleTypeDTO? = null
