@@ -49,7 +49,7 @@ class WorkflowController(
 
     @Operation(summary = "删除工作流")
     @PostMapping("/delete")
-    fun deleteWorkflow(@RequestBody @Validated @NotNull workflowId: Long?) = wrapperResponse {
+    fun deleteWorkflow(@Validated @NotNull workflowId: Long?) = wrapperResponse {
         return@wrapperResponse workflowService.delete(workflowId!!)
     }
 }
