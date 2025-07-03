@@ -85,6 +85,7 @@ class WorkflowEntity : BaseEntity() {
     /**
      * 保留策略
      */
+    @Enumerated(EnumType.STRING)
     @Column(name = "retention_policy", nullable = false)
     var retentionPolicy: RetentionPolicyEnum? = null
 
