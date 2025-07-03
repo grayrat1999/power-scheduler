@@ -1,9 +1,6 @@
 package tech.powerscheduler.server.application.dto.request
 
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotEmpty
-import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Positive
+import jakarta.validation.constraints.*
 import tech.powerscheduler.common.enums.*
 
 /**
@@ -72,10 +69,17 @@ class WorkflowAddRequestDTO {
     @Positive
     var retentionValue: Int? = 100
 
+    /**
+     * 图的UI数据
+     */
+    @NotBlank
+    var graphData: String? = null
+
     inner class Node {
         /**
          * UUID
          */
+        @NotBlank
         var uuid: String? = null
 
         /**
@@ -86,6 +90,7 @@ class WorkflowAddRequestDTO {
         /**
          * 任务名称
          */
+        @NotBlank
         var jobName: String? = null
 
         /**
@@ -96,16 +101,19 @@ class WorkflowAddRequestDTO {
         /**
          * 任务类型
          */
+        @NotNull
         var jobType: JobTypeEnum? = null
 
         /**
          * 任务处理器
          */
+        @NotBlank
         var processor: String? = null
 
         /**
          * 执行模式
          */
+        @NotNull
         var executeMode: ExecuteModeEnum? = null
 
         /**
@@ -126,26 +134,36 @@ class WorkflowAddRequestDTO {
         /**
          * 最大重试次数
          */
-        var maxAttemptCnt: Int? = null
+        @NotNull
+        @PositiveOrZero
+        var maxAttemptCnt: Int? = 0
 
         /**
          * 重试间隔(s)
          */
-        var attemptInterval: Int? = null
+        @NotNull
+        @PositiveOrZero
+        var attemptInterval: Int? = 15
 
         /**
          * 子任务最大重试次数
          */
-        var taskMaxAttemptCnt: Int? = null
+        @NotNull
+        @PositiveOrZero
+        var taskMaxAttemptCnt: Int? = 0
 
         /**
          * 子任务重试间隔(s)
          */
-        var taskAttemptInterval: Int? = null
+        @NotNull
+        @PositiveOrZero
+        var taskAttemptInterval: Int? = 15
 
         /**
          * 优先级
          */
-        var priority: Int? = null
+        @NotNull
+        @PositiveOrZero
+        var priority: Int? = 1
     }
 }
