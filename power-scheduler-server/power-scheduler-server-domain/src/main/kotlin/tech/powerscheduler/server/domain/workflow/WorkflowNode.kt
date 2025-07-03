@@ -34,14 +34,14 @@ class WorkflowNode {
     var id: WorkflowNodeId? = null
 
     /**
-     * 任务名称
+     * 节点名称
      */
-    var jobName: String? = null
+    var name: String? = null
 
     /**
-     * 任务描述
+     * 节点描述
      */
-    var jobDesc: String? = null
+    var description: String? = null
 
     /**
      * 任务类型

@@ -47,14 +47,14 @@ class WorkflowNodeEntity {
     /**
      * 任务名称
      */
-    @Column(name = "job_name", nullable = false)
-    var jobName: String? = null
+    @Column(name = "name", nullable = false)
+    var name: String? = null
 
     /**
      * 任务描述
      */
-    @Column(name = "job_desc", nullable = true)
-    var jobDesc: String? = null
+    @Column(name = "description", nullable = true)
+    var description: String? = null
 
     /**
      * 任务类型
