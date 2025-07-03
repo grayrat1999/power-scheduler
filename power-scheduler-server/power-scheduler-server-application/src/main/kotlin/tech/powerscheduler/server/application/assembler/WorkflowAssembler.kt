@@ -1,10 +1,12 @@
 package tech.powerscheduler.server.application.assembler
 
 import org.springframework.stereotype.Component
+import tech.powerscheduler.common.enums.ScheduleTypeEnum
 import tech.powerscheduler.server.application.dto.request.WorkflowAddRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowEditRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowQueryRequestDTO
 import tech.powerscheduler.server.application.dto.response.WorkflowQueryResponseDTO
+import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.workflow.Workflow
 import tech.powerscheduler.server.domain.workflow.WorkflowQuery
@@ -25,7 +27,19 @@ class WorkflowAssembler {
     }
 
     fun toWorkflowQueryResponseDTO(workflow: Workflow): WorkflowQueryResponseDTO {
-        return WorkflowQueryResponseDTO()
+        return WorkflowQueryResponseDTO().apply {
+            this.appName = workflow.appGroup?.name
+            this.id = workflow.id!!.value
+            this.name = workflow.name
+            this.scheduleType = workflow.scheduleType.toDTO()
+            this.scheduleConfig = workflow.scheduleConfig
+            this.scheduleConfigDesc = when (workflow.scheduleType!!) {
+                ScheduleTypeEnum.CRON -> scheduleConfig
+                ScheduleTypeEnum.FIX_RATE -> "${scheduleType!!.label} | $scheduleConfig(秒)"
+                ScheduleTypeEnum.FIX_DELAY -> "${scheduleType!!.label} | $scheduleConfig(秒)"
+                ScheduleTypeEnum.ONE_TIME -> scheduleConfig
+            }
+        }
     }
 
     fun toDomainModel4AddRequest(appGroup: AppGroup, param: WorkflowAddRequestDTO): Workflow {

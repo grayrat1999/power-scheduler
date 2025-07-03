@@ -36,21 +36,6 @@ class Workflow : Schedulable() {
      */
     var graphData: String? = null
 
-//    /**
-//     * 调度类型
-//     */
-//    var scheduleType: ScheduleTypeEnum? = null
-//
-//    /**
-//     * 调度配置
-//     */
-//    var scheduleConfig: String? = null
-//
-//    /**
-//     * 下次执行时间
-//     */
-//    var nextScheduleAt: LocalDateTime? = null
-
     /**
      * 启用状态
      */
@@ -60,11 +45,6 @@ class Workflow : Schedulable() {
      * 并发数
      */
     var maxConcurrentNum: Int? = null
-
-//    /**
-//     * 上次完成时间
-//     */
-//    var lastCompletedAt: LocalDateTime? = null
 
     /**
      * 保留策略

@@ -16,6 +16,7 @@ import tech.powerscheduler.server.domain.task.TaskId
 import tech.powerscheduler.server.domain.worker.WorkerRegistry
 import tech.powerscheduler.server.domain.worker.WorkerRegistryId
 import tech.powerscheduler.server.domain.workflow.Workflow
+import tech.powerscheduler.server.domain.workflow.WorkflowId
 import tech.powerscheduler.server.domain.workflow.WorkflowNode
 import tech.powerscheduler.server.domain.workflow.WorkflowNodeInstance
 import tech.powerscheduler.server.infrastructure.persistence.model.*
@@ -339,7 +340,23 @@ fun Workflow.toEntity(): WorkflowEntity {
 
 fun WorkflowEntity.toDomainModel(): Workflow {
     return Workflow().also {
-
+        it.appGroup = this.appGroupEntity!!.toDomainModel()
+        it.id = WorkflowId(this.id!!)
+        it.name = this.name
+        it.description = this.description
+        it.graphData = this.graphData
+        it.enabled = this.enabled
+        it.maxConcurrentNum = this.maxConcurrentNum
+        it.retentionPolicy = this.retentionPolicy
+        it.retentionValue = this.retentionValue
+        it.nextScheduleAt = this.nextScheduleAt
+        it.scheduleType = this.scheduleType
+        it.scheduleConfig = this.scheduleConfig
+        it.lastCompletedAt = this.lastCompletedAt
+        it.createdBy = this.createdBy
+        it.createdAt = this.createdAt
+        it.updatedBy = this.updatedBy
+        it.updatedAt = this.updatedAt
     }
 }
 
