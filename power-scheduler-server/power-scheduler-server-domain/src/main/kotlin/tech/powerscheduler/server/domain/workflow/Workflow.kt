@@ -11,10 +11,16 @@ import java.time.LocalDateTime
  * @since 2025/6/21
  */
 class Workflow : Schedulable() {
+
     /**
      * 应用分组
      */
     var appGroup: AppGroup? = null
+
+    /**
+     * 工作流节点
+     */
+    var workflowNodes: List<WorkflowNode> = emptyList()
 
     /**
      * 主键
@@ -30,11 +36,6 @@ class Workflow : Schedulable() {
      * 工作流描述
      */
     var description: String? = null
-
-    /**
-     * 有向无环图的UI数据
-     */
-    var graphData: String? = null
 
     /**
      * 启用状态
@@ -55,6 +56,11 @@ class Workflow : Schedulable() {
      * 保留值
      */
     var retentionValue: Int? = null
+
+    /**
+     * 有向无环图的UI数据
+     */
+    var graphData: String? = null
 
     /**
      * 创建人

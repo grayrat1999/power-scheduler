@@ -113,7 +113,8 @@ class WorkflowRepositoryImpl(
     override fun save(workflow: Workflow): WorkflowId {
         val entity = workflow.toEntity()
         workflowJpaRepository.save(entity)
-        return WorkflowId(entity.id!!)
+        workflow.id = WorkflowId(entity.id!!)
+        return workflow.id!!
     }
 
     override fun deleteById(workflowId: WorkflowId) {

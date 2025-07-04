@@ -323,6 +323,16 @@ fun DomainEventEntity.toDomainModel(): DomainEvent {
 fun Workflow.toEntity(): WorkflowEntity {
     return WorkflowEntity().also {
         it.appGroupEntity = this.appGroup!!.toEntity()
+        val workflowNodeDomainModel2entity = this.workflowNodes.associateWith { node -> node.toEntity() }
+        for (workflowNode in this.workflowNodes) {
+            val workflowNodeEntity = workflowNodeDomainModel2entity[workflowNode]!!
+            workflowNodeEntity.workflowEntity = it
+            workflowNodeEntity.children = workflowNode.children
+                .mapNotNull { entity -> workflowNodeDomainModel2entity[entity] }
+                .toSet()
+        }
+        it.workflowNodeEntities = workflowNodeDomainModel2entity.values.toSet()
+
         it.id = this.id?.value
         it.name = this.name
         it.description = this.description
@@ -362,7 +372,22 @@ fun WorkflowEntity.toDomainModel(): Workflow {
 
 fun WorkflowNode.toEntity(): WorkflowNodeEntity {
     return WorkflowNodeEntity().also {
-
+//        it.workflowEntity = this.workflow!!.toEntity()
+//        it.children = this.children.map { child -> child.toEntity() }.toSet()
+        it.id = this.id?.value
+        it.name = this.name
+        it.description = this.description
+        it.jobType = this.jobType
+        it.processor = this.processor
+        it.executeMode = this.executeMode
+        it.executeParams = this.executeParams
+        it.scriptType = this.scriptType
+        it.scriptCode = this.scriptCode
+        it.maxAttemptCnt = this.maxAttemptCnt
+        it.attemptInterval = this.attemptInterval
+        it.taskMaxAttemptCnt = this.taskMaxAttemptCnt
+        it.taskAttemptInterval = this.taskAttemptInterval
+        it.priority = this.priority
     }
 }
 

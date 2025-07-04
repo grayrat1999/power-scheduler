@@ -1,7 +1,9 @@
 package tech.powerscheduler.server.application.dto.request
 
+import jakarta.validation.Valid
 import jakarta.validation.constraints.*
 import tech.powerscheduler.common.enums.*
+import tech.powerscheduler.server.domain.workflow.WorkflowGraphNode
 
 /**
  * @author grayrat
@@ -12,6 +14,7 @@ class WorkflowAddRequestDTO {
      * 有向无环图
      */
     @NotEmpty
+    @Valid
     var nodes: List<Node> = emptyList()
 
     /**
@@ -75,28 +78,28 @@ class WorkflowAddRequestDTO {
     @NotBlank
     var graphData: String? = null
 
-    inner class Node {
+    class Node : WorkflowGraphNode() {
         /**
          * UUID
          */
         @NotBlank
-        var uuid: String? = null
+        override var uuid: String? = null
 
         /**
-         * 父节点UUID
+         * 子节点UUID
          */
-        var parentUuid: String? = null
+        override var childrenUuids: Set<String> = emptySet()
 
         /**
          * 任务名称
          */
         @NotBlank
-        var jobName: String? = null
+        var name: String? = null
 
         /**
          * 任务描述
          */
-        var jobDesc: String? = null
+        var description: String? = null
 
         /**
          * 任务类型

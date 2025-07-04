@@ -48,12 +48,13 @@ class WorkflowAssembler {
             this.appGroup = appGroup
             this.name = param.name
             this.description = param.description
-            this.scheduleType = param.scheduleType
-            this.scheduleConfig = param.scheduleConfig
+            this.enabled = false
             this.maxConcurrentNum = param.maxConcurrentNum
             this.retentionPolicy = param.retentionPolicy
             this.retentionValue = param.retentionValue
-            this.enabled = false
+            this.graphData = param.graphData
+            this.scheduleType = param.scheduleType
+            this.scheduleConfig = param.scheduleConfig
         }
     }
 

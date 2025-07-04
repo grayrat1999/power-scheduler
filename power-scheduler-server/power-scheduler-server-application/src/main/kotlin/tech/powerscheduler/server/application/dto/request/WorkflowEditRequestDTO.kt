@@ -2,6 +2,7 @@ package tech.powerscheduler.server.application.dto.request
 
 import jakarta.validation.constraints.*
 import tech.powerscheduler.common.enums.*
+import tech.powerscheduler.server.domain.workflow.WorkflowGraphNode
 
 /**
  * @author grayrat
@@ -81,7 +82,7 @@ class WorkflowEditRequestDTO {
     @NotBlank
     var graphData: String? = null
 
-    inner class Node {
+    inner class Node : WorkflowGraphNode() {
         /**
          * 工作流节点ID
          */
@@ -92,12 +93,12 @@ class WorkflowEditRequestDTO {
          * UUID
          */
         @NotBlank
-        var uuid: String? = null
+        override var uuid: String? = null
 
         /**
          * 父节点UUID
          */
-        var parentUuid: String? = null
+        override var childrenUuids: Set<String> = emptySet()
 
         /**
          * 任务名称

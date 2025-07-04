@@ -8,39 +8,23 @@ class WorkflowGraph(
     /**
      * 有向无环图
      */
-    var nodes: List<Node> = emptyList()
+    val nodes: List<WorkflowGraphNode> = emptyList()
 ) {
-
-    inner class Node {
-        /**
-         * UUID
-         */
-        var uuid: String? = null
-
-        /**
-         * 父节点UUID
-         */
-        var parentUuid: String? = null
-
-        /**
-         * 子节点列表
-         */
-        val children: List<Node>
-            get() = nodes.filter { it.parentUuid == this.uuid }
-    }
 
     private enum class VisitState { UNVISITED, VISITING, VISITED }
 
     fun isDag(): Boolean {
-        val stateMap = mutableMapOf<Node, VisitState>()
+        val stateMap = mutableMapOf<WorkflowGraphNode, VisitState>()
+        val uuid2node = nodes.associateBy { it.uuid }
 
-        fun hasCycle(node: Node): Boolean {
+        fun hasCycle(node: WorkflowGraphNode): Boolean {
             val state = stateMap[node] ?: VisitState.UNVISITED
             if (state == VisitState.VISITING) return true  // 回边，存在环
             if (state == VisitState.VISITED) return false  // 已完成，无需重复判断
 
             stateMap[node] = VisitState.VISITING
-            for (child in node.children) {
+            val children = node.childrenUuids.mapNotNull { uuid2node[it] }
+            for (child in children) {
                 if (hasCycle(child)) return true
             }
             stateMap[node] = VisitState.VISITED
