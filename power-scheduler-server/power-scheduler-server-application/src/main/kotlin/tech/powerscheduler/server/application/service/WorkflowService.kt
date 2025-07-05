@@ -52,7 +52,9 @@ class WorkflowService(
             ?: throw BizException("namespace not found")
         val appGroup = appGroupRepository.findByCode(namespace, param.appCode!!)
             ?: throw BizException("appGroup not found")
-        val workflowToSave = workflowAssembler.toDomainModel4AddRequest(appGroup = appGroup, param = param)
+        val workflowToSave = workflowAssembler.toDomainModel4AddRequest(appGroup = appGroup, param = param).apply {
+            this.validScheduleConfig()
+        }
         val workflowNodesToSave = workflowNodeAssembler.toDomainModel4AddRequest(
             workflow = workflowToSave,
             nodes = param.nodes,
@@ -68,7 +70,9 @@ class WorkflowService(
         val workflowId = WorkflowId(param.workflowId!!)
         val workflow = workflowRepository.findById(workflowId)
             ?: throw BizException("Workflow not found")
-        val workflowToSave = workflowAssembler.toDomainModel4EditRequest(workflow = workflow, param = param)
+        val workflowToSave = workflowAssembler.toDomainModel4EditRequest(workflow = workflow, param = param).apply {
+            this.validScheduleConfig()
+        }
         val workflowNodesToSave = workflowNodeAssembler.toDomainModel4EditRequest(
             workflow = workflow,
             nodes = param.nodes,
@@ -76,6 +80,40 @@ class WorkflowService(
         )
         workflowToSave.workflowNodes = workflowNodesToSave
         workflowRepository.save(workflowToSave)
+    }
+
+    @Transactional
+    fun switch(param: WorkflowSwitchRequestDTO) {
+        val workflowId = WorkflowId(param.workflowId!!)
+        val workflow = workflowRepository.findById(workflowId)
+            ?: throw BizException("Workflow not found")
+        if (workflow.enabled == param.enabled) {
+            return
+        }
+        workflow.apply {
+            this.enabled = param.enabled
+            if (this.enabled == true) {
+                this.initNextScheduleTime()
+            } else {
+                this.nextScheduleAt = null
+            }
+        }
+        workflowRepository.save(workflow)
+    }
+
+    @Transactional
+    fun delete(id: Long) {
+        val workflowId = WorkflowId(id)
+        val workflow = workflowRepository.findById(workflowId)
+        if (workflow == null) {
+            return
+        }
+        val workflowNodes = workflowNodeRepository.findAllByWorkflow(workflow)
+        val workflowNodeIds = workflowNodes.mapNotNull { it.id }
+        transactionTemplate.executeWithoutResult {
+            workflowRepository.deleteById(workflow.id!!)
+            workflowNodeRepository.deleteByIds(workflowNodeIds)
+        }
     }
 
     private enum class VisitState { UNVISITED, VISITING, VISITED }
@@ -108,38 +146,6 @@ class WorkflowService(
         }
 
         return nodes.none { hasCycle(it) }
-    }
-
-    fun switch(param: WorkflowSwitchRequestDTO) {
-        val workflowId = WorkflowId(param.workflowId!!)
-        val workflow = workflowRepository.findById(workflowId)
-            ?: throw BizException("Workflow not found")
-        if (workflow.enabled == param.enabled) {
-            return
-        }
-        workflow.apply {
-            this.enabled = param.enabled
-            if (this.enabled == true) {
-                this.initNextScheduleTime()
-            } else {
-                this.nextScheduleAt = null
-            }
-        }
-        workflowRepository.save(workflow)
-    }
-
-    fun delete(id: Long) {
-        val workflowId = WorkflowId(id)
-        val workflow = workflowRepository.findById(workflowId)
-        if (workflow == null) {
-            return
-        }
-        val workflowNodes = workflowNodeRepository.findAllByWorkflow(workflow)
-        val workflowNodeIds = workflowNodes.mapNotNull { it.id }
-        transactionTemplate.executeWithoutResult {
-            workflowRepository.deleteById(workflow.id!!)
-            workflowNodeRepository.deleteByIds(workflowNodeIds)
-        }
     }
 
 }
