@@ -373,6 +373,7 @@ fun WorkflowEntity.toDomainModel(): Workflow {
 fun WorkflowNode.toEntity(): WorkflowNodeEntity {
     return WorkflowNodeEntity().also {
         it.id = this.id?.value
+        it.uuid = this.uuid
         it.name = this.name
         it.description = this.description
         it.jobType = this.jobType
@@ -392,6 +393,7 @@ fun WorkflowNode.toEntity(): WorkflowNodeEntity {
 fun WorkflowNodeEntity.toDomainModel(): WorkflowNode {
     return WorkflowNode().also {
         it.id = WorkflowNodeId(this.id!!)
+        it.uuid = this.uuid
         it.name = this.name
         it.description = this.description
         it.jobType = this.jobType

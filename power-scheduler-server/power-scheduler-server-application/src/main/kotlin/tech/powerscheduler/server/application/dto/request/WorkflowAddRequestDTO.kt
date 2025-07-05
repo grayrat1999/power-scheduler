@@ -1,9 +1,12 @@
 package tech.powerscheduler.server.application.dto.request
 
 import jakarta.validation.Valid
-import jakarta.validation.constraints.*
-import tech.powerscheduler.common.enums.*
-import tech.powerscheduler.server.domain.workflow.WorkflowGraphNode
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Positive
+import tech.powerscheduler.common.enums.RetentionPolicyEnum
+import tech.powerscheduler.common.enums.ScheduleTypeEnum
 
 /**
  * @author grayrat
@@ -15,7 +18,7 @@ class WorkflowAddRequestDTO {
      */
     @NotEmpty
     @Valid
-    var nodes: List<Node> = emptyList()
+    var nodes: List<WorkflowNodeDTO> = emptyList()
 
     /**
      * 命名空间编码
@@ -77,96 +80,4 @@ class WorkflowAddRequestDTO {
      */
     @NotBlank
     var graphData: String? = null
-
-    class Node : WorkflowGraphNode() {
-        /**
-         * UUID
-         */
-        @NotBlank
-        override var uuid: String? = null
-
-        /**
-         * 子节点UUID
-         */
-        override var childrenUuids: Set<String> = emptySet()
-
-        /**
-         * 任务名称
-         */
-        @NotBlank
-        var name: String? = null
-
-        /**
-         * 任务描述
-         */
-        var description: String? = null
-
-        /**
-         * 任务类型
-         */
-        @NotNull
-        var jobType: JobTypeEnum? = null
-
-        /**
-         * 任务处理器
-         */
-        @NotBlank
-        var processor: String? = null
-
-        /**
-         * 执行模式
-         */
-        @NotNull
-        var executeMode: ExecuteModeEnum? = null
-
-        /**
-         * 任务参数
-         */
-        var executeParams: String? = null
-
-        /**
-         * 脚本类型
-         */
-        var scriptType: ScriptTypeEnum? = null
-
-        /**
-         * 脚本源代码
-         */
-        var scriptCode: String? = null
-
-        /**
-         * 最大重试次数
-         */
-        @NotNull
-        @PositiveOrZero
-        var maxAttemptCnt: Int? = 0
-
-        /**
-         * 重试间隔(s)
-         */
-        @NotNull
-        @PositiveOrZero
-        var attemptInterval: Int? = 15
-
-        /**
-         * 子任务最大重试次数
-         */
-        @NotNull
-        @PositiveOrZero
-        var taskMaxAttemptCnt: Int? = 0
-
-        /**
-         * 子任务重试间隔(s)
-         */
-        @NotNull
-        @PositiveOrZero
-        var taskAttemptInterval: Int? = 15
-
-        /**
-         * 优先级
-         */
-        @NotNull
-        @PositiveOrZero
-        var priority: Int? = 1
-    }
 }

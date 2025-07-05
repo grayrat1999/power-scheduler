@@ -34,6 +34,11 @@ class WorkflowNode {
     var id: WorkflowNodeId? = null
 
     /**
+     * uuid
+     */
+    var uuid: String? = null
+
+    /**
      * 节点名称
      */
     var name: String? = null

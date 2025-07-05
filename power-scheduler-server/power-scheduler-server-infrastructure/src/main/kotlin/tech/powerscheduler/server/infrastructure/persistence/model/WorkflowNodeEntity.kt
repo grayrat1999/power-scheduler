@@ -13,7 +13,7 @@ import tech.powerscheduler.common.enums.ScriptTypeEnum
  */
 @Entity
 @Table(name = "workflow_node")
-class WorkflowNodeEntity {
+class WorkflowNodeEntity : BaseEntity() {
 
     @ManyToOne
     @JoinColumn(name = "workflow_id", nullable = false)
@@ -43,6 +43,12 @@ class WorkflowNodeEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     var id: Long? = null
+
+    /**
+     * uuid
+     */
+    @Column(name = "uuid", nullable = false)
+    var uuid: String? = null
 
     /**
      * 任务名称
