@@ -15,6 +15,16 @@ class WorkflowInstance {
     var appGroup: AppGroup? = null
 
     /**
+     * 工作流
+     */
+    var workflow: Workflow? = null
+
+    /**
+     * 工作流节点实例列表
+     */
+    var workflowNodeInstances: List<WorkflowNodeInstance> = emptyList()
+
+    /**
      * 主键
      */
     var id: WorkflowId? = null
@@ -28,6 +38,11 @@ class WorkflowInstance {
      * 状态
      */
     var status: WorkflowStatusEnum? = null
+
+    /**
+     * 数据时间
+     */
+    var dataTime: LocalDateTime? = null
 
     /**
      * 创建人

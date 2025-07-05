@@ -5,6 +5,7 @@ import tech.powerscheduler.common.enums.ExecuteModeEnum
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobTypeEnum
 import tech.powerscheduler.common.enums.ScriptTypeEnum
+import java.time.LocalDateTime
 
 /**
  * @author grayrat
@@ -14,9 +15,9 @@ import tech.powerscheduler.common.enums.ScriptTypeEnum
 @Table(name = "workflow_node_instance")
 class WorkflowNodeInstanceEntity : BaseEntity() {
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "app_group_id", nullable = false)
-    var appGroupEntity: AppGroupEntity? = null
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "app_group_id", nullable = false)
+//    var appGroupEntity: AppGroupEntity? = null
 
     /**
      * 子节点
@@ -28,6 +29,13 @@ class WorkflowNodeInstanceEntity : BaseEntity() {
         inverseJoinColumns = [JoinColumn(name = "workflow_node_instance_child_id")]
     )
     var children: Set<WorkflowNodeInstanceEntity> = emptySet()
+
+    /**
+     * 工作流实例
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workflow_node_instance_id", nullable = false)
+    var workflowInstanceEntity: WorkflowInstanceEntity? = null
 
     /**
      * 父节点
@@ -43,19 +51,17 @@ class WorkflowNodeInstanceEntity : BaseEntity() {
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     var id: Long? = null
 
-    @Column(name = "workflow_node_id", nullable = false)
-    var workflowNodeId: Long? = null
-
     /**
      * 任务名称
      */
     @Column(name = "job_name", nullable = false)
-    var jobName: String? = null
+    var name: String? = null
 
     /**
      * 任务类型
      */
-    @Column(name = "job_desc")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "job_type", nullable = false)
     var jobType: JobTypeEnum? = null
 
     /**
@@ -96,6 +102,18 @@ class WorkflowNodeInstanceEntity : BaseEntity() {
      */
     @Column(name = "script_code")
     var scriptCode: String? = null
+
+    /**
+     * 数据时间
+     */
+    @Column(name = "data_time", nullable = false)
+    var dataTime: LocalDateTime? = null
+
+    /**
+     * Worker地址（ip:host）
+     */
+    @Column(name = "worker_address")
+    var workerAddress: String? = null
 
     /**
      * 最大重试次数

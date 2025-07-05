@@ -4,7 +4,6 @@ import tech.powerscheduler.common.enums.ExecuteModeEnum
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobTypeEnum
 import tech.powerscheduler.common.enums.ScriptTypeEnum
-import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.job.JobInstance
 import java.time.LocalDateTime
 
@@ -13,11 +12,6 @@ import java.time.LocalDateTime
  * @since 2025/6/21
  */
 class WorkflowNodeInstance {
-
-    /**
-     * 应用分组
-     */
-    var appGroup: AppGroup? = null
 
     /**
      * 父节点
@@ -32,12 +26,22 @@ class WorkflowNodeInstance {
     /**
      * 主键
      */
-    var id: WorkflowNodeId? = null
+    var id: WorkflowNodeInstanceId? = null
 
     /**
-     * 任务名称
+     * 工作流节点Id
      */
-    var jobName: String? = null
+    var workflowNodeId: WorkflowNodeId? = null
+
+    /**
+     * 工作流实例id
+     */
+    var workflowInstanceId: WorkflowInstanceId? = null
+
+    /**
+     * 节点名称
+     */
+    var name: String? = null
 
     /**
      * 任务类型
@@ -73,6 +77,16 @@ class WorkflowNodeInstance {
      * 脚本源代码
      */
     var scriptCode: String? = null
+
+    /**
+     * 数据时间
+     */
+    var dataTime: LocalDateTime? = null
+
+    /**
+     * Worker地址（ip:host）
+     */
+    var workerAddress: String? = null
 
     /**
      * 当前重试次数

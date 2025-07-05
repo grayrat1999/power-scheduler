@@ -6,6 +6,10 @@ package tech.powerscheduler.common.enums
  */
 enum class WorkflowStatusEnum {
     /**
+     * 等待
+     */
+    WAITING,
+    /**
      * 运行中
      */
     RUNNING,

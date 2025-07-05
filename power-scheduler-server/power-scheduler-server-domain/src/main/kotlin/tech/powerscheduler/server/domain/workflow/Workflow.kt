@@ -82,11 +82,22 @@ class Workflow : Schedulable() {
      */
     var updatedAt: LocalDateTime? = null
 
-    fun createInstance(): WorkflowInstance {
+    fun createInstance(
+        dataTime: LocalDateTime? = LocalDateTime.now(),
+    ): WorkflowInstance {
         return WorkflowInstance().also {
+            val workflowNode2Instance = this.workflowNodes.associateWith(WorkflowNode::createInstance)
+            for (workflowNode in this.workflowNodes) {
+                val nodeInstance = workflowNode2Instance[workflowNode]!!
+                nodeInstance.dataTime = dataTime
+                nodeInstance.children = workflowNode.children.map { child -> workflowNode2Instance[child]!! }.toSet()
+            }
             it.appGroup = this.appGroup
+            it.workflow = this
+            it.workflowNodeInstances = workflowNode2Instance.values.toList()
             it.name = this.name
-            it.status = WorkflowStatusEnum.RUNNING
+            it.status = WorkflowStatusEnum.WAITING
+            it.dataTime = dataTime
         }
     }
 }

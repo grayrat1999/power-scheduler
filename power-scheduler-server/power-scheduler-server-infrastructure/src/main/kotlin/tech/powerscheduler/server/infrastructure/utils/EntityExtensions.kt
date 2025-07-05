@@ -410,8 +410,40 @@ fun WorkflowNodeEntity.toDomainModel(): WorkflowNode {
     }
 }
 
+fun WorkflowInstance.toEntity(): WorkflowInstanceEntity {
+    return WorkflowInstanceEntity().also {
+        val workflowNodeInstanceEntities = this.workflowNodeInstances
+            .map(WorkflowNodeInstance::toEntity)
+            .onEach { node -> node.workflowInstanceEntity = it }
+            .toSet()
+        it.appGroupEntity = this.appGroup!!.toEntity()
+        it.workflowEntity = this.workflow!!.toEntity()
+        it.workflowNodeInstanceEntities = workflowNodeInstanceEntities
+        it.id = this.id?.value
+        it.name = this.name
+        it.status = this.status
+        it.dataTime = this.dataTime
+    }
+}
+
 fun WorkflowNodeInstance.toEntity(): WorkflowNodeInstanceEntity {
     return WorkflowNodeInstanceEntity().also {
-
+        it.id = this.id?.value
+//        it.workflowNodeId = this.workflowNodeId?.value
+        it.name = this.name
+        it.jobType = this.jobType
+        it.jobStatus = this.jobStatus
+        it.processor = this.processor
+        it.executeMode = this.executeMode
+        it.executeParams = this.executeParams
+        it.scriptType = this.scriptType
+        it.scriptCode = this.scriptCode
+        it.dataTime = this.dataTime
+        it.workerAddress = this.workerAddress
+        it.maxAttemptCnt = this.maxAttemptCnt
+        it.attemptInterval = this.attemptInterval
+        it.taskMaxAttemptCnt = this.taskMaxAttemptCnt
+        it.taskAttemptInterval = this.taskAttemptInterval
+        it.priority = this.priority
     }
 }

@@ -5,10 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.constraints.NotNull
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import tech.powerscheduler.server.application.dto.request.WorkflowAddRequestDTO
-import tech.powerscheduler.server.application.dto.request.WorkflowEditRequestDTO
-import tech.powerscheduler.server.application.dto.request.WorkflowQueryRequestDTO
-import tech.powerscheduler.server.application.dto.request.WorkflowSwitchRequestDTO
+import tech.powerscheduler.server.application.dto.request.*
 import tech.powerscheduler.server.application.service.WorkflowService
 
 /**
@@ -57,5 +54,11 @@ class WorkflowController(
     @PostMapping("/delete")
     fun deleteWorkflow(@Validated @NotNull workflowId: Long?) = wrapperResponse {
         return@wrapperResponse workflowService.delete(workflowId!!)
+    }
+
+    @Operation(summary = "运行工作流")
+    @PostMapping("/run")
+    fun runWorkflow(@NotNull @Validated @RequestBody param: WorkflowRunRequestDTO?) = wrapperResponse {
+        return@wrapperResponse workflowService.run(param!!)
     }
 }

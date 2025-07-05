@@ -14,6 +14,7 @@ import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
 import tech.powerscheduler.server.domain.namespace.NamespaceRepository
 import tech.powerscheduler.server.domain.workflow.WorkflowId
+import tech.powerscheduler.server.domain.workflow.WorkflowInstanceRepository
 import tech.powerscheduler.server.domain.workflow.WorkflowNodeRepository
 import tech.powerscheduler.server.domain.workflow.WorkflowRepository
 
@@ -28,6 +29,7 @@ class WorkflowService(
     private val workflowAssembler: WorkflowAssembler,
     private val workflowNodeAssembler: WorkflowNodeAssembler,
     private val workflowRepository: WorkflowRepository,
+    private val workflowInstanceRepository: WorkflowInstanceRepository,
     private val workflowNodeRepository: WorkflowNodeRepository,
     private val transactionTemplate: TransactionTemplate,
 ) {
@@ -114,6 +116,24 @@ class WorkflowService(
             workflowRepository.deleteById(workflow.id!!)
             workflowNodeRepository.deleteByIds(workflowNodeIds)
         }
+    }
+
+    @Transactional
+    fun run(param: WorkflowRunRequestDTO): Long {
+        val workflowId = WorkflowId(param.workflowId!!)
+        val workflow = workflowRepository.findById(workflowId)
+            ?: throw BizException("Workflow not found")
+        val workflowInstance = workflow.createInstance(
+            dataTime = param.dataTime,
+        )
+        workflowInstance.workflowNodeInstances.forEach {
+            it.dataTime = param.dataTime
+            it.workerAddress = param.workerAddress
+            it.maxAttemptCnt = 0
+            it.taskMaxAttemptCnt = 0
+        }
+        val workflowInstanceId = workflowInstanceRepository.save(workflowInstance)
+        return workflowInstanceId.value
     }
 
     private enum class VisitState { UNVISITED, VISITING, VISITED }

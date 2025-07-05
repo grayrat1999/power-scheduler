@@ -125,6 +125,20 @@ class WorkflowNode {
 
     fun createInstance(): WorkflowNodeInstance {
         return WorkflowNodeInstance().also {
+            it.workflowNodeId = this.id
+            it.name = this.name
+            it.jobType = this.jobType
+            it.processor = this.processor
+            it.executeMode = this.executeMode
+            it.executeParams = this.executeParams
+            it.scriptType = this.scriptType
+            it.scriptCode = this.scriptCode
+            it.attemptCnt = 0
+            it.maxAttemptCnt = this.maxAttemptCnt
+            it.attemptInterval = this.attemptInterval
+            it.taskMaxAttemptCnt = this.taskMaxAttemptCnt
+            it.taskAttemptInterval = this.taskAttemptInterval
+            it.priority = this.priority
             it.jobStatus = JobStatusEnum.WAITING_SCHEDULE
         }
     }

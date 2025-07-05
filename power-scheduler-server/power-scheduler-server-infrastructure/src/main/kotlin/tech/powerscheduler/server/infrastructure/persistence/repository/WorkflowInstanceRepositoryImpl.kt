@@ -6,13 +6,18 @@ import tech.powerscheduler.server.domain.workflow.WorkflowId
 import tech.powerscheduler.server.domain.workflow.WorkflowInstance
 import tech.powerscheduler.server.domain.workflow.WorkflowInstanceId
 import tech.powerscheduler.server.domain.workflow.WorkflowInstanceRepository
+import tech.powerscheduler.server.infrastructure.persistence.repository.impl.WorkflowInstanceJpaRepository
+import tech.powerscheduler.server.infrastructure.utils.toEntity
 
 /**
  * @author grayrat
  * @since 2025/6/22
  */
 @Repository
-class WorkflowInstanceRepositoryImpl : WorkflowInstanceRepository {
+class WorkflowInstanceRepositoryImpl(
+    private val workflowInstanceJpaRepository: WorkflowInstanceJpaRepository
+) : WorkflowInstanceRepository {
+
     override fun countByJobIdAndJobStatus(
         workflowIds: List<WorkflowId>,
         jobStatuses: Set<JobStatusEnum>
@@ -21,6 +26,8 @@ class WorkflowInstanceRepositoryImpl : WorkflowInstanceRepository {
     }
 
     override fun save(workflowInstance: WorkflowInstance): WorkflowInstanceId {
-        TODO("Not yet implemented")
+        val entity = workflowInstance.toEntity()
+        workflowInstanceJpaRepository.save(entity)
+        return WorkflowInstanceId(entity.id!!)
     }
 }

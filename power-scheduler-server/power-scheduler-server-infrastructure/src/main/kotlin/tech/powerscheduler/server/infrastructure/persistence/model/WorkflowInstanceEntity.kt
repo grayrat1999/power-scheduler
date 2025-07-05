@@ -1,6 +1,8 @@
 package tech.powerscheduler.server.infrastructure.persistence.model
 
 import jakarta.persistence.*
+import tech.powerscheduler.common.enums.WorkflowStatusEnum
+import java.time.LocalDateTime
 
 /**
  * @author grayrat
@@ -9,12 +11,31 @@ import jakarta.persistence.*
 @Entity
 @Table(name = "workflow_instance")
 class WorkflowInstanceEntity : BaseEntity() {
+
+    /**
+     * 应用分组
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "app_group_id", nullable = false)
+    var appGroupEntity: AppGroupEntity? = null
+
     /**
      * 工作流
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workflow_id", nullable = false)
     var workflowEntity: WorkflowEntity? = null
+
+    /**
+     * 工作流节点实例列表
+     */
+    @OneToMany(
+        mappedBy = "workflowInstanceEntity",
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
+    var workflowNodeInstanceEntities: Set<WorkflowNodeInstanceEntity> = emptySet()
 
     /**
      * 主键
@@ -29,4 +50,17 @@ class WorkflowInstanceEntity : BaseEntity() {
      */
     @Column(name = "name", nullable = false, updatable = false)
     var name: String? = null
+
+    /**
+     * 状态
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    var status: WorkflowStatusEnum? = null
+
+    /**
+     * 数据时间
+     */
+    @Column(name = "data_time", nullable = false)
+    var dataTime: LocalDateTime? = null
 }
