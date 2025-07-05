@@ -29,7 +29,10 @@ class WorkflowAssembler {
 
     fun toWorkflowQueryResponseDTO(workflow: Workflow): WorkflowQueryResponseDTO {
         return WorkflowQueryResponseDTO().apply {
-            this.appName = workflow.appGroup?.name
+            val appGroup = workflow.appGroup!!
+            this.namespaceCode = appGroup.namespace!!.code
+            this.appCode = appGroup.code
+            this.appName = appGroup.name
             this.id = workflow.id!!.value
             this.name = workflow.name
             this.enabled = workflow.enabled

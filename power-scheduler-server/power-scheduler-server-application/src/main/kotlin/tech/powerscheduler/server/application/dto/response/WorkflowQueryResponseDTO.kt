@@ -6,6 +6,16 @@ package tech.powerscheduler.server.application.dto.response
  */
 class WorkflowQueryResponseDTO {
     /**
+     * 命名空间编码
+     */
+    var namespaceCode: String? = null
+
+    /**
+     * 应用编码
+     */
+    var appCode: String? = null
+
+    /**
      * 应用编码
      */
     var appName: String? = null

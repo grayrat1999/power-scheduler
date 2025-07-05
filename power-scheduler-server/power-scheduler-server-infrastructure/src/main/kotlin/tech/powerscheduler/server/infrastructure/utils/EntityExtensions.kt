@@ -412,13 +412,17 @@ fun WorkflowNodeEntity.toDomainModel(): WorkflowNode {
 
 fun WorkflowInstance.toEntity(): WorkflowInstanceEntity {
     return WorkflowInstanceEntity().also {
-        val workflowNodeInstanceEntities = this.workflowNodeInstances
-            .map(WorkflowNodeInstance::toEntity)
-            .onEach { node -> node.workflowInstanceEntity = it }
-            .toSet()
+        val workflowNodeInstance2entity = this.workflowNodeInstances.associateWith(WorkflowNodeInstance::toEntity)
+        for (workflowNodeInstance in this.workflowNodeInstances) {
+            val nodeInstanceEntity = workflowNodeInstance2entity[workflowNodeInstance]!!
+            nodeInstanceEntity.workflowInstanceEntity = it
+            nodeInstanceEntity.children = workflowNodeInstance.children
+                .mapNotNull { nodeInstance -> workflowNodeInstance2entity[nodeInstance] }
+                .toSet()
+        }
         it.appGroupEntity = this.appGroup!!.toEntity()
         it.workflowEntity = this.workflow!!.toEntity()
-        it.workflowNodeInstanceEntities = workflowNodeInstanceEntities
+        it.workflowNodeInstanceEntities = workflowNodeInstance2entity.values.toSet()
         it.id = this.id?.value
         it.name = this.name
         it.status = this.status
@@ -429,7 +433,6 @@ fun WorkflowInstance.toEntity(): WorkflowInstanceEntity {
 fun WorkflowNodeInstance.toEntity(): WorkflowNodeInstanceEntity {
     return WorkflowNodeInstanceEntity().also {
         it.id = this.id?.value
-//        it.workflowNodeId = this.workflowNodeId?.value
         it.name = this.name
         it.jobType = this.jobType
         it.jobStatus = this.jobStatus
