@@ -22,7 +22,8 @@ class WorkflowEntity : BaseEntity() {
     @OneToMany(
         mappedBy = "workflowEntity",
         cascade = [CascadeType.ALL],
-        orphanRemoval = true
+        orphanRemoval = true,
+        fetch = FetchType.EAGER,
     )
     var workflowNodeEntities: Set<WorkflowNodeEntity> = emptySet()
 

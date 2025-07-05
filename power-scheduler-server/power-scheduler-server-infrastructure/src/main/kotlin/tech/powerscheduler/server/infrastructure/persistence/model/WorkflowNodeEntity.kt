@@ -22,7 +22,7 @@ class WorkflowNodeEntity : BaseEntity() {
     /**
      * 子节点集合
      */
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "workflow_node_children",
         joinColumns = [JoinColumn(name = "workflow_node_id")],
@@ -33,7 +33,7 @@ class WorkflowNodeEntity : BaseEntity() {
     /**
      * 父节点集合
      */
-    @ManyToMany(mappedBy = "children")
+    @ManyToMany(mappedBy = "children", fetch = FetchType.EAGER)
     var parents: Set<WorkflowNodeEntity> = emptySet()
 
     /**
