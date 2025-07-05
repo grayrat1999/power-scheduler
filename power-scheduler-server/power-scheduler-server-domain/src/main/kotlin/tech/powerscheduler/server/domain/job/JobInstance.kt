@@ -8,7 +8,9 @@ import java.time.LocalDateTime
 
 /**
  * 任务实例
- * TODO: 1. 改名为 Execution 2. 常规任务实例和工作流节点实例都通过 Execution 承载
+ * TODO: 1. 改名为 Execution
+ * TODO: 2. 常规任务实例和工作流节点实例都通过 Execution 承载, 新增 ExecutionType 用于区分两者
+ * TODO: 3. jobId改为definitionId(向上做一层抽象)
  *
  * @author grayrat
  * @since 2025/4/16

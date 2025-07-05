@@ -7,6 +7,8 @@ import tech.powerscheduler.server.domain.job.JobInstanceId
 import java.time.LocalDateTime
 
 /**
+ * TODO: jobInstanceId 改为 executionId
+ *
  * @author grayrat
  * @since 2025/6/6
  */
@@ -30,6 +32,7 @@ class Task {
     /**
      * 任务id
      */
+    @Deprecated(message = "废弃无用字段")
     var jobId: JobId? = null
 
     /**
