@@ -347,10 +347,20 @@ fun Workflow.toEntity(): WorkflowEntity {
 
 fun WorkflowEntity.toDomainModel(): Workflow {
     return Workflow().also {
+        val workflowNodeEntity2Model = this.workflowNodeEntities.associateWith(WorkflowNodeEntity::toDomainModel)
+        for (workflowNodeEntity in this.workflowNodeEntities) {
+            val workflowNode = workflowNodeEntity2Model[workflowNodeEntity]!!
+            workflowNode.workflow = it
+            workflowNode.children = workflowNodeEntity.children
+                .mapNotNull { entity -> workflowNodeEntity2Model[entity] }
+                .toSet()
+            workflowNode.parents = workflowNodeEntity.parents
+                .mapNotNull { entity -> workflowNodeEntity2Model[entity] }
+                .toSet()
+        }
+
         it.appGroup = this.appGroupEntity!!.toDomainModel()
-        it.workflowNodes = this.workflowNodeEntities
-            .map(WorkflowNodeEntity::toDomainModel)
-            .onEach { node -> node.workflow = it }
+        it.workflowNodes = workflowNodeEntity2Model.values.toList()
         it.id = WorkflowId(this.id!!)
         it.name = this.name
         it.description = this.description
