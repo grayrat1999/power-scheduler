@@ -15,10 +15,7 @@ import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskId
 import tech.powerscheduler.server.domain.worker.WorkerRegistry
 import tech.powerscheduler.server.domain.worker.WorkerRegistryId
-import tech.powerscheduler.server.domain.workflow.Workflow
-import tech.powerscheduler.server.domain.workflow.WorkflowId
-import tech.powerscheduler.server.domain.workflow.WorkflowNode
-import tech.powerscheduler.server.domain.workflow.WorkflowNodeInstance
+import tech.powerscheduler.server.domain.workflow.*
 import tech.powerscheduler.server.infrastructure.persistence.model.*
 
 /**
@@ -351,6 +348,9 @@ fun Workflow.toEntity(): WorkflowEntity {
 fun WorkflowEntity.toDomainModel(): Workflow {
     return Workflow().also {
         it.appGroup = this.appGroupEntity!!.toDomainModel()
+        it.workflowNodes = this.workflowNodeEntities
+            .map(WorkflowNodeEntity::toDomainModel)
+            .onEach { node -> node.workflow = it }
         it.id = WorkflowId(this.id!!)
         it.name = this.name
         it.description = this.description
@@ -372,8 +372,6 @@ fun WorkflowEntity.toDomainModel(): Workflow {
 
 fun WorkflowNode.toEntity(): WorkflowNodeEntity {
     return WorkflowNodeEntity().also {
-//        it.workflowEntity = this.workflow!!.toEntity()
-//        it.children = this.children.map { child -> child.toEntity() }.toSet()
         it.id = this.id?.value
         it.name = this.name
         it.description = this.description
@@ -393,7 +391,20 @@ fun WorkflowNode.toEntity(): WorkflowNodeEntity {
 
 fun WorkflowNodeEntity.toDomainModel(): WorkflowNode {
     return WorkflowNode().also {
-
+        it.id = WorkflowNodeId(this.id!!)
+        it.name = this.name
+        it.description = this.description
+        it.jobType = this.jobType
+        it.processor = this.processor
+        it.executeMode = this.executeMode
+        it.executeParams = this.executeParams
+        it.scriptType = this.scriptType
+        it.scriptCode = this.scriptCode
+        it.maxAttemptCnt = this.maxAttemptCnt
+        it.attemptInterval = this.attemptInterval
+        it.taskMaxAttemptCnt = this.taskMaxAttemptCnt
+        it.taskAttemptInterval = this.taskAttemptInterval
+        it.priority = this.priority
     }
 }
 

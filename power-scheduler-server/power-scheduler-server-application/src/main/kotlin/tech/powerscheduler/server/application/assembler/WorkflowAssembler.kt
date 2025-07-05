@@ -5,6 +5,7 @@ import tech.powerscheduler.common.enums.ScheduleTypeEnum
 import tech.powerscheduler.server.application.dto.request.WorkflowAddRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowEditRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowQueryRequestDTO
+import tech.powerscheduler.server.application.dto.response.WorkflowDetailResponseDTO
 import tech.powerscheduler.server.application.dto.response.WorkflowQueryResponseDTO
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroup
@@ -40,6 +41,22 @@ class WorkflowAssembler {
                 ScheduleTypeEnum.FIX_DELAY -> "${scheduleType!!.label} | $scheduleConfig(秒)"
                 ScheduleTypeEnum.ONE_TIME -> scheduleConfig
             }
+        }
+    }
+
+    fun toWorkflowDetailResponseDTO(workflow: Workflow): WorkflowDetailResponseDTO {
+        return WorkflowDetailResponseDTO().apply {
+            this.appCode = workflow.appGroup!!.code
+            this.id = workflow.id!!.value
+            this.name = workflow.name
+            this.description = workflow.description
+            this.enabled = workflow.enabled
+            this.maxConcurrentNum = workflow.maxConcurrentNum
+            this.retentionPolicy = workflow.retentionPolicy
+            this.retentionValue = workflow.retentionValue
+            this.graphData = workflow.graphData
+            this.scheduleType = workflow.scheduleType
+            this.scheduleConfig = workflow.scheduleConfig
         }
     }
 

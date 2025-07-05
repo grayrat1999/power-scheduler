@@ -11,6 +11,7 @@ import tech.powerscheduler.server.application.dto.request.WorkflowAddRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowEditRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowQueryRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowSwitchRequestDTO
+import tech.powerscheduler.server.application.dto.response.WorkflowDetailResponseDTO
 import tech.powerscheduler.server.application.dto.response.WorkflowQueryResponseDTO
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroupRepository
@@ -32,10 +33,17 @@ class WorkflowService(
     private val transactionTemplate: TransactionTemplate,
 ) {
 
+    @Transactional
     fun list(param: WorkflowQueryRequestDTO): PageDTO<WorkflowQueryResponseDTO> {
         val query = workflowAssembler.toDomainQuery(param)
         val page = workflowRepository.pageQuery(query)
         return page.toDTO().map { workflowAssembler.toWorkflowQueryResponseDTO(it) }
+    }
+
+    @Transactional
+    fun get(workflowId: Long): WorkflowDetailResponseDTO? {
+        val workflow = workflowRepository.findById(WorkflowId(workflowId))
+        return workflow?.let { workflowAssembler.toWorkflowDetailResponseDTO(it) }
     }
 
     @Transactional
@@ -52,7 +60,6 @@ class WorkflowService(
         )
         workflow.workflowNodes = workflowNodes
         val workflowId = workflowRepository.save(workflow)
-//        workflowNodeRepository.saveAll(workflowNodes)
         return workflowId.value
     }
 

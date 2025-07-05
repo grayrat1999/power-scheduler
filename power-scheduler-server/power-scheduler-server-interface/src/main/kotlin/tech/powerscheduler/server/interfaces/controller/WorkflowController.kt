@@ -29,6 +29,12 @@ class WorkflowController(
         return@wrapperResponse workflowService.list(param!!)
     }
 
+    @Operation(summary = "查询工作流详情")
+    @GetMapping("/detail")
+    fun getWorkflow(@Validated @NotNull workflowId: Long?) = wrapperResponse {
+        return@wrapperResponse workflowService.get(workflowId!!)
+    }
+
     @Operation(summary = "新增工作流")
     @PostMapping("/add")
     fun addWorkflow(@RequestBody @Validated @NotNull param: WorkflowAddRequestDTO?) = wrapperResponse {
