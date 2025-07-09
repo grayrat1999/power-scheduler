@@ -436,6 +436,7 @@ fun WorkflowInstance.toEntity(): WorkflowInstanceEntity {
         it.id = this.id?.value
         it.workflowId = this.workflowId!!.value
         it.name = this.name
+        it.code = this.code
         it.status = this.status
         it.dataTime = this.dataTime
     }
@@ -466,6 +467,14 @@ fun WorkflowNodeInstance.toEntity(): WorkflowNodeInstanceEntity {
 
 fun WorkflowInstanceEntity.toDomainModel(): WorkflowInstance {
     return WorkflowInstance().also {
-
+        it.appGroup = this.appGroupEntity!!.toDomainModel()
+//        it.workflowNodeInstances = this.workflowNodeInstances
+        it.id = WorkflowInstanceId(this.id!!)
+        it.workflowId = WorkflowId(this.workflowId!!)
+        it.code = this.code
+        it.name = this.name
+        it.graphData = JSON.readValue<WorkflowGraphData>(this.graphData)
+        it.status = this.status
+        it.dataTime = this.dataTime
     }
 }

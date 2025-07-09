@@ -22,7 +22,7 @@ class WorkflowInstance {
     /**
      * 主键
      */
-    var id: WorkflowId? = null
+    var id: WorkflowInstanceId? = null
 
     /**
      * 工作流id

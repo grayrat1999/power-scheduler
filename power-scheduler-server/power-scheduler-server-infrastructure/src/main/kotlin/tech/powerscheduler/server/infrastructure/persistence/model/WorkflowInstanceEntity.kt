@@ -45,6 +45,12 @@ class WorkflowInstanceEntity : BaseEntity() {
     var workflowId: Long? = null
 
     /**
+     * 工作流编码
+     */
+    @Column(name = "code", nullable = false, updatable = false)
+    var code: String? = null
+
+    /**
      * 工作流名称
      */
     @Column(name = "name", nullable = false, updatable = false)
@@ -62,4 +68,9 @@ class WorkflowInstanceEntity : BaseEntity() {
      */
     @Column(name = "data_time", nullable = false)
     var dataTime: LocalDateTime? = null
+
+    /**
+     * 有向无环图的UI数据
+     */
+    var graphData: String? = null
 }
