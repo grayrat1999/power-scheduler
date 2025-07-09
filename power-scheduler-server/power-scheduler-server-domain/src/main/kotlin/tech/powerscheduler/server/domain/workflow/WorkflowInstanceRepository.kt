@@ -1,6 +1,7 @@
 package tech.powerscheduler.server.domain.workflow
 
 import tech.powerscheduler.common.enums.JobStatusEnum
+import tech.powerscheduler.server.domain.common.Page
 
 /**
  * @author grayrat
@@ -12,6 +13,10 @@ interface WorkflowInstanceRepository {
         workflowIds: List<WorkflowId>,
         jobStatuses: Set<JobStatusEnum>,
     ): Map<WorkflowId, Long>
+
+    fun pageQuery(query: WorkflowInstanceQuery): Page<WorkflowInstance>
+
+    fun findById(workflowInstanceId: WorkflowInstanceId): WorkflowInstance?
 
     fun save(workflowInstance: WorkflowInstance): WorkflowInstanceId
 }

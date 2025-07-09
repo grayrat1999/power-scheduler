@@ -463,3 +463,9 @@ fun WorkflowNodeInstance.toEntity(): WorkflowNodeInstanceEntity {
         it.priority = this.priority
     }
 }
+
+fun WorkflowInstanceEntity.toDomainModel(): WorkflowInstance {
+    return WorkflowInstance().also {
+
+    }
+}

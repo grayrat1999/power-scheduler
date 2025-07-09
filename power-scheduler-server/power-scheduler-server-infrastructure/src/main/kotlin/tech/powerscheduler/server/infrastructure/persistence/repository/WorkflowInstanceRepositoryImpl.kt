@@ -1,12 +1,12 @@
 package tech.powerscheduler.server.infrastructure.persistence.repository
 
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 import tech.powerscheduler.common.enums.JobStatusEnum
-import tech.powerscheduler.server.domain.workflow.WorkflowId
-import tech.powerscheduler.server.domain.workflow.WorkflowInstance
-import tech.powerscheduler.server.domain.workflow.WorkflowInstanceId
-import tech.powerscheduler.server.domain.workflow.WorkflowInstanceRepository
+import tech.powerscheduler.server.domain.common.Page
+import tech.powerscheduler.server.domain.workflow.*
 import tech.powerscheduler.server.infrastructure.persistence.repository.impl.WorkflowInstanceJpaRepository
+import tech.powerscheduler.server.infrastructure.utils.toDomainModel
 import tech.powerscheduler.server.infrastructure.utils.toEntity
 
 /**
@@ -23,6 +23,15 @@ class WorkflowInstanceRepositoryImpl(
         jobStatuses: Set<JobStatusEnum>
     ): Map<WorkflowId, Long> {
         TODO("Not yet implemented")
+    }
+
+    override fun pageQuery(query: WorkflowInstanceQuery): Page<WorkflowInstance> {
+        TODO("Not yet implemented")
+    }
+
+    override fun findById(workflowInstanceId: WorkflowInstanceId): WorkflowInstance? {
+        val entity = workflowInstanceJpaRepository.findByIdOrNull(workflowInstanceId.value)
+        return entity?.toDomainModel()
     }
 
     override fun save(workflowInstance: WorkflowInstance): WorkflowInstanceId {
