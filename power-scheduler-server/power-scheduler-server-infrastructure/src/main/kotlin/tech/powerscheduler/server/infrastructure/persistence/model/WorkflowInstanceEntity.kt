@@ -72,7 +72,7 @@ class WorkflowInstanceEntity : BaseEntity() {
     /**
      * 有向无环图的UI数据
      */
-    @Column(name = "graph_data", nullable = false)
+    @Column(name = "graph_data", nullable = false, length = 40000)
     var graphData: String? = null
 
     /**

@@ -38,6 +38,8 @@ class WorkflowInstanceAssembler {
             this.name = workflowInstance.name
             this.code = workflowInstance.code
             this.status = workflowInstance.status.toDTO()
+            this.startAt = workflowInstance.startAt
+            this.endAt = workflowInstance.endAt
             this.dataTime = workflowInstance.dataTime
         }
     }
@@ -52,6 +54,8 @@ class WorkflowInstanceAssembler {
             this.name = workflowInstance.name
             this.code = workflowInstance.code
             this.status = workflowInstance.status
+            this.startAt = workflowInstance.startAt
+            this.endAt = workflowInstance.endAt
             this.dataTime = workflowInstance.dataTime
             this.graphData = JSON.writeValueAsString(workflowInstance.graphData!!)
         }

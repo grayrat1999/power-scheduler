@@ -46,4 +46,14 @@ class WorkflowInstanceQueryResponseDTO {
      * 数据时间
      */
     var dataTime: LocalDateTime? = null
+
+    /**
+     * 任务开始时间
+     */
+    var startAt: LocalDateTime? = null
+
+    /**
+     * 任务结束时间
+     */
+    var endAt: LocalDateTime? = null
 }
