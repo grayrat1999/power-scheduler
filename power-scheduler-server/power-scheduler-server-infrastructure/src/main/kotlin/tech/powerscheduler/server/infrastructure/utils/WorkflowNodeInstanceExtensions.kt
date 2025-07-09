@@ -14,7 +14,7 @@ fun WorkflowNodeInstance.toEntity(): WorkflowNodeInstanceEntity {
         it.nodeCode = this.nodeCode
         it.nodeInstanceCode = this.nodeInstanceCode
         it.jobType = this.jobType
-        it.jobStatus = this.jobStatus
+        it.status = this.status
         it.processor = this.processor
         it.executeMode = this.executeMode
         it.executeParams = this.executeParams

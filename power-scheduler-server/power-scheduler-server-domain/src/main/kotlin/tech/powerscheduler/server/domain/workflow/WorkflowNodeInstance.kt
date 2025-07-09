@@ -1,9 +1,9 @@
 package tech.powerscheduler.server.domain.workflow
 
 import tech.powerscheduler.common.enums.ExecuteModeEnum
-import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobTypeEnum
 import tech.powerscheduler.common.enums.ScriptTypeEnum
+import tech.powerscheduler.common.enums.WorkflowStatusEnum
 import tech.powerscheduler.server.domain.job.JobInstance
 import java.time.LocalDateTime
 
@@ -56,7 +56,7 @@ class WorkflowNodeInstance {
     /**
      * 任务状态
      */
-    var jobStatus: JobStatusEnum? = null
+    var status: WorkflowStatusEnum? = null
 
     /**
      * 执行模式

@@ -2,9 +2,9 @@ package tech.powerscheduler.server.infrastructure.persistence.model
 
 import jakarta.persistence.*
 import tech.powerscheduler.common.enums.ExecuteModeEnum
-import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobTypeEnum
 import tech.powerscheduler.common.enums.ScriptTypeEnum
+import tech.powerscheduler.common.enums.WorkflowStatusEnum
 import java.time.LocalDateTime
 
 /**
@@ -80,8 +80,8 @@ class WorkflowNodeInstanceEntity : BaseEntity() {
      * 任务状态
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "job_status", nullable = false)
-    var jobStatus: JobStatusEnum? = null
+    @Column(name = "status", nullable = false)
+    var status: WorkflowStatusEnum? = null
 
     /**
      * 任务处理器

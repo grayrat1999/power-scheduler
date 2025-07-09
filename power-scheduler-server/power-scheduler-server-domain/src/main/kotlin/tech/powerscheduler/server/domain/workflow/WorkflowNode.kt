@@ -1,9 +1,9 @@
 package tech.powerscheduler.server.domain.workflow
 
 import tech.powerscheduler.common.enums.ExecuteModeEnum
-import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobTypeEnum
 import tech.powerscheduler.common.enums.ScriptTypeEnum
+import tech.powerscheduler.common.enums.WorkflowStatusEnum
 import java.time.LocalDateTime
 import java.util.*
 
@@ -141,7 +141,7 @@ class WorkflowNode {
             it.taskMaxAttemptCnt = this.taskMaxAttemptCnt
             it.taskAttemptInterval = this.taskAttemptInterval
             it.priority = this.priority
-            it.jobStatus = JobStatusEnum.WAITING_SCHEDULE
+            it.status = WorkflowStatusEnum.WAITING
         }
     }
 }
