@@ -126,6 +126,7 @@ class WorkflowNode {
 
     fun createInstance(): WorkflowNodeInstance {
         return WorkflowNodeInstance().also {
+            it.nodeCode = this.code
             it.nodeInstanceCode = UUID.randomUUID().toString()
             it.name = this.name
             it.jobType = this.jobType

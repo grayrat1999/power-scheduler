@@ -103,7 +103,7 @@ class Workflow : Schedulable() {
             it.name = this.name
             it.graphData = this.graphData!!
             it.graphData!!
-                .filter { graphDataItem -> graphDataItem.shape === "workflow-node" }
+                .filter { graphDataItem -> graphDataItem.shape == "workflow-node" }
                 .mapNotNull { graphDataItem -> graphDataItem.data }
                 .onEach { data ->
                     val nodeInstance = nodeCode2NodeInstance[data.workflowNodeCode]!!

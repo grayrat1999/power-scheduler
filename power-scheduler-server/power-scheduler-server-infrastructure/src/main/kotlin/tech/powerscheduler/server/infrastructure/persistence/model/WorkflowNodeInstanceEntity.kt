@@ -34,7 +34,7 @@ class WorkflowNodeInstanceEntity : BaseEntity() {
      * 工作流实例
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_node_instance_id", nullable = false)
+    @JoinColumn(name = "workflow_instance_id", nullable = false)
     var workflowInstanceEntity: WorkflowInstanceEntity? = null
 
     /**
