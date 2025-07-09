@@ -5,6 +5,7 @@ import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobTypeEnum
 import tech.powerscheduler.common.enums.ScriptTypeEnum
 import java.time.LocalDateTime
+import java.util.*
 
 
 /**
@@ -34,9 +35,9 @@ class WorkflowNode {
     var id: WorkflowNodeId? = null
 
     /**
-     * uuid
+     * 节点编码
      */
-    var uuid: String? = null
+    var code: String? = null
 
     /**
      * 节点名称
@@ -125,7 +126,7 @@ class WorkflowNode {
 
     fun createInstance(): WorkflowNodeInstance {
         return WorkflowNodeInstance().also {
-            it.workflowNodeId = this.id
+            it.nodeInstanceCode = UUID.randomUUID().toString()
             it.name = this.name
             it.jobType = this.jobType
             it.processor = this.processor

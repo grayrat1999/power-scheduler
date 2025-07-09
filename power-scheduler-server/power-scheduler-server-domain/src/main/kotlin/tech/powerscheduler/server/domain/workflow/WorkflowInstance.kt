@@ -15,11 +15,6 @@ class WorkflowInstance {
     var appGroup: AppGroup? = null
 
     /**
-     * 工作流
-     */
-    var workflow: Workflow? = null
-
-    /**
      * 工作流节点实例列表
      */
     var workflowNodeInstances: List<WorkflowNodeInstance> = emptyList()
@@ -30,9 +25,24 @@ class WorkflowInstance {
     var id: WorkflowId? = null
 
     /**
+     * 工作流id
+     */
+    var workflowId: WorkflowId? = null
+
+    /**
+     * 工作流实例编码
+     */
+    var code: String? = null
+
+    /**
      * 工作流名称
      */
     var name: String? = null
+
+    /**
+     * 有向无环图的UI数据
+     */
+    var graphData: WorkflowGraphData? = null
 
     /**
      * 状态

@@ -5,6 +5,7 @@ import tech.powerscheduler.common.enums.WorkflowStatusEnum
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.common.Schedulable
 import java.time.LocalDateTime
+import java.util.*
 
 /**
  * @author grayrat
@@ -60,7 +61,7 @@ class Workflow : Schedulable() {
     /**
      * 有向无环图的UI数据
      */
-    var graphData: String? = null
+    var graphData: WorkflowGraphData? = null
 
     /**
      * 创建人
@@ -92,10 +93,23 @@ class Workflow : Schedulable() {
                 nodeInstance.dataTime = dataTime
                 nodeInstance.children = workflowNode.children.map { child -> workflowNode2Instance[child]!! }.toSet()
             }
+            val nodeInstances = workflowNode2Instance.values.toList()
+            val nodeCode2NodeInstance = nodeInstances.associateBy { nodeInstance -> nodeInstance.nodeCode }
+
+            it.code = UUID.randomUUID().toString()
             it.appGroup = this.appGroup
-            it.workflow = this
-            it.workflowNodeInstances = workflowNode2Instance.values.toList()
+            it.workflowId = this.id
+            it.workflowNodeInstances = nodeInstances
             it.name = this.name
+            it.graphData = this.graphData!!
+            it.graphData!!
+                .filter { graphDataItem -> graphDataItem.shape === "workflow-node" }
+                .mapNotNull { graphDataItem -> graphDataItem.data }
+                .onEach { data ->
+                    val nodeInstance = nodeCode2NodeInstance[data.workflowNodeCode]!!
+                    data.workflowInstanceCode = it.code
+                    data.workflowNodeInstanceCode = nodeInstance.nodeInstanceCode
+                }
             it.status = WorkflowStatusEnum.WAITING
             it.dataTime = dataTime
         }

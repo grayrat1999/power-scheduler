@@ -20,13 +20,6 @@ class WorkflowInstanceEntity : BaseEntity() {
     var appGroupEntity: AppGroupEntity? = null
 
     /**
-     * 工作流
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_id", nullable = false)
-    var workflowEntity: WorkflowEntity? = null
-
-    /**
      * 工作流节点实例列表
      */
     @OneToMany(
@@ -44,6 +37,12 @@ class WorkflowInstanceEntity : BaseEntity() {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     var id: Long? = null
+
+    /**
+     * 工作流id
+     */
+    @Column(name = "workflow_id", nullable = false, updatable = false)
+    var workflowId: Long? = null
 
     /**
      * 工作流名称

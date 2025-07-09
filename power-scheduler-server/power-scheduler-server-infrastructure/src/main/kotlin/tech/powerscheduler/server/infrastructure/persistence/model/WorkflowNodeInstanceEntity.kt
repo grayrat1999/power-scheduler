@@ -52,6 +52,18 @@ class WorkflowNodeInstanceEntity : BaseEntity() {
     var id: Long? = null
 
     /**
+     * 流节点编码
+     */
+    @Column(name = "node_code", nullable = false, updatable = false)
+    var nodeCode: String? = null
+
+    /**
+     * 节点实例编号
+     */
+    @Column(name = "node_instance_code", nullable = false, updatable = false)
+    var nodeInstanceCode: String? = null
+
+    /**
      * 任务名称
      */
     @Column(name = "job_name", nullable = false)

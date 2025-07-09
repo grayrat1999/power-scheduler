@@ -1,5 +1,6 @@
 package tech.powerscheduler.server.infrastructure.utils
 
+import tech.powerscheduler.server.application.utils.JSON
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.appgroup.AppGroupId
 import tech.powerscheduler.server.domain.common.Page
@@ -333,7 +334,7 @@ fun Workflow.toEntity(): WorkflowEntity {
         it.id = this.id?.value
         it.name = this.name
         it.description = this.description
-        it.graphData = this.graphData
+        it.graphData = JSON.writeValueAsString(this.graphData!!)
         it.scheduleType = this.scheduleType
         it.scheduleConfig = this.scheduleConfig
         it.nextScheduleAt = this.nextScheduleAt
@@ -364,7 +365,7 @@ fun WorkflowEntity.toDomainModel(): Workflow {
         it.id = WorkflowId(this.id!!)
         it.name = this.name
         it.description = this.description
-        it.graphData = this.graphData
+        it.graphData = JSON.readValue<WorkflowGraphData>(this.graphData)
         it.enabled = this.enabled
         it.maxConcurrentNum = this.maxConcurrentNum
         it.retentionPolicy = this.retentionPolicy
@@ -383,7 +384,7 @@ fun WorkflowEntity.toDomainModel(): Workflow {
 fun WorkflowNode.toEntity(): WorkflowNodeEntity {
     return WorkflowNodeEntity().also {
         it.id = this.id?.value
-        it.uuid = this.uuid
+        it.code = this.code
         it.name = this.name
         it.description = this.description
         it.jobType = this.jobType
@@ -403,7 +404,7 @@ fun WorkflowNode.toEntity(): WorkflowNodeEntity {
 fun WorkflowNodeEntity.toDomainModel(): WorkflowNode {
     return WorkflowNode().also {
         it.id = WorkflowNodeId(this.id!!)
-        it.uuid = this.uuid
+        it.code = this.code
         it.name = this.name
         it.description = this.description
         it.jobType = this.jobType
@@ -431,9 +432,9 @@ fun WorkflowInstance.toEntity(): WorkflowInstanceEntity {
                 .toSet()
         }
         it.appGroupEntity = this.appGroup!!.toEntity()
-        it.workflowEntity = this.workflow!!.toEntity()
         it.workflowNodeInstanceEntities = workflowNodeInstance2entity.values.toSet()
         it.id = this.id?.value
+        it.workflowId = this.workflowId!!.value
         it.name = this.name
         it.status = this.status
         it.dataTime = this.dataTime
@@ -444,6 +445,8 @@ fun WorkflowNodeInstance.toEntity(): WorkflowNodeInstanceEntity {
     return WorkflowNodeInstanceEntity().also {
         it.id = this.id?.value
         it.name = this.name
+        it.nodeCode = this.nodeCode
+        it.nodeInstanceCode = this.nodeInstanceCode
         it.jobType = this.jobType
         it.jobStatus = this.jobStatus
         it.processor = this.processor

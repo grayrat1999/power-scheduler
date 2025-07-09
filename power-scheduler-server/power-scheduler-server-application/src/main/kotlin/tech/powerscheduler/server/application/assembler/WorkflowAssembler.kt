@@ -7,9 +7,11 @@ import tech.powerscheduler.server.application.dto.request.WorkflowEditRequestDTO
 import tech.powerscheduler.server.application.dto.request.WorkflowQueryRequestDTO
 import tech.powerscheduler.server.application.dto.response.WorkflowDetailResponseDTO
 import tech.powerscheduler.server.application.dto.response.WorkflowQueryResponseDTO
+import tech.powerscheduler.server.application.utils.JSON
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.workflow.Workflow
+import tech.powerscheduler.server.domain.workflow.WorkflowGraphData
 import tech.powerscheduler.server.domain.workflow.WorkflowQuery
 
 /**
@@ -57,7 +59,7 @@ class WorkflowAssembler {
             this.maxConcurrentNum = workflow.maxConcurrentNum
             this.retentionPolicy = workflow.retentionPolicy
             this.retentionValue = workflow.retentionValue
-            this.graphData = workflow.graphData
+            this.graphData = JSON.writeValueAsString(workflow.graphData!!)
             this.scheduleType = workflow.scheduleType
             this.scheduleConfig = workflow.scheduleConfig
         }
@@ -72,7 +74,7 @@ class WorkflowAssembler {
             this.maxConcurrentNum = param.maxConcurrentNum
             this.retentionPolicy = param.retentionPolicy
             this.retentionValue = param.retentionValue
-            this.graphData = param.graphData
+            this.graphData = JSON.readValue<WorkflowGraphData>(param.graphData)
             this.scheduleType = param.scheduleType
             this.scheduleConfig = param.scheduleConfig
         }
@@ -88,7 +90,7 @@ class WorkflowAssembler {
             this.maxConcurrentNum = param.maxConcurrentNum
             this.retentionPolicy = param.retentionPolicy
             this.retentionValue = param.retentionValue
-            this.graphData = param.graphData
+            this.graphData = JSON.readValue<WorkflowGraphData>(param.graphData)
             this.lastCompletedAt = null
             this.nextScheduleAt = null
             this.scheduleType = param.scheduleType

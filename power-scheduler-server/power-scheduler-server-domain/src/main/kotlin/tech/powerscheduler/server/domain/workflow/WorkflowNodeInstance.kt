@@ -29,14 +29,14 @@ class WorkflowNodeInstance {
     var id: WorkflowNodeInstanceId? = null
 
     /**
-     * 工作流节点Id
+     * 节点编码
      */
-    var workflowNodeId: WorkflowNodeId? = null
+    var nodeCode: String? = null
 
     /**
-     * 工作流实例id
+     * 节点实例编号
      */
-    var workflowInstanceId: WorkflowInstanceId? = null
+    var nodeInstanceCode: String? = null
 
     /**
      * 节点名称

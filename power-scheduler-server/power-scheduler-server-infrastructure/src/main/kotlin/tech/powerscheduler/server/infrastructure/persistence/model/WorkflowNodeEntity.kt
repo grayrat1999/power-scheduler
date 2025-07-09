@@ -45,10 +45,10 @@ class WorkflowNodeEntity : BaseEntity() {
     var id: Long? = null
 
     /**
-     * uuid
+     * 节点编码
      */
-    @Column(name = "uuid", nullable = false)
-    var uuid: String? = null
+    @Column(name = "code", nullable = false)
+    var code: String? = null
 
     /**
      * 任务名称

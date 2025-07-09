@@ -9,15 +9,15 @@ import tech.powerscheduler.common.enums.ScriptTypeEnum
 
 class WorkflowNodeDTO {
     /**
-     * UUID
+     * 节点编码
      */
     @NotBlank
-    var uuid: String? = null
+    var workflowNodeCode: String? = null
 
     /**
-     * 父节点UUID
+     * 父节点编码
      */
-    var childrenUuids: Set<String> = emptySet()
+    var workflowNodeChildCodes: Set<String> = emptySet()
 
     /**
      * 任务名称

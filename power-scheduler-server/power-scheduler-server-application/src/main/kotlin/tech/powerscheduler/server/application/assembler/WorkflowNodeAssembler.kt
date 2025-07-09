@@ -16,9 +16,9 @@ class WorkflowNodeAssembler {
         workflow: Workflow,
         nodes: List<WorkflowNodeDTO>,
     ): List<WorkflowNode> {
-        val uuid2workflowNode = nodes.associate {
+        val nodeCode2workflowNode = nodes.associate {
             Pair(
-                it.uuid,
+                it.workflowNodeCode,
                 toDomainModel4Add(
                     workflow = workflow,
                     currentNode = it,
@@ -26,11 +26,11 @@ class WorkflowNodeAssembler {
             )
         }
         nodes.forEach {
-            val workflowNode = uuid2workflowNode[it.uuid]!!
-            val children = it.childrenUuids.mapNotNull { childUuid -> uuid2workflowNode[childUuid] }
+            val workflowNode = nodeCode2workflowNode[it.workflowNodeCode]!!
+            val children = it.workflowNodeChildCodes.mapNotNull { nodeCode -> nodeCode2workflowNode[nodeCode] }
             workflowNode.children = children.toSet()
         }
-        return uuid2workflowNode.values.toList()
+        return nodeCode2workflowNode.values.toList()
     }
 
     fun toDomainModel4EditRequest(
@@ -38,15 +38,15 @@ class WorkflowNodeAssembler {
         nodes: List<WorkflowNodeDTO>,
         existNodes: List<WorkflowNode>,
     ): List<WorkflowNode> {
-        val uuid2existNode = existNodes.associateBy { it.uuid!! }
-        val uuid2workflowNode = nodes.associate {
+        val nodeCode2existNode = existNodes.associateBy { it.code!! }
+        val nodeCode2workflowNode = nodes.associate {
             Pair(
-                it.uuid,
-                if (uuid2existNode.containsKey(it.uuid)) {
+                it.workflowNodeCode,
+                if (nodeCode2existNode.containsKey(it.workflowNodeCode)) {
                     toDomainModel4Edit(
                         workflow = workflow,
                         currentNode = it,
-                        existNode = uuid2existNode[it.uuid]!!,
+                        existNode = nodeCode2existNode[it.workflowNodeCode]!!,
                     )
                 } else {
                     toDomainModel4Add(
@@ -58,11 +58,11 @@ class WorkflowNodeAssembler {
         }
 
         nodes.forEach {
-            val workflowNode = uuid2workflowNode[it.uuid]!!
-            val children = it.childrenUuids.mapNotNull { childUuid -> uuid2workflowNode[childUuid] }
+            val workflowNode = nodeCode2workflowNode[it.workflowNodeCode]!!
+            val children = it.workflowNodeChildCodes.mapNotNull { childNodeCode -> nodeCode2workflowNode[childNodeCode] }
             workflowNode.children = children.toSet()
         }
-        return uuid2workflowNode.values.toList()
+        return nodeCode2workflowNode.values.toList()
     }
 
     fun toDomainModel4Add(
@@ -71,7 +71,7 @@ class WorkflowNodeAssembler {
     ): WorkflowNode {
         return WorkflowNode().apply {
             this.workflow = workflow
-            this.uuid = currentNode.uuid
+            this.code = currentNode.workflowNodeCode
             this.name = currentNode.name
             this.description = currentNode.description
             this.jobType = currentNode.jobType
@@ -96,7 +96,7 @@ class WorkflowNodeAssembler {
         return WorkflowNode().apply {
             this.workflow = workflow
             this.id = existNode.id
-            this.uuid = currentNode.uuid
+            this.code = currentNode.workflowNodeCode
             this.name = currentNode.name
             this.description = currentNode.description
             this.jobType = currentNode.jobType

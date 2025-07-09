@@ -149,7 +149,7 @@ class WorkflowService(
 
     fun isDag(nodes: List<WorkflowNodeDTO>): Boolean {
         val stateMap = mutableMapOf<WorkflowNodeDTO, VisitState>()
-        val uuid2node = nodes.associateBy { it.uuid }
+        val code2node = nodes.associateBy { it.workflowNodeCode }
 
         fun hasCycle(node: WorkflowNodeDTO): Boolean {
             val state = stateMap[node] ?: VisitState.UNVISITED
@@ -157,7 +157,7 @@ class WorkflowService(
             if (state == VisitState.VISITED) return false  // 已完成，无需重复判断
 
             stateMap[node] = VisitState.VISITING
-            val children = node.childrenUuids.mapNotNull { uuid2node[it] }
+            val children = node.workflowNodeChildCodes.mapNotNull { code2node[it] }
             for (child in children) {
                 if (hasCycle(child)) return true
             }
