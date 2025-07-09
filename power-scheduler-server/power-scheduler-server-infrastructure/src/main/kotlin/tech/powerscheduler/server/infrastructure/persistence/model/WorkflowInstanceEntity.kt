@@ -72,5 +72,18 @@ class WorkflowInstanceEntity : BaseEntity() {
     /**
      * 有向无环图的UI数据
      */
+    @Column(name = "graph_data", nullable = false)
     var graphData: String? = null
+
+    /**
+     * 开始时间
+     */
+    @Column(name = "start_at", insertable = false)
+    var startAt: LocalDateTime? = null
+
+    /**
+     * 结束时间
+     */
+    @Column(name = "end_at", insertable = false)
+    var endAt: LocalDateTime? = null
 }

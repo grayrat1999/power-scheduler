@@ -9,6 +9,11 @@ import java.time.LocalDateTime
  */
 class WorkflowInstanceDetailResponseDTO {
     /**
+     * 应用编码
+     */
+    var appCode: String? = null
+
+    /**
      * 应用名称
      */
     var appName: String? = null

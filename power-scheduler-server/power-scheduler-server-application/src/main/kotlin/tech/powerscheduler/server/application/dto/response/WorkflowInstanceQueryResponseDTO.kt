@@ -1,6 +1,5 @@
 package tech.powerscheduler.server.application.dto.response
 
-import tech.powerscheduler.common.enums.WorkflowStatusEnum
 import java.time.LocalDateTime
 
 /**
@@ -8,6 +7,11 @@ import java.time.LocalDateTime
  * @since 2025/7/9
  */
 class WorkflowInstanceQueryResponseDTO {
+    /**
+     * 应用编码
+     */
+    var appCode: String? = null
+
     /**
      * 应用名称
      */
@@ -36,7 +40,7 @@ class WorkflowInstanceQueryResponseDTO {
     /**
      * 状态
      */
-    var status: WorkflowStatusEnum? = null
+    var status: WorkflowStatusDTO? = null
 
     /**
      * 数据时间

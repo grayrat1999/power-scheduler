@@ -55,6 +55,16 @@ class WorkflowInstance {
     var dataTime: LocalDateTime? = null
 
     /**
+     * 开始时间
+     */
+    var startAt: LocalDateTime? = null
+
+    /**
+     * 结束时间
+     */
+    var endAt: LocalDateTime? = null
+
+    /**
      * 创建人
      */
     var createdBy: String? = null

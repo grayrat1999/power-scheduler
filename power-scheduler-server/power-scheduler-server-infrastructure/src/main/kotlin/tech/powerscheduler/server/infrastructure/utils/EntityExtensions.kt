@@ -1,6 +1,5 @@
 package tech.powerscheduler.server.infrastructure.utils
 
-import tech.powerscheduler.server.application.utils.JSON
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.appgroup.AppGroupId
 import tech.powerscheduler.server.domain.common.Page
@@ -16,7 +15,6 @@ import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskId
 import tech.powerscheduler.server.domain.worker.WorkerRegistry
 import tech.powerscheduler.server.domain.worker.WorkerRegistryId
-import tech.powerscheduler.server.domain.workflow.*
 import tech.powerscheduler.server.infrastructure.persistence.model.*
 
 /**
@@ -315,166 +313,5 @@ fun DomainEventEntity.toDomainModel(): DomainEvent {
         it.eventStatus = this.eventStatus
         it.body = this.body
         it.retryCnt = this.retryCnt
-    }
-}
-
-fun Workflow.toEntity(): WorkflowEntity {
-    return WorkflowEntity().also {
-        it.appGroupEntity = this.appGroup!!.toEntity()
-        val workflowNodeDomainModel2entity = this.workflowNodes.associateWith { node -> node.toEntity() }
-        for (workflowNode in this.workflowNodes) {
-            val workflowNodeEntity = workflowNodeDomainModel2entity[workflowNode]!!
-            workflowNodeEntity.workflowEntity = it
-            workflowNodeEntity.children = workflowNode.children
-                .mapNotNull { entity -> workflowNodeDomainModel2entity[entity] }
-                .toSet()
-        }
-        it.workflowNodeEntities = workflowNodeDomainModel2entity.values.toSet()
-
-        it.id = this.id?.value
-        it.name = this.name
-        it.description = this.description
-        it.graphData = JSON.writeValueAsString(this.graphData!!)
-        it.scheduleType = this.scheduleType
-        it.scheduleConfig = this.scheduleConfig
-        it.nextScheduleAt = this.nextScheduleAt
-        it.enabled = this.enabled
-        it.maxConcurrentNum = this.maxConcurrentNum
-        it.lastCompletedAt = this.lastCompletedAt
-        it.retentionPolicy = this.retentionPolicy
-        it.retentionValue = this.retentionValue
-    }
-}
-
-fun WorkflowEntity.toDomainModel(): Workflow {
-    return Workflow().also {
-        val workflowNodeEntity2Model = this.workflowNodeEntities.associateWith(WorkflowNodeEntity::toDomainModel)
-        for (workflowNodeEntity in this.workflowNodeEntities) {
-            val workflowNode = workflowNodeEntity2Model[workflowNodeEntity]!!
-            workflowNode.workflow = it
-            workflowNode.children = workflowNodeEntity.children
-                .mapNotNull { entity -> workflowNodeEntity2Model[entity] }
-                .toSet()
-            workflowNode.parents = workflowNodeEntity.parents
-                .mapNotNull { entity -> workflowNodeEntity2Model[entity] }
-                .toSet()
-        }
-
-        it.appGroup = this.appGroupEntity!!.toDomainModel()
-        it.workflowNodes = workflowNodeEntity2Model.values.toList()
-        it.id = WorkflowId(this.id!!)
-        it.name = this.name
-        it.description = this.description
-        it.graphData = JSON.readValue<WorkflowGraphData>(this.graphData)
-        it.enabled = this.enabled
-        it.maxConcurrentNum = this.maxConcurrentNum
-        it.retentionPolicy = this.retentionPolicy
-        it.retentionValue = this.retentionValue
-        it.nextScheduleAt = this.nextScheduleAt
-        it.scheduleType = this.scheduleType
-        it.scheduleConfig = this.scheduleConfig
-        it.lastCompletedAt = this.lastCompletedAt
-        it.createdBy = this.createdBy
-        it.createdAt = this.createdAt
-        it.updatedBy = this.updatedBy
-        it.updatedAt = this.updatedAt
-    }
-}
-
-fun WorkflowNode.toEntity(): WorkflowNodeEntity {
-    return WorkflowNodeEntity().also {
-        it.id = this.id?.value
-        it.code = this.code
-        it.name = this.name
-        it.description = this.description
-        it.jobType = this.jobType
-        it.processor = this.processor
-        it.executeMode = this.executeMode
-        it.executeParams = this.executeParams
-        it.scriptType = this.scriptType
-        it.scriptCode = this.scriptCode
-        it.maxAttemptCnt = this.maxAttemptCnt
-        it.attemptInterval = this.attemptInterval
-        it.taskMaxAttemptCnt = this.taskMaxAttemptCnt
-        it.taskAttemptInterval = this.taskAttemptInterval
-        it.priority = this.priority
-    }
-}
-
-fun WorkflowNodeEntity.toDomainModel(): WorkflowNode {
-    return WorkflowNode().also {
-        it.id = WorkflowNodeId(this.id!!)
-        it.code = this.code
-        it.name = this.name
-        it.description = this.description
-        it.jobType = this.jobType
-        it.processor = this.processor
-        it.executeMode = this.executeMode
-        it.executeParams = this.executeParams
-        it.scriptType = this.scriptType
-        it.scriptCode = this.scriptCode
-        it.maxAttemptCnt = this.maxAttemptCnt
-        it.attemptInterval = this.attemptInterval
-        it.taskMaxAttemptCnt = this.taskMaxAttemptCnt
-        it.taskAttemptInterval = this.taskAttemptInterval
-        it.priority = this.priority
-    }
-}
-
-fun WorkflowInstance.toEntity(): WorkflowInstanceEntity {
-    return WorkflowInstanceEntity().also {
-        val workflowNodeInstance2entity = this.workflowNodeInstances.associateWith(WorkflowNodeInstance::toEntity)
-        for (workflowNodeInstance in this.workflowNodeInstances) {
-            val nodeInstanceEntity = workflowNodeInstance2entity[workflowNodeInstance]!!
-            nodeInstanceEntity.workflowInstanceEntity = it
-            nodeInstanceEntity.children = workflowNodeInstance.children
-                .mapNotNull { nodeInstance -> workflowNodeInstance2entity[nodeInstance] }
-                .toSet()
-        }
-        it.appGroupEntity = this.appGroup!!.toEntity()
-        it.workflowNodeInstanceEntities = workflowNodeInstance2entity.values.toSet()
-        it.id = this.id?.value
-        it.workflowId = this.workflowId!!.value
-        it.name = this.name
-        it.code = this.code
-        it.status = this.status
-        it.dataTime = this.dataTime
-    }
-}
-
-fun WorkflowNodeInstance.toEntity(): WorkflowNodeInstanceEntity {
-    return WorkflowNodeInstanceEntity().also {
-        it.id = this.id?.value
-        it.name = this.name
-        it.nodeCode = this.nodeCode
-        it.nodeInstanceCode = this.nodeInstanceCode
-        it.jobType = this.jobType
-        it.jobStatus = this.jobStatus
-        it.processor = this.processor
-        it.executeMode = this.executeMode
-        it.executeParams = this.executeParams
-        it.scriptType = this.scriptType
-        it.scriptCode = this.scriptCode
-        it.dataTime = this.dataTime
-        it.workerAddress = this.workerAddress
-        it.maxAttemptCnt = this.maxAttemptCnt
-        it.attemptInterval = this.attemptInterval
-        it.taskMaxAttemptCnt = this.taskMaxAttemptCnt
-        it.taskAttemptInterval = this.taskAttemptInterval
-        it.priority = this.priority
-    }
-}
-
-fun WorkflowInstanceEntity.toDomainModel(): WorkflowInstance {
-    return WorkflowInstance().also {
-        it.appGroup = this.appGroupEntity!!.toDomainModel()
-//        it.workflowNodeInstances = this.workflowNodeInstances
-        it.id = WorkflowInstanceId(this.id!!)
-        it.workflowId = WorkflowId(this.workflowId!!)
-        it.code = this.code
-        it.name = this.name
-        it.graphData = JSON.readValue<WorkflowGraphData>(this.graphData)
-        it.status = this.status
-        it.dataTime = this.dataTime
     }
 }

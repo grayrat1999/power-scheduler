@@ -5,6 +5,7 @@ import tech.powerscheduler.server.application.dto.request.WorkflowInstanceQueryR
 import tech.powerscheduler.server.application.dto.response.WorkflowInstanceDetailResponseDTO
 import tech.powerscheduler.server.application.dto.response.WorkflowInstanceQueryResponseDTO
 import tech.powerscheduler.server.application.utils.JSON
+import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.workflow.WorkflowInstance
 import tech.powerscheduler.server.domain.workflow.WorkflowInstanceQuery
 
@@ -19,25 +20,33 @@ class WorkflowInstanceAssembler {
         return WorkflowInstanceQuery().apply {
             this.pageNo = param.pageNo
             this.pageSize = param.pageSize
+            this.namespaceCode = param.namespaceCode
+            this.appCode = param.appCode
             this.status = param.status
+            this.startAtRange = param.startAtRange
+            this.endAtRange = param.endAtRange
         }
     }
 
     fun toWorkflowInstanceQueryResponseDTO(workflowInstance: WorkflowInstance): WorkflowInstanceQueryResponseDTO {
         return WorkflowInstanceQueryResponseDTO().apply {
-            this.appName = workflowInstance.appGroup!!.name
+            val appGroup = workflowInstance.appGroup!!
+            this.appCode = appGroup.code
+            this.appName = appGroup.name
             this.id = workflowInstance.id!!.value
             this.workflowId = workflowInstance.workflowId!!.value
             this.name = workflowInstance.name
             this.code = workflowInstance.code
-            this.status = workflowInstance.status
+            this.status = workflowInstance.status.toDTO()
             this.dataTime = workflowInstance.dataTime
         }
     }
 
     fun toWorkflowInstanceDetailResponseDTO(workflowInstance: WorkflowInstance): WorkflowInstanceDetailResponseDTO {
         return WorkflowInstanceDetailResponseDTO().apply {
-            this.appName = workflowInstance.appGroup!!.name
+            val appGroup = workflowInstance.appGroup!!
+            this.appCode = appGroup.code
+            this.appName = appGroup.name
             this.id = workflowInstance.id!!.value
             this.workflowId = workflowInstance.workflowId!!.value
             this.name = workflowInstance.name
