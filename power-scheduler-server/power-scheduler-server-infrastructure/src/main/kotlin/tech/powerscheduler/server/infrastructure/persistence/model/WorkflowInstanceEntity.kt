@@ -26,7 +26,7 @@ class WorkflowInstanceEntity : BaseEntity() {
         mappedBy = "workflowInstanceEntity",
         cascade = [CascadeType.ALL],
         orphanRemoval = true,
-        fetch = FetchType.LAZY
+        fetch = FetchType.EAGER,
     )
     var workflowNodeInstanceEntities: Set<WorkflowNodeInstanceEntity> = emptySet()
 

@@ -54,10 +54,9 @@ class WorkflowInstanceRepositoryImpl(
             val appCodeEqual = query.appCode.takeUnless { it.isNullOrBlank() }?.let {
                 criteriaBuilder.equal(appGroupJoin.get<String>(AppGroupEntity::code.name), it)
             }
-            val statusEqual = criteriaBuilder.equal(
-                root.get<WorkflowStatusEnum>(WorkflowInstanceEntity::status.name),
-                query.status
-            )
+            val statusEqual = query.status?.let {
+                criteriaBuilder.equal(root.get<WorkflowStatusEnum>(WorkflowInstanceEntity::status.name), it)
+            }
             val startAtBetween = query.startAtRange?.let {
                 criteriaBuilder.between(root.get(JobInstanceEntity::startAt.name), it[0], it[1])
             }

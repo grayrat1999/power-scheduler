@@ -22,12 +22,13 @@ fun WorkflowInstance.toEntity(): WorkflowInstanceEntity {
         it.workflowNodeInstanceEntities = workflowNodeInstance2entity.values.toSet()
         it.id = this.id?.value
         it.workflowId = this.workflowId!!.value
-        it.name = this.name
         it.code = this.code
+        it.name = this.name
         it.status = this.status
         it.dataTime = this.dataTime
         it.startAt = this.startAt
         it.endAt = this.endAt
+        it.graphData = JSON.writeValueAsString(this.graphData!!)
     }
 }
 
@@ -39,10 +40,10 @@ fun WorkflowInstanceEntity.toDomainModel(): WorkflowInstance {
         it.workflowId = WorkflowId(this.workflowId!!)
         it.code = this.code
         it.name = this.name
-        it.graphData = JSON.readValue<WorkflowGraphData>(this.graphData)
         it.status = this.status
         it.dataTime = this.dataTime
         it.startAt = this.startAt
         it.endAt = this.endAt
+        it.graphData = JSON.readValue<WorkflowGraphData>(this.graphData)
     }
 }

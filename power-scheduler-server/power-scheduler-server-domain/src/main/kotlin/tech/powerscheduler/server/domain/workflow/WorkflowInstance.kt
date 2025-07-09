@@ -40,11 +40,6 @@ class WorkflowInstance {
     var name: String? = null
 
     /**
-     * 有向无环图的UI数据
-     */
-    var graphData: WorkflowGraphData? = null
-
-    /**
      * 状态
      */
     var status: WorkflowStatusEnum? = null
@@ -63,6 +58,11 @@ class WorkflowInstance {
      * 结束时间
      */
     var endAt: LocalDateTime? = null
+
+    /**
+     * 有向无环图的UI数据
+     */
+    var graphData: WorkflowGraphData? = null
 
     /**
      * 创建人
