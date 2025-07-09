@@ -20,6 +20,16 @@ class WorkflowInstanceQueryRequestDTO : PageQueryRequestDTO() {
     var appCode: String? = null
 
     /**
+     * 工作流id
+     */
+    var workflowId: Long? = null
+
+    /**
+     * 工作流实例id
+     */
+    var workflowInstanceId: Long? = null
+
+    /**
      * 状态
      */
     var status: WorkflowStatusEnum? = null
