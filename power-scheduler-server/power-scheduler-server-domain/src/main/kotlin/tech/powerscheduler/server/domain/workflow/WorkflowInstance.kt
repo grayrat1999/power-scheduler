@@ -62,7 +62,7 @@ class WorkflowInstance {
     /**
      * 有向无环图的UI数据
      */
-    var graphData: WorkflowGraphData? = null
+    var graphData: WorkflowInstanceGraphData? = null
 
     /**
      * 创建人

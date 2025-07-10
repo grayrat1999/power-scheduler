@@ -44,6 +44,6 @@ fun WorkflowInstanceEntity.toDomainModel(): WorkflowInstance {
         it.dataTime = this.dataTime
         it.startAt = this.startAt
         it.endAt = this.endAt
-        it.graphData = JSON.readValue<WorkflowGraphData>(this.graphData)
+        it.graphData = JSON.readValue<WorkflowInstanceGraphData>(this.graphData)
     }
 }
