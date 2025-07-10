@@ -15,15 +15,16 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.common.enums.ExecuteModeEnum
+import tech.powerscheduler.common.enums.JobSourceTypeEnum
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.server.application.assembler.TaskAssembler
 import tech.powerscheduler.server.application.utils.hostPort
 import tech.powerscheduler.server.domain.appgroup.AppGroupKey
 import tech.powerscheduler.server.domain.common.PageQuery
-import tech.powerscheduler.server.domain.job.JobId
 import tech.powerscheduler.server.domain.job.JobInfoRepository
 import tech.powerscheduler.server.domain.job.JobInstance
 import tech.powerscheduler.server.domain.job.JobInstanceRepository
+import tech.powerscheduler.server.domain.job.SourceId
 import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.task.TaskRepository
 import tech.powerscheduler.server.domain.task.TaskStatusChangeEvent
@@ -111,17 +112,21 @@ class TaskDispatcherActor(
             if (assignedJobInfos.isEmpty()) {
                 continue
             }
-            dispatchByJobIds(assignedJobInfos)
+            dispatchByJobIds(
+                sourceIds = assignedJobInfos.map { it.toSourceId() },
+                sourceType = JobSourceTypeEnum.JOB
+            )
             pageNo++
         } while (assignedJobIdPage.isNotEmpty())
         return this
     }
 
-    private fun dispatchByJobIds(assignedJobInfos: List<JobId>) {
+    private fun dispatchByJobIds(sourceIds: List<SourceId>, sourceType: JobSourceTypeEnum) {
         var pageNo = 1
         do {
             val dispatchablePage = taskRepository.listDispatchable(
-                jobIds = assignedJobInfos,
+                sourceIds = sourceIds,
+                sourceType = sourceType,
                 pageQuery = PageQuery(pageNo = pageNo++, pageSize = 200)
             )
             val dispatchableJobInstanceList = dispatchablePage.content
