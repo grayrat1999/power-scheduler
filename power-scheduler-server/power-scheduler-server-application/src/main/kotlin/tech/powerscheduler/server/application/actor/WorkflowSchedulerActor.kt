@@ -1,6 +1,7 @@
 package tech.powerscheduler.server.application.actor
 
 import akka.actor.typed.Behavior
+import akka.actor.typed.PostStop
 import akka.actor.typed.SupervisorStrategy
 import akka.actor.typed.javadsl.AbstractBehavior
 import akka.actor.typed.javadsl.ActorContext
@@ -99,6 +100,8 @@ class WorkflowSchedulerActor(
     override fun createReceive(): Receive<Command> {
         return newReceiveBuilder()
             .onMessageEquals(Command.ScheduleWorkflows) { handleScheduleWorkflows() }
+            .onMessageEquals(Command.CreateTasks) { handleCreateTasks() }
+            .onSignal(PostStop::class.java) { signal -> onPostStop() }
             .build()
     }
 
@@ -215,5 +218,13 @@ class WorkflowSchedulerActor(
             jobInstanceRepository.saveAll(jobInstances)
             log.info("schedule workflow [{}] success, nextScheduleTime={}", workflowId.value, workflow.nextScheduleAt)
         }
+    }
+
+    private fun handleCreateTasks(): Behavior<Command> {
+        return this
+    }
+
+    private fun onPostStop(): Behavior<Command> {
+        return this
     }
 }

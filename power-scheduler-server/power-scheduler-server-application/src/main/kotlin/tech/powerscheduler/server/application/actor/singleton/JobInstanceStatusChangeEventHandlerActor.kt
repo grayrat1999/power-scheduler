@@ -24,13 +24,13 @@ import java.time.Duration
  * @author grayrat
  * @since 2025/6/25
  */
-class InstanceStatusChangeEventHandlerActor(
+class JobInstanceStatusChangeEventHandlerActor(
     context: ActorContext<Command>,
     val domainEventRepository: DomainEventRepository,
     val jobInstanceRepository: JobInstanceRepository,
     val transactionTemplate: TransactionTemplate,
     val jobInstanceService: JobInstanceService,
-) : AbstractBehavior<InstanceStatusChangeEventHandlerActor.Command>(context) {
+) : AbstractBehavior<JobInstanceStatusChangeEventHandlerActor.Command>(context) {
     private val log = LoggerFactory.getLogger(javaClass)
 
     sealed interface Command {
@@ -47,7 +47,7 @@ class InstanceStatusChangeEventHandlerActor(
             val transactionTemplate = applicationContext.getBean(TransactionTemplate::class.java)
             return Behaviors.setup { context ->
                 Behaviors.withTimers { timer ->
-                    val actor = InstanceStatusChangeEventHandlerActor(
+                    val actor = JobInstanceStatusChangeEventHandlerActor(
                         context = context,
                         domainEventRepository = domainEventRepository,
                         jobInstanceRepository = jobInstanceRepository,

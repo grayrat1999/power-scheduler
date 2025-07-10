@@ -49,7 +49,6 @@ class JobSchedulerActor(
     }
 
     companion object {
-
         val SERVICE_KEY: ServiceKey<Command> = ServiceKey.create<Command>(
             Command::class.java,
             JobSchedulerActor::class.simpleName
