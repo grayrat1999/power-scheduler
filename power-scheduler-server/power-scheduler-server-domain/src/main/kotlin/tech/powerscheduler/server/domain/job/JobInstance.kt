@@ -216,6 +216,8 @@ class JobInstance {
     fun createTask(workerAddress: String?): Task {
         val task = Task().also {
             it.appGroup = this.appGroup
+            it.sourceId = this.sourceId
+            it.sourceType = this.sourceType
             it.jobInstanceId = this.id
             it.taskName = this.jobName
             it.jobType = this.jobType
