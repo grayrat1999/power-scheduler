@@ -167,6 +167,7 @@ class JobInfo {
         return JobInstance().also {
             it.appGroup = this.appGroup
             it.sourceId = this.id!!.toSourceId()
+            it.sourceType = JobSourceTypeEnum.JOB
             it.jobName = this.jobName
             it.jobType = this.jobType
             it.processor = this.processor

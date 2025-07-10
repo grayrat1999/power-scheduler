@@ -105,7 +105,7 @@ interface JobInstanceJpaRepository :
             jobInstance.id
         FROM JobInstanceEntity AS jobInstance
         WHERE true 
-          AND jobInstance.sourceId IN :sourceId
+          AND jobInstance.sourceId IN :sourceIds
           AND jobInstance.sourceType = :sourceType
           AND jobInstance.jobStatus IN :jobStatuses
     """
