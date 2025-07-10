@@ -4,6 +4,7 @@ import tech.powerscheduler.common.enums.*
 import tech.powerscheduler.common.enums.ExecuteModeEnum.*
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.task.Task
+import tech.powerscheduler.server.domain.worker.WorkerRegistry
 import java.time.LocalDateTime
 
 /**
@@ -211,6 +212,43 @@ class JobInstance {
             it.priority = this.priority
         }
         return newInstance
+    }
+
+    fun createTasks(availableWorkers: List<WorkerRegistry>): List<Task> {
+        val tasks = when (executeMode!!) {
+            // 单机模式创建1个task
+            // Map/MapReduce模式 先创建1个task，后续根据任务上报的结果持续创建子task(需要做好幂等)
+            SINGLE, MAP, MAP_REDUCE -> {
+                val targetWorkerAddress = selectWorker(candidateWorkers = availableWorkers)
+                val task = this.createTask(targetWorkerAddress)
+                listOf(task)
+            }
+            // 广播模式 有多少台在线的worker就创建多少个task
+            BROADCAST -> {
+                availableWorkers.map { this.createTask(it.address) }
+            }
+        }
+        return tasks
+    }
+
+    private fun selectWorker(
+        candidateWorkers: List<WorkerRegistry>
+    ): String {
+        val specifiedWorkerAddress = this.workerAddress
+        val executeMode = this.executeMode
+        if (executeMode == SINGLE && specifiedWorkerAddress.orEmpty().isNotBlank()) {
+            // 使用用户指定的运行机器
+            return specifiedWorkerAddress!!
+        }
+        return if (this.attemptCnt!! > 0 && candidateWorkers.size > 1) {
+            // 如果上次任务执行失败了，本次就换个节点执行
+            candidateWorkers.asSequence()
+                .filterNot { it.address == this.workerAddress }
+                .maxBy { it.healthScore }
+                .address
+        } else {
+            candidateWorkers.maxBy { it.healthScore }.address
+        }
     }
 
     fun createTask(workerAddress: String?): Task {
