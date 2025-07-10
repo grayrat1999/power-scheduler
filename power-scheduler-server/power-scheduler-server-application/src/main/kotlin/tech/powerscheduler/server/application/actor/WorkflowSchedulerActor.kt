@@ -205,7 +205,7 @@ class WorkflowSchedulerActor(
                 }
             }
             val workflowInstance = workflow.createInstance()
-            val workflowNodeInstances = workflowNodes.createInstance()
+            val workflowNodeInstances = workflowNodes.createInstance(workflowInstance)
             val rootNodeInstances = workflowNodeInstances.filter { it.parents.isEmpty() }
             val jobInstances = rootNodeInstances.map { it.createJobInstance() }
 

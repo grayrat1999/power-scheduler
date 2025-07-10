@@ -4,12 +4,12 @@ package tech.powerscheduler.server.domain.workflow
  * @author grayrat
  * @since 2025/6/25
  */
-fun Collection<WorkflowNode>.createInstance(): List<WorkflowNodeInstance> {
+fun Collection<WorkflowNode>.createInstance(workflowInstance: WorkflowInstance): List<WorkflowNodeInstance> {
     val rootNodes = this.asSequence()
         .filter { it.parents.isEmpty() }
         .map {
-            it.createInstance().apply {
-                this.children = it.children.map(WorkflowNode::createInstance).toSet()
+            it.createInstance(workflowInstance).apply {
+                this.children = it.children.map { child -> child.createInstance(workflowInstance) }.toSet()
             }
         }
         .toList()

@@ -1,6 +1,7 @@
 package tech.powerscheduler.server.infrastructure.persistence.model
 
 import jakarta.persistence.*
+import tech.powerscheduler.common.enums.ScheduleTypeEnum
 import tech.powerscheduler.common.enums.WorkflowStatusEnum
 import java.time.LocalDateTime
 
@@ -74,6 +75,25 @@ class WorkflowInstanceEntity : BaseEntity() {
      */
     @Column(name = "graph_data", nullable = false, length = 40000)
     var graphData: String? = null
+
+    /**
+     * 调度类型
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "schedule_type", nullable = false)
+    var scheduleType: ScheduleTypeEnum? = null
+
+    /**
+     * 调度配置
+     */
+    @Column(name = "schedule_config", nullable = false)
+    var scheduleConfig: String? = null
+
+    /**
+     * 触发时间
+     */
+    @Column(name = "schedule_at", nullable = false)
+    var scheduleAt: LocalDateTime? = null
 
     /**
      * 开始时间

@@ -97,7 +97,7 @@ class JobInstanceServiceTest : FunSpec({
             val jobInstanceId = JobInstanceId(1L)
             val jobInstance = JobInstance().also {
                 it.id = jobInstanceId
-                it.jobId = JobId(param.jobId!!)
+                it.sourceId = JobId(param.jobId!!)
             }
             every { jobInfoRepository.findById(JobId(param.jobId!!)) } returns jobInfo
             every { jobInfo.createInstance() } returns jobInstance

@@ -14,11 +14,6 @@ import java.time.LocalDateTime
 @Entity
 @Table(name = "workflow_node_instance")
 class WorkflowNodeInstanceEntity : BaseEntity() {
-
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "app_group_id", nullable = false)
-//    var appGroupEntity: AppGroupEntity? = null
-
     /**
      * 子节点
      */
@@ -156,4 +151,28 @@ class WorkflowNodeInstanceEntity : BaseEntity() {
      */
     @Column(name = "priority")
     var priority: Int? = null
+
+    /**
+     * 触发时间
+     */
+    @Column(name = "schedule_at", nullable = false)
+    var scheduleAt: LocalDateTime? = null
+
+    /**
+     * 开始时间
+     */
+    @Column(name = "start_at", insertable = false)
+    var startAt: LocalDateTime? = null
+
+    /**
+     * 结束时间
+     */
+    @Column(name = "end_at", insertable = false)
+    var endAt: LocalDateTime? = null
+
+    /**
+     * 调度端ip
+     */
+    @Column(name = "scheduler_address")
+    var schedulerAddress: String? = null
 }

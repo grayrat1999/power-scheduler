@@ -1,5 +1,6 @@
 package tech.powerscheduler.server.domain.workflow
 
+import tech.powerscheduler.common.enums.ScheduleTypeEnum
 import tech.powerscheduler.common.enums.WorkflowStatusEnum
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import java.time.LocalDateTime
@@ -43,6 +44,21 @@ class WorkflowInstance {
      * 状态
      */
     var status: WorkflowStatusEnum? = null
+
+    /**
+     * 调度类型
+     */
+    var scheduleType: ScheduleTypeEnum? = null
+
+    /**
+     * 调度配置
+     */
+    var scheduleConfig: String? = null
+
+    /**
+     * 调度时间
+     */
+    var scheduleAt: LocalDateTime? = null
 
     /**
      * 数据时间

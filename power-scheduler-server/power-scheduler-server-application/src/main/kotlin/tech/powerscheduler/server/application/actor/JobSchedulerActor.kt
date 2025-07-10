@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationContext
 import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.common.enums.ExecuteModeEnum.*
+import tech.powerscheduler.common.enums.JobSourceTypeEnum
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
 import tech.powerscheduler.server.application.utils.hostPort
@@ -250,7 +251,8 @@ class JobSchedulerActor(
         do {
             val pageQuery = PageQuery(pageNo = pageNo++, pageSize = 200)
             val jobInstanceIdPage = jobInstanceRepository.listDispatchable(
-                jobIds = jobIds,
+                sourceIds = jobIds.map { it.toSourceId() },
+                sourceType = JobSourceTypeEnum.JOB,
                 pageQuery = pageQuery
             )
             if (jobInstanceIdPage.isEmpty()) {

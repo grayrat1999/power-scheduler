@@ -166,7 +166,7 @@ class JobInfo {
     fun createInstance(): JobInstance {
         return JobInstance().also {
             it.appGroup = this.appGroup
-            it.jobId = this.id
+            it.sourceId = this.id!!.toSourceId()
             it.jobName = this.jobName
             it.jobType = this.jobType
             it.processor = this.processor

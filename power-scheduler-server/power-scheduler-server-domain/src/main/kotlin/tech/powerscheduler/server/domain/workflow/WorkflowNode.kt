@@ -124,8 +124,9 @@ class WorkflowNode {
      */
     var updatedAt: LocalDateTime? = null
 
-    fun createInstance(): WorkflowNodeInstance {
+    fun createInstance(workflowInstance: WorkflowInstance): WorkflowNodeInstance {
         return WorkflowNodeInstance().also {
+            it.workflowInstance = workflowInstance
             it.nodeCode = this.code
             it.nodeInstanceCode = UUID.randomUUID().toString()
             it.name = this.name

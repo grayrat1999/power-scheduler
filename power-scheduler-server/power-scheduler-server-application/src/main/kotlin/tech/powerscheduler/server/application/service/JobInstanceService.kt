@@ -162,12 +162,12 @@ class JobInstanceService(
 
         jobInstanceRepository.save(jobInstance)
         if (jobInstance.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
-            val jobInfo = jobInfoRepository.lockById(jobInstance.jobId!!)
+            val jobInfo = jobInfoRepository.lockById(jobInstance.sourceId!!.toJobId())
             if (jobInfo == null) {
                 return
             }
             jobInfo.lastCompletedAt = jobInstance.endAt
-            if (jobInstance.scheduleType == ScheduleTypeEnum.ONE_TIME) {
+            if (jobInfo.scheduleType == ScheduleTypeEnum.ONE_TIME) {
                 jobInfo.enabled = false
             }
             if (jobInfo.scheduleType == ScheduleTypeEnum.FIX_DELAY) {

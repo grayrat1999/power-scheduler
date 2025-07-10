@@ -8,9 +8,6 @@ import java.time.LocalDateTime
 
 /**
  * 任务实例
- * TODO: 1. 改名为 Execution
- * TODO: 2. 常规任务实例和工作流节点实例都通过 Execution 承载, 新增 ExecutionType 用于区分两者
- * TODO: 3. jobId改为definitionId(向上做一层抽象)
  *
  * @author grayrat
  * @since 2025/4/16
@@ -28,9 +25,19 @@ class JobInstance {
     var id: JobInstanceId? = null
 
     /**
-     * 任务id
+     * 任务来源对象的id(JobId 或者 WorkflowId)
      */
-    var jobId: JobId? = null
+    var sourceId: SourceId? = null
+
+    /**
+     * 任务来源
+     */
+    var sourceType: JobSourceTypeEnum? = null
+
+    /**
+     * 工作流节点实例编码
+     */
+    var workflowNodeInstanceCode: String? = null
 
     /**
      * 任务名称
@@ -186,7 +193,7 @@ class JobInstance {
     fun cloneForReattempt(): JobInstance {
         val newInstance = JobInstance().also {
             it.appGroup = this.appGroup
-            it.jobId = this.jobId
+            it.sourceId = this.sourceId
             it.jobName = this.jobName
             it.jobType = this.jobType
             it.processor = this.processor
@@ -209,7 +216,6 @@ class JobInstance {
     fun createTask(workerAddress: String?): Task {
         val task = Task().also {
             it.appGroup = this.appGroup
-            it.jobId = this.jobId
             it.jobInstanceId = this.id
             it.taskName = this.jobName
             it.jobType = this.jobType

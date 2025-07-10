@@ -1,9 +1,6 @@
 package tech.powerscheduler.server.domain.workflow
 
-import tech.powerscheduler.common.enums.ExecuteModeEnum
-import tech.powerscheduler.common.enums.JobTypeEnum
-import tech.powerscheduler.common.enums.ScriptTypeEnum
-import tech.powerscheduler.common.enums.WorkflowStatusEnum
+import tech.powerscheduler.common.enums.*
 import tech.powerscheduler.server.domain.job.JobInstance
 import java.time.LocalDateTime
 
@@ -12,6 +9,11 @@ import java.time.LocalDateTime
  * @since 2025/6/21
  */
 class WorkflowNodeInstance {
+
+    /**
+     * 工作流
+     */
+    var workflowInstance: WorkflowInstance? = null
 
     /**
      * 父节点
@@ -119,6 +121,11 @@ class WorkflowNodeInstance {
     var priority: Int? = null
 
     /**
+     * 调度器地址
+     */
+    var schedulerAddress: String? = null
+
+    /**
      * 创建人
      */
     var createdBy: String? = null
@@ -139,8 +146,31 @@ class WorkflowNodeInstance {
     var updatedAt: LocalDateTime? = null
 
     fun createJobInstance(): JobInstance {
-        return JobInstance().apply {
-
+        return JobInstance().also {
+            val workflowInstance = this.workflowInstance!!
+            it.appGroup = workflowInstance.appGroup
+            it.sourceId = workflowInstance.workflowId!!.toSourceId()
+            it.sourceType = JobSourceTypeEnum.WORKFLOW
+            it.workflowNodeInstanceCode = this.nodeInstanceCode
+            it.jobName = this.name
+            it.jobType = this.jobType
+            it.processor = this.processor
+            it.jobStatus = JobStatusEnum.WAITING_SCHEDULE
+            it.scheduleAt = workflowInstance.scheduleAt
+            it.executeParams = this.executeParams
+            it.executeMode = this.executeMode
+            it.scheduleType = workflowInstance.scheduleType
+            it.dataTime = this.dataTime
+            it.scriptType = this.scriptType
+            it.scriptCode = this.scriptCode
+            it.attemptCnt = this.attemptCnt
+            it.maxAttemptCnt = this.maxAttemptCnt
+            it.attemptInterval = this.attemptInterval
+            it.taskMaxAttemptCnt = this.taskMaxAttemptCnt
+            it.taskAttemptInterval = this.taskAttemptInterval
+            it.priority = this.priority
+            it.workerAddress = this.workerAddress
+            it.schedulerAddress = this.schedulerAddress
         }
     }
 }

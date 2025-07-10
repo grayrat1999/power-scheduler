@@ -87,7 +87,9 @@ class Workflow : Schedulable() {
         dataTime: LocalDateTime? = LocalDateTime.now(),
     ): WorkflowInstance {
         return WorkflowInstance().also {
-            val workflowNode2Instance = this.workflowNodes.associateWith(WorkflowNode::createInstance)
+            val workflowNode2Instance = this.workflowNodes.associateWith { workflowNode ->
+                workflowNode.createInstance(it)
+            }
             for (workflowNode in this.workflowNodes) {
                 val nodeInstance = workflowNode2Instance[workflowNode]!!
                 nodeInstance.dataTime = dataTime
@@ -111,6 +113,9 @@ class Workflow : Schedulable() {
                     data.workflowNodeInstanceCode = nodeInstance.nodeInstanceCode
                 }
             it.status = WorkflowStatusEnum.WAITING
+            it.scheduleType = this.scheduleType
+            it.scheduleConfig = this.scheduleConfig
+            it.scheduleAt = this.nextScheduleAt
             it.dataTime = dataTime
         }
     }

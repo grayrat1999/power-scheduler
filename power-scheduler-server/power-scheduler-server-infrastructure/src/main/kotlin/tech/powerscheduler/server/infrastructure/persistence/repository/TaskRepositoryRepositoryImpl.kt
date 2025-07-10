@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
+import tech.powerscheduler.common.enums.JobSourceTypeEnum
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.TaskTypeEnum
 import tech.powerscheduler.server.domain.common.Page
@@ -86,7 +87,8 @@ class TaskRepositoryRepositoryImpl(
             Sort.by(JobInstanceEntity::scheduleAt.name).ascending()
         )
         val page = taskRepositoryJpaRepository.listDispatchable(
-            jobIds = jobIds.map { it.value },
+            sourceIds = jobIds.map { it.value },
+            sourceType = JobSourceTypeEnum.JOB,
             jobStatuses = listOf(JobStatusEnum.WAITING_DISPATCH),
             pageRequest = pageable,
         )
