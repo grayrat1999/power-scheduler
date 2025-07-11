@@ -116,6 +116,11 @@ class AppGuardian(
                 WorkerRegistryCleanActor::class.simpleName,
             )
             context.spawn(
+                WorkflowSchedulerActor.create(applicationContext),
+                WorkflowSchedulerActor::class.simpleName,
+                Props.empty().withDispatcherFromConfig("workflow-scheduler-dispatcher")
+            )
+            context.spawn(
                 JobSchedulerActor.create(applicationContext),
                 JobSchedulerActor::class.simpleName,
                 Props.empty().withDispatcherFromConfig("job-scheduler-dispatcher")

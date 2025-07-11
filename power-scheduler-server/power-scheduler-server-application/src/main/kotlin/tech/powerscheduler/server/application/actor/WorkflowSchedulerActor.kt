@@ -206,13 +206,11 @@ class WorkflowSchedulerActor(
                 }
             }
             val workflowInstance = workflow.createInstance()
-            val workflowNodeInstances = workflowNodes.createInstance(workflowInstance)
-            val rootNodeInstances = workflowNodeInstances.filter { it.parents.isEmpty() }
+            val rootNodeInstances = workflowInstance.workflowNodeInstances.filter { it.parents.isEmpty() }
             val jobInstances = rootNodeInstances.map { it.createJobInstance() }
 
             workflowRepository.save(workflow)
             workflowInstanceRepository.save(workflowInstance)
-            workflowNodeInstanceRepository.saveAll(workflowNodeInstances)
             jobInstanceRepository.saveAll(jobInstances)
             log.info("schedule workflow [{}] success, nextScheduleTime={}", workflowId.value, workflow.nextScheduleAt)
         }

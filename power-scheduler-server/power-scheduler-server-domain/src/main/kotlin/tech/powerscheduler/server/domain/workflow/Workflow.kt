@@ -99,6 +99,7 @@ class Workflow : Schedulable() {
                 val nodeInstance = workflowNode2Instance[workflowNode]!!
                 nodeInstance.dataTime = dataTime
                 nodeInstance.children = workflowNode.children.map { child -> workflowNode2Instance[child]!! }.toSet()
+                nodeInstance.parents = workflowNode.parents.map { child -> workflowNode2Instance[child]!! }.toSet()
             }
             val nodeInstances = workflowNode2Instance.values.toList()
             val nodeCode2NodeInstance = nodeInstances.associateBy { nodeInstance -> nodeInstance.nodeCode }

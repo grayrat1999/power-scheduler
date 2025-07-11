@@ -37,10 +37,10 @@ interface WorkflowJpaRepository
     @Modifying
     @Query(
         """
-        UPDATE SchedulerEntity t
-        SET t.address = null 
+        UPDATE WorkflowEntity t
+        SET t.schedulerAddress = null 
         WHERE true
-            AND t.address = :address
+            AND t.schedulerAddress = :address
     """
     )
     fun clearSchedulerByAddress(address: String)
