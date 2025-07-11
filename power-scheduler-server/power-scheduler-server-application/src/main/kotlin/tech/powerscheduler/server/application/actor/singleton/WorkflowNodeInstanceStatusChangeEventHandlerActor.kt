@@ -130,7 +130,10 @@ class WorkflowNodeInstanceStatusChangeEventHandlerActor(
                     .filter { it.status == WorkflowStatusEnum.WAITING }
                     .filter { it.parents.all { parent -> parent.status == WorkflowStatusEnum.SUCCESS } }
                 val jobInstances = nextNodeInstances.map { it.createJobInstance() }
-                jobInstanceRepository.saveAll(jobInstances)
+                if (jobInstances.isNotEmpty()) {
+                    jobInstanceRepository.saveAll(jobInstances)
+                    log.info("nodeInstance {} is ready to run", nextNodeInstances.map { it.id!!.value })
+                }
             }
             workflowInstanceRepository.save(workflowInstance)
         }

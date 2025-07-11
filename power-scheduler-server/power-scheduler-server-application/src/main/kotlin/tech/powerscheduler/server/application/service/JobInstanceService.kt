@@ -167,10 +167,14 @@ class JobInstanceService(
         val workflowNodeInstance = workflowInstance.workflowNodeInstances.find {
             it.nodeInstanceCode == workflowNodeInstanceCode
         }!!
+        val newStatus = WorkflowStatusEnum.from(jobInstance.jobStatus!!)
+        if (workflowNodeInstance.status == newStatus) {
+            return
+        }
         workflowNodeInstance.apply {
             this.startAt = jobInstance.startAt
             this.endAt = jobInstance.endAt
-            this.status = WorkflowStatusEnum.from(jobInstance.jobStatus!!)
+            this.status = newStatus
             this.workerAddress = jobInstance.workerAddress
         }
         workflowInstance.apply {
@@ -187,6 +191,10 @@ class JobInstanceService(
             body = JSON.writeValueAsString(WorkflowNodeInstanceStatusChangeEvent.create(workflowInstanceId))
         )
         domainEventRepository.save(domainEvent)
+        log.info(
+            "workflowNodeInstance update successfully: id={}, status={}",
+            workflowNodeInstance.id!!.value, workflowNodeInstance.status
+        )
     }
 
     private fun updateJobInfo(jobInstance: JobInstance) {
