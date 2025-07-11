@@ -2,6 +2,7 @@ package tech.powerscheduler.server.domain.job
 
 import tech.powerscheduler.common.enums.*
 import tech.powerscheduler.common.enums.ExecuteModeEnum.*
+import tech.powerscheduler.common.enums.JobStatusEnum.FAILED
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.worker.WorkerRegistry
@@ -301,6 +302,28 @@ class JobInstance {
             }
         }
         return task
+    }
+
+    fun updateProgress(tasks: Iterable<Task>) {
+        val calculatedJobStatus = this.calculateJobStatus(tasks)
+        this.jobStatus = calculatedJobStatus
+        // task可能会失败重试, 开始时间只取第一个task的开始时间
+        if (this.startAt == null) {
+            this.startAt = this.calculateStartAt(tasks)
+        }
+        this.workerAddress = this.calculateWorkerAddress(tasks)
+        if (calculatedJobStatus in JobStatusEnum.COMPLETED_STATUSES) {
+            this.endAt = this.calculateEndAt(tasks)
+        }
+        if (calculatedJobStatus == FAILED) {
+            if (this.canReattempt) {
+                this.resetStatusForReattempt()
+            } else {
+                if (this.executeMode == SINGLE) {
+                    this.message = tasks.mapNotNull { it.result }.firstOrNull { it.isNotBlank() }
+                }
+            }
+        }
     }
 
     fun calculateJobStatus(tasks: Iterable<Task>): JobStatusEnum {

@@ -4,9 +4,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.common.dto.response.PageDTO
-import tech.powerscheduler.common.enums.ExecuteModeEnum
+import tech.powerscheduler.common.enums.JobSourceTypeEnum.JOB
+import tech.powerscheduler.common.enums.JobSourceTypeEnum.WORKFLOW
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobStatusEnum.*
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
@@ -20,8 +20,10 @@ import tech.powerscheduler.server.application.dto.request.JobRunRequestDTO
 import tech.powerscheduler.server.application.dto.response.JobInstanceDetailResponseDTO
 import tech.powerscheduler.server.application.dto.response.JobInstanceQueryResponseDTO
 import tech.powerscheduler.server.application.dto.response.JobProgressQueryResponseDTO
+import tech.powerscheduler.server.application.utils.JSON
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.common.PageQuery
+import tech.powerscheduler.server.domain.domainevent.*
 import tech.powerscheduler.server.domain.job.*
 import tech.powerscheduler.server.domain.task.TaskRepository
 import java.time.LocalDateTime
@@ -39,7 +41,7 @@ class JobInstanceService(
     private val jobInfoRepository: JobInfoRepository,
     private val jobInstanceRepository: JobInstanceRepository,
     private val jobInstanceAssembler: JobInstanceAssembler,
-    private val transactionTemplate: TransactionTemplate,
+    private val domainEventRepository: DomainEventRepository,
     private val applicationEventPublisher: ApplicationEventPublisher,
 ) {
 
@@ -134,49 +136,44 @@ class JobInstanceService(
             jobInstanceId = jobInstanceId,
             batch = jobInstance.batch!!
         )
-        val calculatedJobStatus = jobInstance.calculateJobStatus(tasks)
+        val oldStatus = jobInstance.jobStatus
+        jobInstance.updateProgress(tasks)
         // 如果计算出的任务状态与当前一样, 则不需要更新状态
-        if (jobInstance.jobStatus == calculatedJobStatus) {
+        if (oldStatus == jobInstance.jobStatus) {
             return
         }
-        jobInstance.apply {
-            this.jobStatus = calculatedJobStatus
-            // task可能会失败重试, 开始时间只取第一个task的开始时间
-            if (this.startAt == null) {
-                this.startAt = this.calculateStartAt(tasks)
-            }
-            this.workerAddress = this.calculateWorkerAddress(tasks)
-            if (calculatedJobStatus in JobStatusEnum.COMPLETED_STATUSES) {
-                this.endAt = this.calculateEndAt(tasks)
-            }
-            if (calculatedJobStatus == FAILED) {
-                if (this.canReattempt) {
-                    this.resetStatusForReattempt()
-                } else {
-                    if (this.executeMode == ExecuteModeEnum.SINGLE) {
-                        this.message = tasks.mapNotNull { it.result }.firstOrNull { it.isNotBlank() }
-                    }
-                }
-            }
-        }
-
         jobInstanceRepository.save(jobInstance)
-        if (jobInstance.jobStatus in JobStatusEnum.COMPLETED_STATUSES) {
-            val jobInfo = jobInfoRepository.lockById(jobInstance.sourceId!!.toJobId())
-            if (jobInfo == null) {
-                return
-            }
-            jobInfo.lastCompletedAt = jobInstance.endAt
-            if (jobInfo.scheduleType == ScheduleTypeEnum.ONE_TIME) {
-                jobInfo.enabled = false
-            }
-            if (jobInfo.scheduleType == ScheduleTypeEnum.FIX_DELAY) {
-                jobInfo.updateNextScheduleTime()
-            }
-            jobInfoRepository.save(jobInfo)
+        when (jobInstance.sourceType!!) {
+            JOB -> updateJobInfo(jobInstance)
+            WORKFLOW -> persistentJobInstanceStatusChangeEvent(jobInstanceId)
         }
-        // 如果是工作流的任务实例, 则更新工作流节点状态
-        applicationEventPublisher.publishEvent(JobInstanceStatusChangeEvent)
         log.info("jobInstance update successfully: id={}, status={}", jobInstanceId.value, jobInstance.jobStatus)
+    }
+
+    fun persistentJobInstanceStatusChangeEvent(jobInstanceId: JobInstanceId) {
+        val domainEvent = DomainEvent().apply {
+            this.eventStatus = DomainEventStatusEnum.PENDING
+            this.aggregateId = jobInstanceId.value.toString()
+            this.aggregateType = AggregateTypeEnum.JOB_INSTANCE
+            this.eventType = DomainEventTypeEnum.JOB_INSTANCE_STATUS_CHANGED
+            this.body = JSON.writeValueAsString(JobInstanceStatusChangeEvent(jobInstanceId.value))
+            this.retryCnt = 0
+        }
+        domainEventRepository.save(domainEvent)
+    }
+
+    private fun updateJobInfo(jobInstance: JobInstance) {
+        val jobInfo = jobInfoRepository.lockById(jobInstance.sourceId!!.toJobId())
+        if (jobInfo == null) {
+            return
+        }
+        jobInfo.lastCompletedAt = jobInstance.endAt
+        if (jobInfo.scheduleType == ScheduleTypeEnum.ONE_TIME) {
+            jobInfo.enabled = false
+        }
+        if (jobInfo.scheduleType == ScheduleTypeEnum.FIX_DELAY) {
+            jobInfo.updateNextScheduleTime()
+        }
+        jobInfoRepository.save(jobInfo)
     }
 }
