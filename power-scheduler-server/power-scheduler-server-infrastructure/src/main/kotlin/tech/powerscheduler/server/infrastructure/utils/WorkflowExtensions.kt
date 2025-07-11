@@ -32,6 +32,7 @@ fun Workflow.toEntity(): WorkflowEntity {
         it.scheduleConfig = this.scheduleConfig
         it.nextScheduleAt = this.nextScheduleAt
         it.enabled = this.enabled
+        it.schedulerAddress = this.schedulerAddress
         it.maxConcurrentNum = this.maxConcurrentNum
         it.lastCompletedAt = this.lastCompletedAt
         it.retentionPolicy = this.retentionPolicy
@@ -60,6 +61,7 @@ fun WorkflowEntity.toDomainModel(): Workflow {
         it.description = this.description
         it.graphData = JSON.readValue<WorkflowGraphData>(this.graphData)
         it.enabled = this.enabled
+        it.schedulerAddress = this.schedulerAddress
         it.maxConcurrentNum = this.maxConcurrentNum
         it.retentionPolicy = this.retentionPolicy
         it.retentionValue = this.retentionValue

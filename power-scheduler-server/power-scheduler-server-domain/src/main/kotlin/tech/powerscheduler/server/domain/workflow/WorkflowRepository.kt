@@ -10,6 +10,10 @@ import java.time.LocalDateTime
  */
 interface WorkflowRepository {
 
+    fun listAssignableIds(pageQuery: PageQuery): Page<WorkflowId>
+
+    fun listAllIds(pageQuery: PageQuery): Page<WorkflowId>
+
     fun lockById(workflowId: WorkflowId): Workflow?
 
     fun findById(workflowId: WorkflowId): Workflow?
@@ -27,7 +31,6 @@ interface WorkflowRepository {
     fun save(workflow: Workflow): WorkflowId
 
     fun deleteById(workflowId: WorkflowId)
-
     fun clearSchedulerByAddress(address: String)
 
 }

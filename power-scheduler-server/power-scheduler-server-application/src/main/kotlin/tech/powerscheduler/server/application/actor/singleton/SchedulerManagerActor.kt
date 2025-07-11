@@ -1,5 +1,6 @@
 package tech.powerscheduler.server.application.actor.singleton
 
+import akka.actor.typed.ActorRef
 import akka.actor.typed.Behavior
 import akka.actor.typed.SupervisorStrategy
 import akka.actor.typed.javadsl.AbstractBehavior
@@ -23,14 +24,24 @@ class SchedulerManagerActor(
     private val jobInfoRepository: JobInfoRepository,
     private val workflowRepository: WorkflowRepository,
     private val transactionTemplate: TransactionTemplate,
+    private val jobAssignorActorRef: ActorRef<JobAssignorActor.Command>,
+    private val workflowAssignorActorRef: ActorRef<WorkflowAssignorActor.Command>
 ) : AbstractBehavior<SchedulerManagerActor.Command>(context) {
 
+    private val schedulerAddressSet = mutableSetOf<String>()
+
     sealed interface Command {
+        object AwareSchedulerChange : Command
+
         object CleanOfflineScheduler : Command
     }
 
     companion object {
-        fun create(applicationContext: ApplicationContext): Behavior<Command> {
+        fun create(
+            applicationContext: ApplicationContext,
+            jobAssignorActorRef: ActorRef<JobAssignorActor.Command>,
+            workflowAssignorActorRef: ActorRef<WorkflowAssignorActor.Command>,
+        ): Behavior<Command> {
             val schedulerRepository = applicationContext.getBean(SchedulerRepository::class.java)
             val jobInfoRepository = applicationContext.getBean(JobInfoRepository::class.java)
             val workflowRepository = applicationContext.getBean(WorkflowRepository::class.java)
@@ -43,10 +54,12 @@ class SchedulerManagerActor(
                         jobInfoRepository = jobInfoRepository,
                         workflowRepository = workflowRepository,
                         transactionTemplate = transactionTemplate,
+                        jobAssignorActorRef = jobAssignorActorRef,
+                        workflowAssignorActorRef = workflowAssignorActorRef,
                     )
                     timer.startTimerWithFixedDelay(
-                        Command.CleanOfflineScheduler,
-                        Command.CleanOfflineScheduler,
+                        Command.AwareSchedulerChange,
+                        Command.AwareSchedulerChange,
                         Duration.ofSeconds(5),
                         Duration.ofHours(5),
                     )
@@ -61,7 +74,24 @@ class SchedulerManagerActor(
     override fun createReceive(): Receive<Command> {
         return newReceiveBuilder()
             .onMessageEquals(Command.CleanOfflineScheduler) { cleanOfflineScheduler() }
+            .onMessageEquals(Command.AwareSchedulerChange) { awareSchedulerChange() }
             .build()
+    }
+
+    fun awareSchedulerChange(): Behavior<Command> {
+        val schedulers = schedulerRepository.findAll()
+        val availableSchedulers = schedulers.filter { it.expired.not() }.mapNotNull { it.address }
+        if (schedulerAddressSet.isEmpty()) {
+            schedulerAddressSet.addAll(availableSchedulers)
+            return this
+        }
+        if (schedulerAddressSet != availableSchedulers) {
+            schedulerAddressSet.clear()
+            schedulerAddressSet.addAll(availableSchedulers)
+            jobAssignorActorRef.tell(JobAssignorActor.Command.ReassignAll)
+            workflowAssignorActorRef.tell(WorkflowAssignorActor.Command.ReassignAll)
+        }
+        return this
     }
 
     fun cleanOfflineScheduler(): Behavior<Command> {

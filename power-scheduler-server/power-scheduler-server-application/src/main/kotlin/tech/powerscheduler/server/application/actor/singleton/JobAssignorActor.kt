@@ -22,14 +22,14 @@ import java.time.Duration
 class JobAssignorActor(
     context: ActorContext<Command>,
     private val jobInfoRepository: JobInfoRepository,
-    private val transactionTemplate: TransactionTemplate,
     private val schedulerRepository: SchedulerRepository,
+    private val transactionTemplate: TransactionTemplate,
 ) : AbstractBehavior<JobAssignorActor.Command>(context) {
 
     sealed interface Command {
         object Assign : Command
 
-        object ReassignAllJob : Command
+        object ReassignAll : Command
     }
 
     companion object {
@@ -44,8 +44,8 @@ class JobAssignorActor(
                     val actor = JobAssignorActor(
                         context = context,
                         jobInfoRepository = jobInfoRepository,
-                        schedulerRepository = schedulerRepository,
                         transactionTemplate = transactionTemplate,
+                        schedulerRepository = schedulerRepository,
                     )
                     timer.startTimerWithFixedDelay(
                         Command.Assign,
@@ -64,7 +64,7 @@ class JobAssignorActor(
     override fun createReceive(): Receive<Command> {
         return newReceiveBuilder()
             .onMessageEquals(Command.Assign, this::handleAssign)
-            .onMessageEquals(Command.ReassignAllJob, this::handleReassignAllJob)
+            .onMessageEquals(Command.ReassignAll, this::handleReassignAllJob)
             .build()
     }
 

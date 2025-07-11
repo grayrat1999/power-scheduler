@@ -30,8 +30,33 @@ class WorkflowRepositoryImpl(
     private val workflowJpaRepository: WorkflowJpaRepository
 ) : WorkflowRepository {
 
+    override fun listAssignableIds(pageQuery: PageQuery): Page<WorkflowId> {
+        val pageable = PageRequest.of(
+            pageQuery.pageNo - 1,
+            pageQuery.pageSize,
+            Sort.by(WorkflowEntity::id.name).descending()
+        )
+        val specification = Specification<WorkflowEntity> { root, _, criteriaBuilder ->
+            val notAssigned = criteriaBuilder.isNull(root.get<Boolean>(WorkflowEntity::schedulerAddress.name))
+            criteriaBuilder.and(notAssigned)
+        }
+        val page = workflowJpaRepository.findAll(specification, pageable)
+        return page.map { WorkflowId(it.id!!) }.toDomainPage()
+    }
+
+    override fun listAllIds(pageQuery: PageQuery): Page<WorkflowId> {
+        val pageable = PageRequest.of(
+            pageQuery.pageNo - 1,
+            pageQuery.pageSize,
+            Sort.by(WorkflowEntity::id.name).descending()
+        )
+        val page = workflowJpaRepository.findAll(pageable)
+        return page.map { WorkflowId(it.id!!) }.toDomainPage()
+    }
+
     override fun lockById(workflowId: WorkflowId): Workflow? {
-        TODO("Not yet implemented")
+        val entity = workflowJpaRepository.findByIdForUpdate(workflowId.value)
+        return entity?.toDomainModel()
     }
 
     override fun findById(workflowId: WorkflowId): Workflow? {

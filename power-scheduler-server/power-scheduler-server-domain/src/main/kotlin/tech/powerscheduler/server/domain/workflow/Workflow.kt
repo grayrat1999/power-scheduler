@@ -44,6 +44,11 @@ class Workflow : Schedulable() {
     var enabled: Boolean? = null
 
     /**
+     * 调度器地址
+     */
+    var schedulerAddress: String? = null
+
+    /**
      * 并发数
      */
     var maxConcurrentNum: Int? = null

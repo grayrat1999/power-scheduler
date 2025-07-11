@@ -79,6 +79,12 @@ class WorkflowEntity : BaseEntity() {
     var enabled: Boolean? = null
 
     /**
+     * 调度器地址
+     */
+    @Column(name = "scheduler_address")
+    var schedulerAddress: String? = null
+
+    /**
      * 并发数
      */
     @Column(name = "max_concurrent_num", nullable = false)
@@ -102,10 +108,4 @@ class WorkflowEntity : BaseEntity() {
      */
     @Column(name = "retention_value", nullable = false)
     var retentionValue: Int? = null
-
-    /**
-     * 调度器地址
-     */
-    @Column(name = "scheduler_address")
-    var schedulerAddress: String? = null
 }

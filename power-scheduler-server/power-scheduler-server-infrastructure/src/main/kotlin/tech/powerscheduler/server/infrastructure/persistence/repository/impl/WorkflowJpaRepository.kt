@@ -1,11 +1,9 @@
 package tech.powerscheduler.server.infrastructure.persistence.repository.impl
 
+import jakarta.persistence.LockModeType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor
-import org.springframework.data.jpa.repository.Modifying
-import org.springframework.data.jpa.repository.Query
+import org.springframework.data.jpa.repository.*
 import org.springframework.transaction.annotation.Transactional
 import tech.powerscheduler.server.infrastructure.persistence.model.WorkflowEntity
 
@@ -15,6 +13,10 @@ import tech.powerscheduler.server.infrastructure.persistence.model.WorkflowEntit
  */
 interface WorkflowJpaRepository
     : JpaRepository<WorkflowEntity, Long>, JpaSpecificationExecutor<WorkflowEntity> {
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT t FROM WorkflowEntity t WHERE t.id = :id")
+    fun findByIdForUpdate(id: Long): WorkflowEntity?
 
     @Query(
         """
