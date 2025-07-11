@@ -160,7 +160,7 @@ class JobInstanceService(
     private fun updateWorkflowInstance(jobInstance: JobInstance) {
         val workflowInstanceCode = jobInstance.workflowInstanceCode!!
         val workflowNodeInstanceCode = jobInstance.workflowNodeInstanceCode
-        val workflowInstance = workflowInstanceRepository.findByCode(workflowInstanceCode)
+        val workflowInstance = workflowInstanceRepository.lockByCode(workflowInstanceCode)
         if (workflowInstance == null) {
             return
         }
@@ -172,6 +172,11 @@ class JobInstanceService(
             this.endAt = jobInstance.endAt
             this.status = WorkflowStatusEnum.from(jobInstance.jobStatus!!)
             this.workerAddress = jobInstance.workerAddress
+        }
+        workflowInstance.apply {
+            this.graphData!!.mapNotNull { it.data }
+                .find { it.workflowNodeInstanceCode == workflowNodeInstanceCode }
+                ?.also { it.status = workflowNodeInstance.status }
         }
         workflowInstanceRepository.save(workflowInstance)
         val workflowInstanceId = workflowInstance.id!!

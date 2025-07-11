@@ -34,6 +34,8 @@ interface WorkflowInstanceJpaRepository
     @Query("SELECT t FROM WorkflowInstanceEntity t WHERE t.id = :id")
     fun findByIdForUpdate(id: Long): WorkflowInstanceEntity?
 
-    fun findByCode(code: String): WorkflowInstanceEntity?
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT t FROM WorkflowInstanceEntity t WHERE t.code = :code")
+    fun findByCodeForUpdate(code: String): WorkflowInstanceEntity?
 
 }

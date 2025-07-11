@@ -43,6 +43,11 @@ class WorkflowInstanceRepositoryImpl(
         return entity?.toDomainModel()
     }
 
+    override fun lockByCode(code: String): WorkflowInstance? {
+        val entity = workflowInstanceJpaRepository.findByCodeForUpdate(code)
+        return entity?.toDomainModel()
+    }
+
     override fun pageQuery(query: WorkflowInstanceQuery): Page<WorkflowInstance> {
         val pageable = PageRequest.of(
             query.pageNo - 1,
@@ -90,11 +95,6 @@ class WorkflowInstanceRepositoryImpl(
 
     override fun findById(workflowInstanceId: WorkflowInstanceId): WorkflowInstance? {
         val entity = workflowInstanceJpaRepository.findByIdOrNull(workflowInstanceId.value)
-        return entity?.toDomainModel()
-    }
-
-    override fun findByCode(code: String): WorkflowInstance? {
-        val entity = workflowInstanceJpaRepository.findByCode(code)
         return entity?.toDomainModel()
     }
 

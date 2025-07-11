@@ -16,11 +16,11 @@ interface WorkflowInstanceRepository {
 
     fun lockById(workflowInstanceId: WorkflowInstanceId): WorkflowInstance?
 
+    fun lockByCode(code: String): WorkflowInstance?
+
     fun pageQuery(query: WorkflowInstanceQuery): Page<WorkflowInstance>
 
     fun findById(workflowInstanceId: WorkflowInstanceId): WorkflowInstance?
-
-    fun findByCode(code: String): WorkflowInstance?
 
     fun save(workflowInstance: WorkflowInstance): WorkflowInstanceId
 }
