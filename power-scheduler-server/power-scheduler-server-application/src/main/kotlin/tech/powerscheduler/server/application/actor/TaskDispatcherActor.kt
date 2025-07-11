@@ -18,7 +18,6 @@ import tech.powerscheduler.common.enums.ExecuteModeEnum
 import tech.powerscheduler.common.enums.JobSourceTypeEnum
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.server.application.assembler.TaskAssembler
-import tech.powerscheduler.server.application.utils.hostPort
 import tech.powerscheduler.server.domain.appgroup.AppGroupKey
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.job.JobInfoRepository
@@ -47,6 +46,7 @@ class TaskDispatcherActor(
     private val workerRemoteService: WorkerRemoteService,
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val transactionTemplate: TransactionTemplate,
+    private val serverAddressHolder: ServerAddressHolder,
 ) : AbstractBehavior<TaskDispatcherActor.Command>(context) {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
@@ -66,6 +66,7 @@ class TaskDispatcherActor(
             val workerRemoteService = applicationContext.getBean(WorkerRemoteService::class.java)
             val jobInfoRepository = applicationContext.getBean(JobInfoRepository::class.java)
             val transactionTemplate = applicationContext.getBean(TransactionTemplate::class.java)
+            val serverAddressHolder = applicationContext.getBean(ServerAddressHolder::class.java)
             val applicationEventPublisher = applicationContext as ApplicationEventPublisher
             return Behaviors.setup { context ->
                 return@setup Behaviors.withTimers { timer ->
@@ -83,6 +84,7 @@ class TaskDispatcherActor(
                         workerRemoteService = workerRemoteService,
                         applicationEventPublisher = applicationEventPublisher,
                         transactionTemplate = transactionTemplate,
+                        serverAddressHolder = serverAddressHolder,
                     )
                     return@withTimers jobDispatcherActor
                 }
@@ -100,7 +102,7 @@ class TaskDispatcherActor(
 
     private fun handleDispatchTask(): Behavior<Command> {
         var pageNo = 1
-        val currentServerAddress = context.system.hostPort()
+        val currentServerAddress = serverAddressHolder.address
         do {
             val pageQuery = PageQuery(pageNo = pageNo++, pageSize = 200)
             val assignedJobIdPage = jobInfoRepository.listIdsByEnabledAndSchedulerAddress(
@@ -184,7 +186,7 @@ class TaskDispatcherActor(
 
         val targetWorker = selectWorker(task, jobInstance, candidateWorkers)
         task.workerAddress = targetWorker
-        task.schedulerAddress = context.system.hostPort()
+        task.schedulerAddress = serverAddressHolder.address
         task.taskStatus = JobStatusEnum.DISPATCHING
         transactionTemplate.executeWithoutResult {
             taskRepository.save(task)

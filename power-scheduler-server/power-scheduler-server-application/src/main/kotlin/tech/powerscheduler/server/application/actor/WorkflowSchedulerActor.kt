@@ -17,7 +17,6 @@ import org.springframework.context.ApplicationContext
 import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
-import tech.powerscheduler.server.application.utils.hostPort
 import tech.powerscheduler.server.application.utils.registerSelfAsService
 import tech.powerscheduler.server.domain.appgroup.AppGroupKey
 import tech.powerscheduler.server.domain.common.PageQuery
@@ -33,6 +32,7 @@ import java.time.LocalDateTime
  */
 class WorkflowSchedulerActor(
     context: ActorContext<Command>,
+    private val serverAddressHolder: ServerAddressHolder,
     private val jobInstanceRepository: JobInstanceRepository,
     private val workflowRepository: WorkflowRepository,
     private val workflowNodeRepository: WorkflowNodeRepository,
@@ -59,6 +59,7 @@ class WorkflowSchedulerActor(
         fun create(
             applicationContext: ApplicationContext,
         ): Behavior<Command> {
+            val serverAddressHolder = applicationContext.getBean(ServerAddressHolder::class.java)
             val jobInstanceRepository = applicationContext.getBean(JobInstanceRepository::class.java)
             val workflowRepository = applicationContext.getBean(WorkflowRepository::class.java)
             val workflowNodeRepository = applicationContext.getBean(WorkflowNodeRepository::class.java)
@@ -78,6 +79,7 @@ class WorkflowSchedulerActor(
                     )
                     val jobSchedulerActor = WorkflowSchedulerActor(
                         context = context,
+                        serverAddressHolder = serverAddressHolder,
                         jobInstanceRepository = jobInstanceRepository,
                         workflowRepository = workflowRepository,
                         workflowNodeRepository = workflowNodeRepository,
@@ -107,7 +109,7 @@ class WorkflowSchedulerActor(
 
     private fun handleScheduleWorkflows(): Behavior<Command> {
         var pageNo = 1
-        val currentServerAddress = context.system.hostPort()
+        val currentServerAddress = serverAddressHolder.address
         do {
             val pageQuery = PageQuery(pageNo = pageNo++, pageSize = 200)
             val workflowIdPage = workflowRepository.listIdsByEnabledAndSchedulerAddress(

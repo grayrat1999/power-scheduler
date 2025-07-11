@@ -18,7 +18,6 @@ import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.common.enums.JobSourceTypeEnum
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
-import tech.powerscheduler.server.application.utils.hostPort
 import tech.powerscheduler.server.application.utils.registerSelfAsService
 import tech.powerscheduler.server.domain.appgroup.AppGroupKey
 import tech.powerscheduler.server.domain.common.PageQuery
@@ -33,6 +32,7 @@ import java.time.LocalDateTime
 
 class JobSchedulerActor(
     context: ActorContext<Command>,
+    private val serverAddressHolder: ServerAddressHolder,
     private val taskRepository: TaskRepository,
     private val jobInfoRepository: JobInfoRepository,
     private val jobInstanceRepository: JobInstanceRepository,
@@ -57,6 +57,7 @@ class JobSchedulerActor(
         fun create(
             applicationContext: ApplicationContext,
         ): Behavior<Command> {
+            val serverAddressHolder = applicationContext.getBean(ServerAddressHolder::class.java)
             val taskRepository = applicationContext.getBean(TaskRepository::class.java)
             val jobInfoRepository = applicationContext.getBean(JobInfoRepository::class.java)
             val jobInstanceRepository = applicationContext.getBean(JobInstanceRepository::class.java)
@@ -74,6 +75,7 @@ class JobSchedulerActor(
                     )
                     val jobSchedulerActor = JobSchedulerActor(
                         context = context,
+                        serverAddressHolder = serverAddressHolder,
                         taskRepository = taskRepository,
                         jobInfoRepository = jobInfoRepository,
                         jobInstanceRepository = jobInstanceRepository,
@@ -101,7 +103,7 @@ class JobSchedulerActor(
 
     private fun handleScheduleDueJobs(): Behavior<Command> {
         var pageNo = 1
-        val currentServerAddress = context.system.hostPort()
+        val currentServerAddress = serverAddressHolder.address
         do {
             val pageQuery = PageQuery(pageNo = pageNo++, pageSize = 200)
             val assignedJobIdPage = jobInfoRepository.listIdsByEnabledAndSchedulerAddress(
@@ -225,7 +227,7 @@ class JobSchedulerActor(
 
     private fun handleCreateTasks(): Behavior<Command> {
         var pageNo = 1
-        val currentServerAddress = context.system.hostPort()
+        val currentServerAddress = serverAddressHolder.address
         do {
             val pageQuery = PageQuery(pageNo = pageNo++, pageSize = 200)
             val jobIdPage = jobInfoRepository.listIdsByEnabledAndSchedulerAddress(
@@ -289,7 +291,7 @@ class JobSchedulerActor(
 
     private fun onPostStop(): Behavior<Command> {
         log.info("start to reset jobs assigned to this server")
-        val currentServerAddress = context.system.hostPort()
+        val currentServerAddress = serverAddressHolder.address
         jobInfoRepository.clearSchedulerByAddress(currentServerAddress)
         log.info("successfully reset jobs assigned to this server")
         return this

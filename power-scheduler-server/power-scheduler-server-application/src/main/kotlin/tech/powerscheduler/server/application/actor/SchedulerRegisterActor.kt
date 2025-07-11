@@ -9,7 +9,6 @@ import akka.actor.typed.javadsl.Behaviors
 import akka.actor.typed.javadsl.Receive
 import org.springframework.context.ApplicationContext
 import org.springframework.transaction.support.TransactionTemplate
-import tech.powerscheduler.server.application.utils.hostPort
 import tech.powerscheduler.server.domain.scheduler.Scheduler
 import tech.powerscheduler.server.domain.scheduler.SchedulerRepository
 import java.time.Duration
@@ -21,6 +20,7 @@ import java.time.LocalDateTime
  */
 class SchedulerRegisterActor(
     context: ActorContext<Command>,
+    private val serverAddressHolder: ServerAddressHolder,
     private val schedulerRepository: SchedulerRepository,
     private val transactionTemplate: TransactionTemplate,
 ) : AbstractBehavior<SchedulerRegisterActor.Command>(context) {
@@ -31,12 +31,14 @@ class SchedulerRegisterActor(
 
     companion object {
         fun create(applicationContext: ApplicationContext): Behavior<Command> {
+            val serverAddressHolder = applicationContext.getBean(ServerAddressHolder::class.java)
             val schedulerRepository = applicationContext.getBean(SchedulerRepository::class.java)
             val transactionTemplate = applicationContext.getBean(TransactionTemplate::class.java)
             return Behaviors.setup { context ->
                 Behaviors.withTimers { timer ->
                     val actor = SchedulerRegisterActor(
                         context = context,
+                        serverAddressHolder = serverAddressHolder,
                         schedulerRepository = schedulerRepository,
                         transactionTemplate = transactionTemplate,
                     )
@@ -62,7 +64,7 @@ class SchedulerRegisterActor(
     }
 
     fun register(): Behavior<Command> {
-        val address = context.self.hostPort()
+        val address = serverAddressHolder.address
         val existScheduler = schedulerRepository.findByAddress(address)
         transactionTemplate.execute {
             if (existScheduler != null) {
@@ -80,7 +82,7 @@ class SchedulerRegisterActor(
     }
 
     fun onPostStop(): Behavior<Command> {
-        val address = context.self.hostPort()
+        val address = serverAddressHolder.address
         val existScheduler = schedulerRepository.findByAddress(address)
         if (existScheduler != null) {
             existScheduler.online = false
