@@ -31,7 +31,7 @@ class WorkflowAssignorActor(
     override fun createReceive(): Receive<Command> {
         return newReceiveBuilder()
             .onMessageEquals(Command.Assign, this::handleAssign)
-            .onMessageEquals(Command.ReassignAll, this::handleReassignAllJob)
+            .onMessageEquals(Command.ReassignAll, this::handleReassignAll)
             .build()
     }
 
@@ -43,31 +43,31 @@ class WorkflowAssignorActor(
         }
         var pageNo = 1
         do {
-            val query = PageQuery(pageNo = pageNo++, pageSize = 200)
+            val query = PageQuery(pageNo = pageNo++, pageSize = 50)
             val page = workflowRepository.listAssignableIds(query)
-            val jobIds = page.content
-            reassignJob(jobIds, availableSchedulers)
+            val workflowIds = page.content
+            reassign(workflowIds, availableSchedulers)
         } while (page.isNotEmpty())
         return this
     }
 
-    private fun handleReassignAllJob(): Behavior<Command> {
+    private fun handleReassignAll(): Behavior<Command> {
         val availableSchedulers = schedulerRepository.findAll().filter { it.expired.not() }
         if (availableSchedulers.isEmpty()) {
-            context.log.error("handleReassignAllJob failed, no available schedulers")
+            context.log.error("handleReassignAll failed, no available schedulers")
             return this
         }
         var pageNo = 1
         do {
-            val query = PageQuery(pageNo = pageNo++, pageSize = 1000)
+            val query = PageQuery(pageNo = pageNo++, pageSize = 100)
             val page = workflowRepository.listAllIds(query)
-            val jobIds = page.content
-            reassignJob(jobIds, availableSchedulers)
+            val workflowIds = page.content
+            reassign(workflowIds, availableSchedulers)
         } while (page.isNotEmpty())
         return this
     }
 
-    private fun reassignJob(workflowIds: List<WorkflowId>, availableSchedulers: List<Scheduler>) {
+    private fun reassign(workflowIds: List<WorkflowId>, availableSchedulers: List<Scheduler>) {
         if (workflowIds.isEmpty()) {
             return
         }

@@ -64,7 +64,7 @@ class JobAssignorActor(
     override fun createReceive(): Receive<Command> {
         return newReceiveBuilder()
             .onMessageEquals(Command.Assign, this::handleAssign)
-            .onMessageEquals(Command.ReassignAll, this::handleReassignAllJob)
+            .onMessageEquals(Command.ReassignAll, this::handleReassignAll)
             .build()
     }
 
@@ -79,12 +79,12 @@ class JobAssignorActor(
             val query = PageQuery(pageNo = pageNo++, pageSize = 200)
             val page = jobInfoRepository.listAssignableIds(query)
             val jobIds = page.content
-            reassignJob(jobIds, availableSchedulers)
+            reassign(jobIds, availableSchedulers)
         } while (page.isNotEmpty())
         return this
     }
 
-    private fun handleReassignAllJob(): Behavior<Command> {
+    private fun handleReassignAll(): Behavior<Command> {
         val availableSchedulers = schedulerRepository.findAll().filter { it.expired.not() }
         if (availableSchedulers.isEmpty()) {
             context.log.error("handleReassignAllJob failed, no available schedulers")
@@ -95,12 +95,12 @@ class JobAssignorActor(
             val query = PageQuery(pageNo = pageNo++, pageSize = 1000)
             val page = jobInfoRepository.listAllIds(query)
             val jobIds = page.content
-            reassignJob(jobIds, availableSchedulers)
+            reassign(jobIds, availableSchedulers)
         } while (page.isNotEmpty())
         return this
     }
 
-    private fun reassignJob(jobIds: List<JobId>, availableSchedulers: List<Scheduler>) {
+    private fun reassign(jobIds: List<JobId>, availableSchedulers: List<Scheduler>) {
         if (jobIds.isEmpty()) {
             return
         }
