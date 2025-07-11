@@ -10,10 +10,7 @@ import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.management.javadsl.AkkaManagement
 import com.typesafe.config.ConfigFactory
 import org.springframework.context.ApplicationContext
-import tech.powerscheduler.server.application.actor.singleton.JobAssignorActor
-import tech.powerscheduler.server.application.actor.singleton.JobInstanceCleanActor
-import tech.powerscheduler.server.application.actor.singleton.TaskStatusChangeEventHandlerActor
-import tech.powerscheduler.server.application.actor.singleton.WorkerRegistryCleanActor
+import tech.powerscheduler.server.application.actor.singleton.*
 import java.util.concurrent.TimeUnit
 
 class AppGuardian(
@@ -80,6 +77,11 @@ class AppGuardian(
             val singleton = ClusterSingleton.get(actorSystem)
 
             SingletonActor.of(
+                SchedulerManagerActor.create(applicationContext = applicationContext),
+                SchedulerManagerActor::class.simpleName,
+            ).let { singleton.init(it) }
+
+            SingletonActor.of(
                 JobInstanceCleanActor.create(applicationContext = applicationContext),
                 JobInstanceCleanActor::class.simpleName,
             )
@@ -96,6 +98,10 @@ class AppGuardian(
                 TaskStatusChangeEventHandlerActor::class.simpleName,
             ).let { singleton.init(it) }
 
+            context.spawn(
+                SchedulerRegisterActor.create(applicationContext),
+                SchedulerRegisterActor::class.simpleName,
+            )
             context.spawn(
                 WorkerRegistryCleanActor.create(applicationContext),
                 WorkerRegistryCleanActor::class.simpleName,
