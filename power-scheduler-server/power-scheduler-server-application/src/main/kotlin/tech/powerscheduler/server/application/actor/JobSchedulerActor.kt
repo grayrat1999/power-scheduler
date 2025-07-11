@@ -44,7 +44,6 @@ class JobSchedulerActor(
 
     sealed interface Command {
         object ScheduleJobs : Command
-
         object CreateTasks : Command
     }
 

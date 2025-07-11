@@ -7,7 +7,6 @@ import akka.actor.typed.javadsl.AbstractBehavior
 import akka.actor.typed.javadsl.ActorContext
 import akka.actor.typed.javadsl.Behaviors
 import akka.actor.typed.javadsl.Receive
-import akka.actor.typed.receptionist.ServiceKey
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
@@ -15,12 +14,15 @@ import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationContext
 import org.springframework.transaction.support.TransactionTemplate
+import tech.powerscheduler.common.enums.JobSourceTypeEnum
 import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
-import tech.powerscheduler.server.application.utils.registerSelfAsService
+import tech.powerscheduler.common.enums.WorkflowStatusEnum
 import tech.powerscheduler.server.domain.appgroup.AppGroupKey
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.job.JobInstanceRepository
+import tech.powerscheduler.server.domain.task.TaskRepository
+import tech.powerscheduler.server.domain.worker.WorkerRegistry
 import tech.powerscheduler.server.domain.worker.WorkerRegistryRepository
 import tech.powerscheduler.server.domain.workflow.*
 import java.time.Duration
@@ -39,6 +41,7 @@ class WorkflowSchedulerActor(
     private val workflowInstanceRepository: WorkflowInstanceRepository,
     private val workflowNodeInstanceRepository: WorkflowNodeInstanceRepository,
     private val workerRegistryRepository: WorkerRegistryRepository,
+    private val taskRepository: TaskRepository,
     private val transactionTemplate: TransactionTemplate,
 ) : AbstractBehavior<WorkflowSchedulerActor.Command>(context) {
 
@@ -46,16 +49,10 @@ class WorkflowSchedulerActor(
 
     sealed interface Command {
         object ScheduleWorkflows : Command
-
         object CreateTasks : Command
     }
 
     companion object {
-        val SERVICE_KEY: ServiceKey<Command> = ServiceKey.create<Command>(
-            Command::class.java,
-            WorkflowSchedulerActor::class.simpleName
-        )
-
         fun create(
             applicationContext: ApplicationContext,
         ): Behavior<Command> {
@@ -66,6 +63,7 @@ class WorkflowSchedulerActor(
             val workflowInstanceRepository = applicationContext.getBean(WorkflowInstanceRepository::class.java)
             val workflowNodeInstanceRepository = applicationContext.getBean(WorkflowNodeInstanceRepository::class.java)
             val workerRegistryRepository = applicationContext.getBean(WorkerRegistryRepository::class.java)
+            val taskRepository = applicationContext.getBean(TaskRepository::class.java)
             val transactionTemplate = applicationContext.getBean(TransactionTemplate::class.java)
             return Behaviors.setup { context ->
                 return@setup Behaviors.withTimers { timer ->
@@ -86,11 +84,9 @@ class WorkflowSchedulerActor(
                         workerRegistryRepository = workerRegistryRepository,
                         workflowInstanceRepository = workflowInstanceRepository,
                         workflowNodeInstanceRepository = workflowNodeInstanceRepository,
+                        taskRepository = taskRepository,
                         transactionTemplate = transactionTemplate,
                     )
-                    jobSchedulerActor.apply {
-                        this.registerSelfAsService(SERVICE_KEY)
-                    }
                     return@withTimers jobSchedulerActor
                 }
             }.apply {
@@ -176,9 +172,9 @@ class WorkflowSchedulerActor(
                 return@executeWithoutResult
             }
             // 检查任务实例并发数量
-            val workflowId2UnfinishedWorkflowInstanceCount = workflowInstanceRepository.countByJobIdAndJobStatus(
+            val workflowId2UnfinishedWorkflowInstanceCount = workflowInstanceRepository.countByWorkflowIdAndStatus(
                 workflowIds = listOf(workflowId),
-                jobStatuses = JobStatusEnum.Companion.UNCOMPLETED_STATUSES
+                statuses = WorkflowStatusEnum.UNCOMPLETED_STATUSES
             )
             val maxConcurrentNum = workflow.maxConcurrentNum!!
             val existUnfinishedWorkflowInstanceCount = workflowId2UnfinishedWorkflowInstanceCount[workflow.id] ?: 0L
@@ -223,10 +219,74 @@ class WorkflowSchedulerActor(
     }
 
     private fun handleCreateTasks(): Behavior<Command> {
+        var pageNo = 1
+        val currentServerAddress = serverAddressHolder.address
+        do {
+            val pageQuery = PageQuery(pageNo = pageNo++, pageSize = 200)
+            val workflowIdPage = workflowRepository.listIdsByEnabledAndSchedulerAddress(
+                enabled = null,
+                schedulerAddress = currentServerAddress,
+                pageQuery = pageQuery
+            )
+            if (workflowIdPage.isEmpty()) {
+                break
+            }
+            val workflowIds = workflowIdPage.content
+            createTasks(workflowIds)
+        } while (workflowIdPage.isNotEmpty())
         return this
     }
 
+    private fun createTasks(workflowIds: List<WorkflowId>) {
+        var pageNo = 1
+        do {
+            val pageQuery = PageQuery(pageNo = pageNo++, pageSize = 20)
+            val jobInstanceIdPage = jobInstanceRepository.listDispatchable(
+                sourceIds = workflowIds.map { it.toSourceId() },
+                sourceType = JobSourceTypeEnum.WORKFLOW,
+                pageQuery = pageQuery
+            )
+            if (jobInstanceIdPage.isEmpty()) {
+                break
+            }
+            val jobInstanceIds = jobInstanceIdPage.content
+            val appCode2AvailableWorkers = mutableMapOf<AppGroupKey, List<WorkerRegistry>>()
+            jobInstanceIds.forEach { jobInstanceId ->
+                transactionTemplate.executeWithoutResult {
+                    val jobInstance = jobInstanceRepository.lockById(jobInstanceId)
+                    if (jobInstance == null) {
+                        return@executeWithoutResult
+                    }
+                    if (jobInstance.jobStatus != JobStatusEnum.WAITING_SCHEDULE) {
+                        return@executeWithoutResult
+                    }
+                    val appGroupKey = AppGroupKey(jobInstance.appGroup!!)
+                    val workerRegistries = appCode2AvailableWorkers.computeIfAbsent(appGroupKey) { appGroupKey ->
+                        workerRegistryRepository.findAllByAppGroupKey(appGroupKey)
+                    }
+                    if (workerRegistries.isEmpty()) {
+                        if (jobInstance.canReattempt) {
+                            jobInstance.resetStatusForReattempt()
+                        } else {
+                            jobInstance.markFailed(message = "no available workers")
+                        }
+                        jobInstanceRepository.save(jobInstance)
+                        return@executeWithoutResult
+                    }
+                    jobInstance.jobStatus = JobStatusEnum.WAITING_DISPATCH
+                    val tasks = jobInstance.createTasks(workerRegistries)
+                    jobInstanceRepository.save(jobInstance)
+                    taskRepository.saveAll(tasks)
+                }
+            }
+        } while (jobInstanceIdPage.isNotEmpty())
+    }
+
     private fun onPostStop(): Behavior<Command> {
+        log.info("start to reset jobs assigned to this server")
+        val currentServerAddress = serverAddressHolder.address
+        workflowRepository.clearSchedulerByAddress(currentServerAddress)
+        log.info("successfully reset jobs assigned to this server")
         return this
     }
 }

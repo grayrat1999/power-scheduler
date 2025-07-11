@@ -31,6 +31,7 @@ interface WorkflowRepository {
     fun save(workflow: Workflow): WorkflowId
 
     fun deleteById(workflowId: WorkflowId)
+
     fun clearSchedulerByAddress(address: String)
 
 }

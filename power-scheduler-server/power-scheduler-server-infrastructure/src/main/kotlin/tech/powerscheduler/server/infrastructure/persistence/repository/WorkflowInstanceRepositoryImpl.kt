@@ -6,7 +6,6 @@ import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
-import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.WorkflowStatusEnum
 import tech.powerscheduler.server.domain.common.Page
 import tech.powerscheduler.server.domain.workflow.*
@@ -28,11 +27,15 @@ class WorkflowInstanceRepositoryImpl(
     private val workflowInstanceJpaRepository: WorkflowInstanceJpaRepository
 ) : WorkflowInstanceRepository {
 
-    override fun countByJobIdAndJobStatus(
+    override fun countByWorkflowIdAndStatus(
         workflowIds: List<WorkflowId>,
-        jobStatuses: Set<JobStatusEnum>
+        statuses: Set<WorkflowStatusEnum>,
     ): Map<WorkflowId, Long> {
-        TODO("Not yet implemented")
+        val group = workflowInstanceJpaRepository.countGroupByWorkflowIdAndStatus(
+            workflowIds = workflowIds.map { it.value },
+            statuses = statuses,
+        )
+        return group.associate { WorkflowId(it[0] as Long) to it[1] as Long }
     }
 
     override fun pageQuery(query: WorkflowInstanceQuery): Page<WorkflowInstance> {

@@ -37,4 +37,23 @@ enum class WorkflowStatusEnum (
     ;
 
     override val code = this.name
+
+    companion object {
+        /**
+         * 未完成状态集合
+         */
+        val UNCOMPLETED_STATUSES = setOf(
+            WAITING,
+            RUNNING,
+        )
+
+        /**
+         * 已完成状态集合
+         */
+        val COMPLETED_STATUSES = setOf(
+            SUCCEED,
+            FAILED,
+            CANCELED,
+        )
+    }
 }

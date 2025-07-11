@@ -1,6 +1,6 @@
 package tech.powerscheduler.server.domain.workflow
 
-import tech.powerscheduler.common.enums.JobStatusEnum
+import tech.powerscheduler.common.enums.WorkflowStatusEnum
 import tech.powerscheduler.server.domain.common.Page
 
 /**
@@ -9,9 +9,9 @@ import tech.powerscheduler.server.domain.common.Page
  */
 interface WorkflowInstanceRepository {
 
-    fun countByJobIdAndJobStatus(
+    fun countByWorkflowIdAndStatus(
         workflowIds: List<WorkflowId>,
-        jobStatuses: Set<JobStatusEnum>,
+        statuses: Set<WorkflowStatusEnum>,
     ): Map<WorkflowId, Long>
 
     fun pageQuery(query: WorkflowInstanceQuery): Page<WorkflowInstance>
