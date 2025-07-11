@@ -108,24 +108,18 @@ class WorkflowInstance {
 
     fun calculateStatus(): WorkflowStatusEnum {
         val nodeInstanceStatusSet = this.workflowNodeInstances.mapNotNull { it.status }.toSet()
-        // 如果全部任务都已经完成, 则设置成功或者失败状态
-        if ((nodeInstanceStatusSet - WorkflowStatusEnum.COMPLETED_STATUSES).isEmpty()) {
-            if (nodeInstanceStatusSet.all { it == WorkflowStatusEnum.SUCCESS }) {
-                return WorkflowStatusEnum.SUCCESS
-            }
-            if (nodeInstanceStatusSet.any { it == WorkflowStatusEnum.FAILED }) {
-                return WorkflowStatusEnum.FAILED
-            }
-            // 取消状态的任务不会走到这里, 留个未知状态兜底
-            return WorkflowStatusEnum.UNKNOWN
+        if (nodeInstanceStatusSet.all { it == WorkflowStatusEnum.SUCCESS }) {
+            return WorkflowStatusEnum.SUCCESS
+        }
+        if (nodeInstanceStatusSet.any { it == WorkflowStatusEnum.FAILED }) {
+            return WorkflowStatusEnum.FAILED
+        }
+        return if (nodeInstanceStatusSet.intersect(WorkflowStatusEnum.COMPLETED_STATUSES).isNotEmpty()) {
+            // 如果部分完成, 则设置为执行中
+            WorkflowStatusEnum.RUNNING
         } else {
-            return if (nodeInstanceStatusSet.intersect(WorkflowStatusEnum.COMPLETED_STATUSES).isNotEmpty()) {
-                // 如果部分完成, 则设置为执行中
-                WorkflowStatusEnum.RUNNING
-            } else {
-                // 如果没有任何完成状态的, 则取最大的状态
-                nodeInstanceStatusSet.maxBy { it.ordinal }
-            }
+            // 如果没有任何完成状态的, 则取最大的状态
+            nodeInstanceStatusSet.maxBy { it.ordinal }
         }
     }
 }

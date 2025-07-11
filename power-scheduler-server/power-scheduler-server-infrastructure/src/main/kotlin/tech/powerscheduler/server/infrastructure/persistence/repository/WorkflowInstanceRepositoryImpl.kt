@@ -39,7 +39,8 @@ class WorkflowInstanceRepositoryImpl(
     }
 
     override fun lockById(workflowInstanceId: WorkflowInstanceId): WorkflowInstance? {
-        TODO("Not yet implemented")
+        val entity = workflowInstanceJpaRepository.findByIdForUpdate(workflowInstanceId.value)
+        return entity?.toDomainModel()
     }
 
     override fun pageQuery(query: WorkflowInstanceQuery): Page<WorkflowInstance> {

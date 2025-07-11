@@ -77,6 +77,13 @@ class AppGuardian(
             val singleton = ClusterSingleton.get(actorSystem)
 
             SingletonActor.of(
+                WorkflowNodeInstanceStatusChangeEventHandlerActor.create(applicationContext = applicationContext),
+                WorkflowNodeInstanceStatusChangeEventHandlerActor::class.simpleName,
+            )
+//                .withProps(Props.empty().withDispatcherFromConfig("job-instance-clean-dispatcher"))
+                .let { singleton.init(it) }
+
+            SingletonActor.of(
                 JobInstanceCleanActor.create(applicationContext = applicationContext),
                 JobInstanceCleanActor::class.simpleName,
             )

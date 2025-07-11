@@ -151,6 +151,13 @@ class WorkflowService(
         val stateMap = mutableMapOf<WorkflowNodeDTO, VisitState>()
         val code2node = nodes.associateBy { it.workflowNodeCode }
 
+        // 检查是否存在孤立节点
+        val allChildCodes = nodes.flatMap { it.workflowNodeChildCodes }.toSet()
+        val hasIsolated = nodes.any { node ->
+            node.workflowNodeChildCodes.isEmpty() && node.workflowNodeCode !in allChildCodes
+        }
+        if (hasIsolated) return false
+
         fun hasCycle(node: WorkflowNodeDTO): Boolean {
             val state = stateMap[node] ?: VisitState.UNVISITED
             if (state == VisitState.VISITING) return true  // 回边，存在环

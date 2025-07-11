@@ -1,7 +1,9 @@
 package tech.powerscheduler.server.infrastructure.persistence.repository.impl
 
+import jakarta.persistence.LockModeType
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
+import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
 import tech.powerscheduler.common.enums.WorkflowStatusEnum
 import tech.powerscheduler.server.infrastructure.persistence.model.WorkflowInstanceEntity
@@ -28,7 +30,10 @@ interface WorkflowInstanceJpaRepository
         statuses: Set<WorkflowStatusEnum>
     ): List<Array<Any>>
 
-    fun findByCode(code: String): WorkflowInstanceEntity?
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT t FROM WorkflowInstanceEntity t WHERE t.id = :id")
+    fun findByIdForUpdate(id: Long): WorkflowInstanceEntity?
 
+    fun findByCode(code: String): WorkflowInstanceEntity?
 
 }
