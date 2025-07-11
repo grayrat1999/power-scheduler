@@ -43,8 +43,8 @@ class SchedulerRegisterActor(
                     timer.startTimerWithFixedDelay(
                         Command.Register,
                         Command.Register,
-                        Duration.ofSeconds(300),
-                        Duration.ofHours(12),
+                        Duration.ofSeconds(0),
+                        Duration.ofSeconds(3),
                     )
                     return@withTimers actor
                 }
