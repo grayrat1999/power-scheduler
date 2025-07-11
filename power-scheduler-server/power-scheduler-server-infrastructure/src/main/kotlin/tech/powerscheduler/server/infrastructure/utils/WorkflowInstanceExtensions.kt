@@ -25,6 +25,8 @@ fun WorkflowInstance.toEntity(): WorkflowInstanceEntity {
         it.code = this.code
         it.name = this.name
         it.status = this.status
+        it.scheduleType = this.scheduleType
+        it.scheduleAt = this.scheduleAt
         it.dataTime = this.dataTime
         it.startAt = this.startAt
         it.endAt = this.endAt
@@ -35,12 +37,13 @@ fun WorkflowInstance.toEntity(): WorkflowInstanceEntity {
 fun WorkflowInstanceEntity.toDomainModel(): WorkflowInstance {
     return WorkflowInstance().also {
         it.appGroup = this.appGroupEntity!!.toDomainModel()
-//        it.workflowNodeInstances = this.workflowNodeInstances
         it.id = WorkflowInstanceId(this.id!!)
         it.workflowId = WorkflowId(this.workflowId!!)
         it.code = this.code
         it.name = this.name
         it.status = this.status
+        it.scheduleType = this.scheduleType
+        it.scheduleAt = this.scheduleAt
         it.dataTime = this.dataTime
         it.startAt = this.startAt
         it.endAt = this.endAt

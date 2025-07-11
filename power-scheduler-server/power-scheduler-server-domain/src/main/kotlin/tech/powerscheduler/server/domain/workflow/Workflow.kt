@@ -120,7 +120,6 @@ class Workflow : Schedulable() {
                 }
             it.status = WorkflowStatusEnum.WAITING
             it.scheduleType = this.scheduleType
-            it.scheduleConfig = this.scheduleConfig
             it.scheduleAt = this.nextScheduleAt
             it.dataTime = dataTime
         }

@@ -84,12 +84,6 @@ class WorkflowInstanceEntity : BaseEntity() {
     var scheduleType: ScheduleTypeEnum? = null
 
     /**
-     * 调度配置
-     */
-    @Column(name = "schedule_config", nullable = false)
-    var scheduleConfig: String? = null
-
-    /**
      * 触发时间
      */
     @Column(name = "schedule_at", nullable = false)

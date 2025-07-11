@@ -51,11 +51,6 @@ class WorkflowInstance {
     var scheduleType: ScheduleTypeEnum? = null
 
     /**
-     * 调度配置
-     */
-    var scheduleConfig: String? = null
-
-    /**
      * 调度时间
      */
     var scheduleAt: LocalDateTime? = null

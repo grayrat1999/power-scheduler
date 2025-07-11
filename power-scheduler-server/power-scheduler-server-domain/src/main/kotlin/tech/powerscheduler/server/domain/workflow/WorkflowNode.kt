@@ -136,6 +136,7 @@ class WorkflowNode {
             it.executeParams = this.executeParams
             it.scriptType = this.scriptType
             it.scriptCode = this.scriptCode
+            it.dataTime = workflowInstance.dataTime
             it.attemptCnt = 0
             it.maxAttemptCnt = this.maxAttemptCnt
             it.attemptInterval = this.attemptInterval

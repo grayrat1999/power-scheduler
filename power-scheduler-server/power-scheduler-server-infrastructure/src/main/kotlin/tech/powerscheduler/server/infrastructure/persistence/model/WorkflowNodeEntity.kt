@@ -15,7 +15,7 @@ import tech.powerscheduler.common.enums.ScriptTypeEnum
 @Table(name = "workflow_node")
 class WorkflowNodeEntity : BaseEntity() {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "workflow_id", nullable = false)
     var workflowEntity: WorkflowEntity? = null
 

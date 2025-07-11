@@ -17,7 +17,7 @@ class WorkflowNodeInstanceEntity : BaseEntity() {
     /**
      * 子节点
      */
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "workflow_node_instance_children",
         joinColumns = [JoinColumn(name = "workflow_node_instance_id")],
@@ -26,17 +26,17 @@ class WorkflowNodeInstanceEntity : BaseEntity() {
     var children: Set<WorkflowNodeInstanceEntity> = emptySet()
 
     /**
-     * 工作流实例
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_instance_id", nullable = false)
-    var workflowInstanceEntity: WorkflowInstanceEntity? = null
-
-    /**
      * 父节点
      */
-    @ManyToMany(mappedBy = "children")
+    @ManyToMany(mappedBy = "children", fetch = FetchType.EAGER)
     var parents: Set<WorkflowNodeInstanceEntity> = emptySet()
+
+    /**
+     * 工作流实例
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "workflow_instance_id", nullable = false)
+    var workflowInstanceEntity: WorkflowInstanceEntity? = null
 
     /**
      * 主键
@@ -152,23 +152,23 @@ class WorkflowNodeInstanceEntity : BaseEntity() {
     @Column(name = "priority")
     var priority: Int? = null
 
-    /**
-     * 触发时间
-     */
-    @Column(name = "schedule_at", nullable = false)
-    var scheduleAt: LocalDateTime? = null
-
-    /**
-     * 开始时间
-     */
-    @Column(name = "start_at", insertable = false)
-    var startAt: LocalDateTime? = null
-
-    /**
-     * 结束时间
-     */
-    @Column(name = "end_at", insertable = false)
-    var endAt: LocalDateTime? = null
+//    /**
+//     * 触发时间
+//     */
+//    @Column(name = "schedule_at")
+//    var scheduleAt: LocalDateTime? = null
+//
+//    /**
+//     * 开始时间
+//     */
+//    @Column(name = "start_at", insertable = false)
+//    var startAt: LocalDateTime? = null
+//
+//    /**
+//     * 结束时间
+//     */
+//    @Column(name = "end_at", insertable = false)
+//    var endAt: LocalDateTime? = null
 
     /**
      * 调度端ip
