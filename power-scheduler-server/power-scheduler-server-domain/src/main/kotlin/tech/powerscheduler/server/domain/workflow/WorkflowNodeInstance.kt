@@ -86,6 +86,16 @@ class WorkflowNodeInstance {
     var dataTime: LocalDateTime? = null
 
     /**
+     * 开始时间
+     */
+    var startAt: LocalDateTime? = null
+
+    /**
+     * 结束时间
+     */
+    var endAt: LocalDateTime? = null
+
+    /**
      * Worker地址（ip:host）
      */
     var workerAddress: String? = null

@@ -117,6 +117,18 @@ class WorkflowNodeInstanceEntity : BaseEntity() {
     var dataTime: LocalDateTime? = null
 
     /**
+     * 开始时间
+     */
+    @Column(name = "start_at", insertable = false)
+    var startAt: LocalDateTime? = null
+
+    /**
+     * 结束时间
+     */
+    @Column(name = "end_at", insertable = false)
+    var endAt: LocalDateTime? = null
+
+    /**
      * Worker地址（ip:host）
      */
     @Column(name = "worker_address")
@@ -157,18 +169,6 @@ class WorkflowNodeInstanceEntity : BaseEntity() {
 //     */
 //    @Column(name = "schedule_at")
 //    var scheduleAt: LocalDateTime? = null
-//
-//    /**
-//     * 开始时间
-//     */
-//    @Column(name = "start_at", insertable = false)
-//    var startAt: LocalDateTime? = null
-//
-//    /**
-//     * 结束时间
-//     */
-//    @Column(name = "end_at", insertable = false)
-//    var endAt: LocalDateTime? = null
 
     /**
      * 调度端ip

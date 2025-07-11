@@ -22,6 +22,8 @@ fun WorkflowNodeInstance.toEntity(): WorkflowNodeInstanceEntity {
         it.scriptType = this.scriptType
         it.scriptCode = this.scriptCode
         it.dataTime = this.dataTime
+        it.startAt = this.startAt
+        it.endAt = this.endAt
         it.workerAddress = this.workerAddress
         it.maxAttemptCnt = this.maxAttemptCnt
         it.attemptInterval = this.attemptInterval
@@ -45,6 +47,8 @@ fun WorkflowNodeInstanceEntity.toDomainModel(): WorkflowNodeInstance {
         it.scriptType = this.scriptType
         it.scriptCode = this.scriptCode
         it.dataTime = this.dataTime
+        it.startAt = this.startAt
+        it.endAt = this.endAt
         it.workerAddress = this.workerAddress
         it.maxAttemptCnt = this.maxAttemptCnt
         it.attemptInterval = this.attemptInterval

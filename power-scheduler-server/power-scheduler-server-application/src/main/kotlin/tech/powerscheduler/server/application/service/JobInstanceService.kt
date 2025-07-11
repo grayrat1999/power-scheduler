@@ -167,6 +167,8 @@ class JobInstanceService(
             it.nodeInstanceCode == workflowInstanceCode
         }!!
         workflowNodeInstance.apply {
+            this.startAt = jobInstance.startAt
+            this.endAt = jobInstance.endAt
             this.status = WorkflowStatusEnum.from(jobInstance.jobStatus!!)
             this.workerAddress = jobInstance.workerAddress
         }
