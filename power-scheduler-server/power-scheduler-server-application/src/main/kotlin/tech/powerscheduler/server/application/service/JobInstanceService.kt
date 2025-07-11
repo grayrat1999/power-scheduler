@@ -159,12 +159,13 @@ class JobInstanceService(
 
     private fun updateWorkflowInstance(jobInstance: JobInstance) {
         val workflowInstanceCode = jobInstance.workflowInstanceCode!!
+        val workflowNodeInstanceCode = jobInstance.workflowNodeInstanceCode
         val workflowInstance = workflowInstanceRepository.findByCode(workflowInstanceCode)
         if (workflowInstance == null) {
             return
         }
         val workflowNodeInstance = workflowInstance.workflowNodeInstances.find {
-            it.nodeInstanceCode == workflowInstanceCode
+            it.nodeInstanceCode == workflowNodeInstanceCode
         }!!
         workflowNodeInstance.apply {
             this.startAt = jobInstance.startAt
