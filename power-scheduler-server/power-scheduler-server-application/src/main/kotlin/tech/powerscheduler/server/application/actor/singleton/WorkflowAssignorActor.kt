@@ -1,15 +1,19 @@
 package tech.powerscheduler.server.application.actor.singleton
 
 import akka.actor.typed.Behavior
+import akka.actor.typed.SupervisorStrategy
 import akka.actor.typed.javadsl.AbstractBehavior
 import akka.actor.typed.javadsl.ActorContext
+import akka.actor.typed.javadsl.Behaviors
 import akka.actor.typed.javadsl.Receive
+import org.springframework.context.ApplicationContext
 import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.scheduler.Scheduler
 import tech.powerscheduler.server.domain.scheduler.SchedulerRepository
 import tech.powerscheduler.server.domain.workflow.WorkflowId
 import tech.powerscheduler.server.domain.workflow.WorkflowRepository
+import java.time.Duration
 
 /**
  * @author grayrat
@@ -26,6 +30,35 @@ class WorkflowAssignorActor(
         object Assign : Command
 
         object ReassignAll : Command
+    }
+
+    companion object {
+        fun create(
+            applicationContext: ApplicationContext,
+        ): Behavior<Command> {
+            val workflowRepository = applicationContext.getBean(WorkflowRepository::class.java)
+            val schedulerRepository = applicationContext.getBean(SchedulerRepository::class.java)
+            val transactionTemplate = applicationContext.getBean(TransactionTemplate::class.java)
+            return Behaviors.setup { context ->
+                Behaviors.withTimers { timer ->
+                    val actor = WorkflowAssignorActor(
+                        context = context,
+                        workflowRepository = workflowRepository,
+                        transactionTemplate = transactionTemplate,
+                        schedulerRepository = schedulerRepository,
+                    )
+                    timer.startTimerWithFixedDelay(
+                        Command.Assign,
+                        Command.Assign,
+                        Duration.ofSeconds(3),
+                        Duration.ofSeconds(3),
+                    )
+                    return@withTimers actor
+                }
+            }.apply {
+                Behaviors.supervise(this).onFailure(SupervisorStrategy.resume())
+            }
+        }
     }
 
     override fun createReceive(): Receive<Command> {
@@ -82,7 +115,11 @@ class WorkflowAssignorActor(
                     val assignedScheduler = availableSchedulers[schedulerIdx]
                     workflow.schedulerAddress = assignedScheduler.address
                     workflowRepository.save(workflow)
-                    context.log.info("assign workflow [{}] to server [{}]", workflow.id!!.value, workflow.schedulerAddress)
+                    context.log.info(
+                        "assign workflow [{}] to server [{}]",
+                        workflow.id!!.value,
+                        workflow.schedulerAddress
+                    )
                 }
             } catch (e: Exception) {
                 context.log.error("Failed to reassign workflow [{}]: {}", workflowId.value, e.message, e)

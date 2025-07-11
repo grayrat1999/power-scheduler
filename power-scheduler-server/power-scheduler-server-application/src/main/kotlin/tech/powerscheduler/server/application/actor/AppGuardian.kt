@@ -77,20 +77,29 @@ class AppGuardian(
             val singleton = ClusterSingleton.get(actorSystem)
 
             SingletonActor.of(
-                SchedulerManagerActor.create(applicationContext = applicationContext),
-                SchedulerManagerActor::class.simpleName,
-            ).let { singleton.init(it) }
-
-            SingletonActor.of(
                 JobInstanceCleanActor.create(applicationContext = applicationContext),
                 JobInstanceCleanActor::class.simpleName,
             )
                 .withProps(Props.empty().withDispatcherFromConfig("job-instance-clean-dispatcher"))
                 .let { singleton.init(it) }
 
-            SingletonActor.of(
+            val jobAssignorActorRef = SingletonActor.of(
                 JobAssignorActor.create(applicationContext = applicationContext),
                 JobAssignorActor::class.simpleName,
+            ).let { singleton.init(it) }
+
+            val workflowAssignorActorRef = SingletonActor.of(
+                WorkflowAssignorActor.create(applicationContext = applicationContext),
+                WorkflowAssignorActor::class.simpleName,
+            ).let { singleton.init(it) }
+
+            SingletonActor.of(
+                SchedulerManagerActor.create(
+                    applicationContext = applicationContext,
+                    jobAssignorActorRef = jobAssignorActorRef,
+                    workflowAssignorActorRef = workflowAssignorActorRef,
+                ),
+                SchedulerManagerActor::class.simpleName,
             ).let { singleton.init(it) }
 
             SingletonActor.of(
