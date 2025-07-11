@@ -6,6 +6,7 @@ import akka.actor.typed.javadsl.AbstractBehavior
 import akka.actor.typed.javadsl.ActorContext
 import akka.actor.typed.javadsl.Behaviors
 import akka.actor.typed.javadsl.Receive
+import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationContext
 import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.server.domain.common.PageQuery
@@ -25,6 +26,8 @@ class JobAssignorActor(
     private val schedulerRepository: SchedulerRepository,
     private val transactionTemplate: TransactionTemplate,
 ) : AbstractBehavior<JobAssignorActor.Command>(context) {
+
+    private val log = LoggerFactory.getLogger(javaClass)
 
     sealed interface Command {
         object Assign : Command
@@ -71,7 +74,7 @@ class JobAssignorActor(
     private fun handleAssign(): Behavior<Command> {
         val availableSchedulers = schedulerRepository.findAll().filter { it.expired.not() }
         if (availableSchedulers.isEmpty()) {
-            context.log.error("handleAssign failed, no available schedulers")
+            log.error("handleAssign failed, no available schedulers")
             return this
         }
         var pageNo = 1
@@ -87,7 +90,7 @@ class JobAssignorActor(
     private fun handleReassignAll(): Behavior<Command> {
         val availableSchedulers = schedulerRepository.findAll().filter { it.expired.not() }
         if (availableSchedulers.isEmpty()) {
-            context.log.error("handleReassignAllJob failed, no available schedulers")
+            log.error("handleReassignAllJob failed, no available schedulers")
             return this
         }
         var pageNo = 1
@@ -115,10 +118,10 @@ class JobAssignorActor(
                     val assignedScheduler = availableSchedulers[schedulerIdx]
                     jobInfo.schedulerAddress = assignedScheduler.address
                     jobInfoRepository.save(jobInfo)
-                    context.log.info("assign job [{}] to server [{}]", jobInfo.id!!.value, jobInfo.schedulerAddress)
+                    log.info("assign job [{}] to server [{}]", jobInfo.id!!.value, jobInfo.schedulerAddress)
                 }
             } catch (e: Exception) {
-                context.log.error("Failed to reassign job [{}]: {}", jobId.value, e.message, e)
+                log.error("Failed to reassign job [{}]: {}", jobId.value, e.message, e)
             }
         }
     }
