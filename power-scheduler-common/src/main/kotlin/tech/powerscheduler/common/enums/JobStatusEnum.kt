@@ -79,6 +79,7 @@ enum class JobStatusEnum(
             SUCCESS,
             FAILED,
             CANCELED,
+            UNKNOWN,
         )
     }
 }

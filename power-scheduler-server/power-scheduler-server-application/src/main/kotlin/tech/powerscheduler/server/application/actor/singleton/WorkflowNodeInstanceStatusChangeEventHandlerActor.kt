@@ -9,14 +9,15 @@ import akka.actor.typed.javadsl.Receive
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationContext
 import org.springframework.transaction.support.TransactionTemplate
-import tech.powerscheduler.server.application.service.JobInstanceService
+import tech.powerscheduler.common.enums.WorkflowStatusEnum
 import tech.powerscheduler.server.application.utils.JSON
 import tech.powerscheduler.server.domain.common.PageQuery
 import tech.powerscheduler.server.domain.domainevent.DomainEventRepository
 import tech.powerscheduler.server.domain.domainevent.DomainEventStatusEnum
 import tech.powerscheduler.server.domain.domainevent.DomainEventTypeEnum
-import tech.powerscheduler.server.domain.job.JobInstanceId
 import tech.powerscheduler.server.domain.job.JobInstanceRepository
+import tech.powerscheduler.server.domain.workflow.WorkflowInstanceId
+import tech.powerscheduler.server.domain.workflow.WorkflowInstanceRepository
 import tech.powerscheduler.server.domain.workflow.WorkflowNodeInstanceStatusChangeEvent
 import java.time.Duration
 
@@ -24,12 +25,13 @@ import java.time.Duration
  * @author grayrat
  * @since 2025/6/25
  */
-class JobInstanceStatusChangeEventHandlerActor(
+class WorkflowNodeInstanceStatusChangeEventHandlerActor(
     context: ActorContext<Command>,
-    val domainEventRepository: DomainEventRepository,
-    val jobInstanceRepository: JobInstanceRepository,
-    val transactionTemplate: TransactionTemplate,
-) : AbstractBehavior<JobInstanceStatusChangeEventHandlerActor.Command>(context) {
+    private val domainEventRepository: DomainEventRepository,
+    private val jobInstanceRepository: JobInstanceRepository,
+    private val workflowInstanceRepository: WorkflowInstanceRepository,
+    private val transactionTemplate: TransactionTemplate,
+) : AbstractBehavior<WorkflowNodeInstanceStatusChangeEventHandlerActor.Command>(context) {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -43,14 +45,15 @@ class JobInstanceStatusChangeEventHandlerActor(
         ): Behavior<Command> {
             val domainEventRepository = applicationContext.getBean(DomainEventRepository::class.java)
             val jobInstanceRepository = applicationContext.getBean(JobInstanceRepository::class.java)
-            val jobInstanceService = applicationContext.getBean(JobInstanceService::class.java)
+            val workflowInstanceRepository = applicationContext.getBean(WorkflowInstanceRepository::class.java)
             val transactionTemplate = applicationContext.getBean(TransactionTemplate::class.java)
             return Behaviors.setup { context ->
                 Behaviors.withTimers { timer ->
-                    val actor = JobInstanceStatusChangeEventHandlerActor(
+                    val actor = WorkflowNodeInstanceStatusChangeEventHandlerActor(
                         context = context,
                         domainEventRepository = domainEventRepository,
                         jobInstanceRepository = jobInstanceRepository,
+                        workflowInstanceRepository = workflowInstanceRepository,
                         transactionTemplate = transactionTemplate,
                     )
                     timer.startTimerWithFixedDelay(
@@ -112,14 +115,24 @@ class JobInstanceStatusChangeEventHandlerActor(
     }
 
     private fun doHandleEvent(event: WorkflowNodeInstanceStatusChangeEvent) {
-        val jobInstanceId = JobInstanceId(event.workflowInstanceId)
-        val jobInstance = jobInstanceRepository.findById(jobInstanceId)!!
-        // 更新工作流节点实例的状态
-
-        // 如果工作流节点实例到达了完成状态, 则进一步判断并执行后续操作
-
-        // 如果当前节点的后续节点 依赖的所有节点都成功了, 则继续推进后续的节点
-
-        // 如果有节点实例失败了, 或者所有节点实例都完成了, 则进一步更新工作流实例的状态
+        val workflowInstanceId = WorkflowInstanceId(event.workflowInstanceId)
+        transactionTemplate.executeWithoutResult {
+            val workflowInstance = workflowInstanceRepository.lockById(workflowInstanceId)
+            if (workflowInstance == null) {
+                return@executeWithoutResult
+            }
+            if (workflowInstance.status in WorkflowStatusEnum.COMPLETED_STATUSES) {
+                return@executeWithoutResult
+            }
+            workflowInstance.updateProgress()
+            if (workflowInstance.status == WorkflowStatusEnum.RUNNING) {
+                val nextNodeInstances = workflowInstance.workflowNodeInstances
+                    .filter { it.status == WorkflowStatusEnum.WAITING }
+                    .filter { it.parents.all { parent -> parent.status == WorkflowStatusEnum.SUCCESS } }
+                val jobInstances = nextNodeInstances.map { it.createJobInstance() }
+                jobInstanceRepository.saveAll(jobInstances)
+            }
+            workflowInstanceRepository.save(workflowInstance)
+        }
     }
 }

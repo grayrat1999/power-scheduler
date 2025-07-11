@@ -34,6 +34,11 @@ enum class WorkflowStatusEnum(
      * 取消
      */
     CANCELED("取消"),
+
+    /**
+     * 未知(如果出现没有考虑到的分支, 则使用此状态兜底)
+     */
+    UNKNOWN("未知");
     ;
 
     override val code = this.name
@@ -67,6 +72,7 @@ enum class WorkflowStatusEnum(
             SUCCESS,
             FAILED,
             CANCELED,
+            UNKNOWN,
         )
     }
 }

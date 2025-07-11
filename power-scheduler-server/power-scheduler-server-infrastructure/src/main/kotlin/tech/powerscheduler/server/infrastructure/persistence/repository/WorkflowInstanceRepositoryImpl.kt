@@ -38,6 +38,10 @@ class WorkflowInstanceRepositoryImpl(
         return group.associate { WorkflowId(it[0] as Long) to it[1] as Long }
     }
 
+    override fun lockById(workflowInstanceId: WorkflowInstanceId): WorkflowInstance? {
+        TODO("Not yet implemented")
+    }
+
     override fun pageQuery(query: WorkflowInstanceQuery): Page<WorkflowInstance> {
         val pageable = PageRequest.of(
             query.pageNo - 1,

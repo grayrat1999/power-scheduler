@@ -195,8 +195,7 @@ class WorkflowSchedulerActor(
             }
             // 前置检查全部通过后, 正式开始调度
             val workflowInstance = workflow.createInstance()
-            val rootNodeInstances = workflowInstance.workflowNodeInstances
-                .filter { it.parents.isEmpty() }
+            val rootNodeInstances = workflowInstance.workflowNodeInstances.filter { it.parents.isEmpty() }
             val jobInstances = rootNodeInstances.map { it.createJobInstance() }
             workflow.apply {
                 /*

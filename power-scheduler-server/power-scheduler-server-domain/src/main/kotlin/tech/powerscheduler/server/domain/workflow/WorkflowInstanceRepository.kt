@@ -14,6 +14,8 @@ interface WorkflowInstanceRepository {
         statuses: Set<WorkflowStatusEnum>,
     ): Map<WorkflowId, Long>
 
+    fun lockById(workflowInstanceId: WorkflowInstanceId): WorkflowInstance?
+
     fun pageQuery(query: WorkflowInstanceQuery): Page<WorkflowInstance>
 
     fun findById(workflowInstanceId: WorkflowInstanceId): WorkflowInstance?

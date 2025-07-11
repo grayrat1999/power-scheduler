@@ -2,7 +2,6 @@ package tech.powerscheduler.server.domain.job
 
 import tech.powerscheduler.common.enums.*
 import tech.powerscheduler.common.enums.ExecuteModeEnum.*
-import tech.powerscheduler.common.enums.JobStatusEnum.FAILED
 import tech.powerscheduler.server.domain.appgroup.AppGroup
 import tech.powerscheduler.server.domain.task.Task
 import tech.powerscheduler.server.domain.worker.WorkerRegistry
@@ -320,7 +319,7 @@ class JobInstance {
         if (calculatedJobStatus in JobStatusEnum.COMPLETED_STATUSES) {
             this.endAt = this.calculateEndAt(tasks)
         }
-        if (calculatedJobStatus == FAILED) {
+        if (calculatedJobStatus == JobStatusEnum.FAILED) {
             if (this.canReattempt) {
                 this.resetStatusForReattempt()
             } else {
