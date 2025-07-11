@@ -26,4 +26,10 @@ class Scheduler {
      * 最后心跳时间
      */
     var lastHeartbeatAt: LocalDateTime? = null
+
+    val expired = online!!.not() || lastHeartbeatAt!!.plusSeconds(EXPIRE_TIME) < LocalDateTime.now()
+
+    companion object {
+        const val EXPIRE_TIME = 10L
+    }
 }

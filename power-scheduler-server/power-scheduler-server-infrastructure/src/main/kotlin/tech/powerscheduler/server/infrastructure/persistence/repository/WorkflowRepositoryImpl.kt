@@ -121,4 +121,8 @@ class WorkflowRepositoryImpl(
         workflowJpaRepository.deleteById(workflowId.value)
     }
 
+    override fun clearSchedulerByAddress(address: String) {
+        workflowJpaRepository.clearSchedulerByAddress(address)
+    }
+
 }

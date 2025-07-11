@@ -87,8 +87,8 @@ class JobInfoRepositoryImpl(
         return list.map { it.toDomainModel() }
     }
 
-    override fun clearSchedulerAddress(schedulerAddress: String) {
-        jobInfoJpaRepository.clearSchedulerAddress(schedulerAddress)
+    override fun clearSchedulerByAddress(schedulerAddress: String) {
+        jobInfoJpaRepository.clearSchedulerByAddress(schedulerAddress)
     }
 
     override fun save(jobInfo: JobInfo): JobId {

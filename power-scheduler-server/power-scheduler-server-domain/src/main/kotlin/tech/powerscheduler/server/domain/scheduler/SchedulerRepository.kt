@@ -6,8 +6,14 @@ package tech.powerscheduler.server.domain.scheduler
  */
 interface SchedulerRepository {
 
+    fun lockById(id: SchedulerId): Scheduler?
+
     fun findByAddress(address: String): Scheduler?
 
+    fun findAllExpired(): List<Scheduler>
+
     fun save(scheduler: Scheduler): SchedulerId
+
+    fun remove(id: SchedulerId)
 
 }

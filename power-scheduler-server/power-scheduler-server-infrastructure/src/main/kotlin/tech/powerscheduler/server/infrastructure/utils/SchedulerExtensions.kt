@@ -8,7 +8,7 @@ import tech.powerscheduler.server.infrastructure.persistence.model.SchedulerEnti
  * @author grayrat
  * @since 2025/7/11
  */
-fun SchedulerEntity.toDomain(): Scheduler {
+fun SchedulerEntity.toDomainModel(): Scheduler {
     return Scheduler().also {
         it.id = SchedulerId(this.id!!)
         it.online = this.online

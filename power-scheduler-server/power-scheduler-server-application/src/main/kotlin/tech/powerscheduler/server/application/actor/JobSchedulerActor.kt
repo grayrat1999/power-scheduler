@@ -290,7 +290,7 @@ class JobSchedulerActor(
     private fun onPostStop(): Behavior<Command> {
         log.info("start to reset jobs assigned to this server")
         val currentServerAddress = context.system.hostPort()
-        jobInfoRepository.clearSchedulerAddress(currentServerAddress)
+        jobInfoRepository.clearSchedulerByAddress(currentServerAddress)
         log.info("successfully reset jobs assigned to this server")
         return this
     }

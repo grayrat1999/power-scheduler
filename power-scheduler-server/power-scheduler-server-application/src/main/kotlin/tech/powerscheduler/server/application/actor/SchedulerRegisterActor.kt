@@ -8,6 +8,7 @@ import akka.actor.typed.javadsl.ActorContext
 import akka.actor.typed.javadsl.Behaviors
 import akka.actor.typed.javadsl.Receive
 import org.springframework.context.ApplicationContext
+import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.server.application.utils.hostPort
 import tech.powerscheduler.server.domain.scheduler.Scheduler
 import tech.powerscheduler.server.domain.scheduler.SchedulerRepository
@@ -21,6 +22,7 @@ import java.time.LocalDateTime
 class SchedulerRegisterActor(
     context: ActorContext<Command>,
     private val schedulerRepository: SchedulerRepository,
+    private val transactionTemplate: TransactionTemplate,
 ) : AbstractBehavior<SchedulerRegisterActor.Command>(context) {
 
     sealed interface Command {
@@ -30,11 +32,13 @@ class SchedulerRegisterActor(
     companion object {
         fun create(applicationContext: ApplicationContext): Behavior<Command> {
             val schedulerRepository = applicationContext.getBean(SchedulerRepository::class.java)
+            val transactionTemplate = applicationContext.getBean(TransactionTemplate::class.java)
             return Behaviors.setup { context ->
                 Behaviors.withTimers { timer ->
                     val actor = SchedulerRegisterActor(
                         context = context,
                         schedulerRepository = schedulerRepository,
+                        transactionTemplate = transactionTemplate,
                     )
                     timer.startTimerWithFixedDelay(
                         Command.Register,
@@ -60,13 +64,18 @@ class SchedulerRegisterActor(
     fun register(): Behavior<Command> {
         val address = context.self.hostPort()
         val existScheduler = schedulerRepository.findByAddress(address)
-        val schedulerToSave = Scheduler().apply {
-            this.id = existScheduler?.id
-            this.online = true
-            this.address = address
-            this.lastHeartbeatAt = LocalDateTime.now()
+        transactionTemplate.execute {
+            if (existScheduler != null) {
+                schedulerRepository.lockById(existScheduler.id!!)
+            }
+            val schedulerToSave = Scheduler().apply {
+                this.id = existScheduler?.id
+                this.online = true
+                this.address = address
+                this.lastHeartbeatAt = LocalDateTime.now()
+            }
+            schedulerRepository.save(schedulerToSave)
         }
-        schedulerRepository.save(schedulerToSave)
         return this
     }
 

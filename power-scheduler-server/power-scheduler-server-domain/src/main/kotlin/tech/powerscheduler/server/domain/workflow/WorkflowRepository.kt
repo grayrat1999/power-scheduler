@@ -28,4 +28,6 @@ interface WorkflowRepository {
 
     fun deleteById(workflowId: WorkflowId)
 
+    fun clearSchedulerByAddress(address: String)
+
 }
