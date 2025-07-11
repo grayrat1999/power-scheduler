@@ -8,6 +8,8 @@ interface SchedulerRepository {
 
     fun lockById(id: SchedulerId): Scheduler?
 
+    fun findAll(): List<Scheduler>
+
     fun findByAddress(address: String): Scheduler?
 
     fun findAllExpired(): List<Scheduler>

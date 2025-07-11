@@ -18,6 +18,11 @@ class SchedulerRepositoryImpl(
     private val schedulerJpaRepository: SchedulerJpaRepository,
 ) : SchedulerRepository {
 
+    override fun findAll(): List<Scheduler> {
+        val entities = schedulerJpaRepository.findAll()
+        return entities.map { it.toDomainModel() }
+    }
+
     override fun lockById(id: SchedulerId): Scheduler? {
         val entity = schedulerJpaRepository.findByIdForUpdate(id.value)
         return entity?.toDomainModel()
