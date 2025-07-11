@@ -7,7 +7,7 @@ import tech.powerscheduler.common.annotation.Metadata
  * @since 2025/6/25
  */
 @Metadata(label = "工作流状态", code = "WorkflowStatusEnum")
-enum class WorkflowStatusEnum (
+enum class WorkflowStatusEnum(
     override val label: String
 ) : BaseEnum {
     /**
@@ -23,7 +23,7 @@ enum class WorkflowStatusEnum (
     /**
      * 成功
      */
-    SUCCEED("成功"),
+    SUCCESS("成功"),
 
     /**
      * 失败
@@ -39,6 +39,19 @@ enum class WorkflowStatusEnum (
     override val code = this.name
 
     companion object {
+        fun from(jobStatusEnum: JobStatusEnum): WorkflowStatusEnum {
+            return when (jobStatusEnum) {
+                JobStatusEnum.WAITING_SCHEDULE, JobStatusEnum.WAITING_DISPATCH,
+                JobStatusEnum.DISPATCHING, JobStatusEnum.PENDING, JobStatusEnum.PROCESSING -> RUNNING
+
+                JobStatusEnum.FAILED, JobStatusEnum.UNKNOWN -> FAILED
+
+                JobStatusEnum.SUCCESS -> SUCCESS
+
+                JobStatusEnum.CANCELED -> CANCELED
+            }
+        }
+
         /**
          * 未完成状态集合
          */
@@ -51,7 +64,7 @@ enum class WorkflowStatusEnum (
          * 已完成状态集合
          */
         val COMPLETED_STATUSES = setOf(
-            SUCCEED,
+            SUCCESS,
             FAILED,
             CANCELED,
         )

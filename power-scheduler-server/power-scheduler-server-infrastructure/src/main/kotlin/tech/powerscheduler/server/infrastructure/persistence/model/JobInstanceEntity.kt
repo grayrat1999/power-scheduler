@@ -42,6 +42,12 @@ class JobInstanceEntity() : BaseEntity() {
     var sourceType: JobSourceTypeEnum? = null
 
     /**
+     * 工作流实例编码
+     */
+    @Column(name = "workflow_instance_code", updatable = false)
+    var workflowInstanceCode: String? = null
+
+    /**
      * 工作流节点实例编码
      */
     @Column(name = "workflow_node_instance_code", updatable = false)

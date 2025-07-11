@@ -15,8 +15,7 @@ fun WorkflowInstance.toEntity(): WorkflowInstanceEntity {
             val nodeInstanceEntity = workflowNodeInstance2entity[workflowNodeInstance]!!
             nodeInstanceEntity.workflowInstanceEntity = it
             nodeInstanceEntity.children = workflowNodeInstance.children
-                .mapNotNull { nodeInstance -> workflowNodeInstance2entity[nodeInstance] }
-                .toSet()
+                .mapNotNullTo(mutableSetOf()) { child -> workflowNodeInstance2entity[child] }
         }
         it.appGroupEntity = this.appGroup!!.toEntity()
         it.workflowNodeInstanceEntities = workflowNodeInstance2entity.values.toSet()
@@ -36,7 +35,20 @@ fun WorkflowInstance.toEntity(): WorkflowInstanceEntity {
 
 fun WorkflowInstanceEntity.toDomainModel(): WorkflowInstance {
     return WorkflowInstance().also {
+        val nodeInstanceEntity2domainModel = this.workflowNodeInstanceEntities.associateWith { nodeInstanceEntity ->
+            nodeInstanceEntity.toDomainModel()
+        }
+        nodeInstanceEntity2domainModel.forEach { nodeInstanceEntity, nodeInstance ->
+            nodeInstance.workflowInstance = it
+            nodeInstance.children = nodeInstanceEntity.children.mapNotNullTo(mutableSetOf()) { child ->
+                nodeInstanceEntity2domainModel[child]
+            }
+            nodeInstance.parents = nodeInstanceEntity.parents.mapNotNullTo(mutableSetOf()) { parent ->
+                nodeInstanceEntity2domainModel[parent]
+            }
+        }
         it.appGroup = this.appGroupEntity!!.toDomainModel()
+        it.workflowNodeInstances = nodeInstanceEntity2domainModel.values.toList()
         it.id = WorkflowInstanceId(this.id!!)
         it.workflowId = WorkflowId(this.workflowId!!)
         it.code = this.code

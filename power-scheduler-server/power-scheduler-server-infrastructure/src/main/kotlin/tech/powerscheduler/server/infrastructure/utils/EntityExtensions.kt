@@ -143,6 +143,7 @@ fun JobInstance.toEntity(): JobInstanceEntity {
         it.id = this.id?.value
         it.sourceId = this.sourceId?.value
         it.sourceType = this.sourceType
+        it.workflowInstanceCode = this.workflowInstanceCode
         it.workflowNodeInstanceCode = this.workflowNodeInstanceCode
         it.workerAddress = this.workerAddress
         it.schedulerAddress = this.schedulerAddress
@@ -174,6 +175,7 @@ fun JobInstanceEntity.toDomainModel(): JobInstance {
         it.id = JobInstanceId(this.id!!)
         it.sourceId = SourceId(this.sourceId!!)
         it.sourceType = this.sourceType
+        it.workflowInstanceCode = this.workflowInstanceCode
         it.workflowNodeInstanceCode = this.workflowNodeInstanceCode
         it.workerAddress = this.workerAddress
         it.schedulerAddress = this.schedulerAddress

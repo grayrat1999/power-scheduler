@@ -88,6 +88,11 @@ class WorkflowInstanceRepositoryImpl(
         return entity?.toDomainModel()
     }
 
+    override fun findByCode(code: String): WorkflowInstance? {
+        val entity = workflowInstanceJpaRepository.findByCode(code)
+        return entity?.toDomainModel()
+    }
+
     override fun save(workflowInstance: WorkflowInstance): WorkflowInstanceId {
         val entity = workflowInstance.toEntity()
         workflowInstanceJpaRepository.save(entity)

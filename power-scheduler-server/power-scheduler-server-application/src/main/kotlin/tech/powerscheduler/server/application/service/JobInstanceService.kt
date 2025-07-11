@@ -11,6 +11,7 @@ import tech.powerscheduler.common.enums.JobStatusEnum
 import tech.powerscheduler.common.enums.JobStatusEnum.*
 import tech.powerscheduler.common.enums.ScheduleTypeEnum
 import tech.powerscheduler.common.enums.TaskTypeEnum
+import tech.powerscheduler.common.enums.WorkflowStatusEnum
 import tech.powerscheduler.common.exception.BizException
 import tech.powerscheduler.server.application.assembler.JobInstanceAssembler
 import tech.powerscheduler.server.application.assembler.TaskAssembler
@@ -23,9 +24,14 @@ import tech.powerscheduler.server.application.dto.response.JobProgressQueryRespo
 import tech.powerscheduler.server.application.utils.JSON
 import tech.powerscheduler.server.application.utils.toDTO
 import tech.powerscheduler.server.domain.common.PageQuery
-import tech.powerscheduler.server.domain.domainevent.*
+import tech.powerscheduler.server.domain.domainevent.AggregateTypeEnum
+import tech.powerscheduler.server.domain.domainevent.DomainEvent
+import tech.powerscheduler.server.domain.domainevent.DomainEventRepository
+import tech.powerscheduler.server.domain.domainevent.DomainEventTypeEnum
 import tech.powerscheduler.server.domain.job.*
 import tech.powerscheduler.server.domain.task.TaskRepository
+import tech.powerscheduler.server.domain.workflow.WorkflowInstanceRepository
+import tech.powerscheduler.server.domain.workflow.WorkflowNodeInstanceStatusChangeEvent
 import java.time.LocalDateTime
 
 /**
@@ -42,6 +48,7 @@ class JobInstanceService(
     private val jobInstanceRepository: JobInstanceRepository,
     private val jobInstanceAssembler: JobInstanceAssembler,
     private val domainEventRepository: DomainEventRepository,
+    private val workflowInstanceRepository: WorkflowInstanceRepository,
     private val applicationEventPublisher: ApplicationEventPublisher,
 ) {
 
@@ -145,20 +152,32 @@ class JobInstanceService(
         jobInstanceRepository.save(jobInstance)
         when (jobInstance.sourceType!!) {
             JOB -> updateJobInfo(jobInstance)
-            WORKFLOW -> persistentJobInstanceStatusChangeEvent(jobInstanceId)
+            WORKFLOW -> updateWorkflowInstance(jobInstance)
         }
         log.info("jobInstance update successfully: id={}, status={}", jobInstanceId.value, jobInstance.jobStatus)
     }
 
-    fun persistentJobInstanceStatusChangeEvent(jobInstanceId: JobInstanceId) {
-        val domainEvent = DomainEvent().apply {
-            this.eventStatus = DomainEventStatusEnum.PENDING
-            this.aggregateId = jobInstanceId.value.toString()
-            this.aggregateType = AggregateTypeEnum.JOB_INSTANCE
-            this.eventType = DomainEventTypeEnum.JOB_INSTANCE_STATUS_CHANGED
-            this.body = JSON.writeValueAsString(JobInstanceStatusChangeEvent(jobInstanceId.value))
-            this.retryCnt = 0
+    private fun updateWorkflowInstance(jobInstance: JobInstance) {
+        val workflowInstanceCode = jobInstance.workflowInstanceCode!!
+        val workflowInstance = workflowInstanceRepository.findByCode(workflowInstanceCode)
+        if (workflowInstance == null) {
+            return
         }
+        val workflowNodeInstance = workflowInstance.workflowNodeInstances.find {
+            it.nodeInstanceCode == workflowInstanceCode
+        }!!
+        workflowNodeInstance.apply {
+            this.status = WorkflowStatusEnum.from(jobInstance.jobStatus!!)
+            this.workerAddress = jobInstance.workerAddress
+        }
+        workflowInstanceRepository.save(workflowInstance)
+        val workflowInstanceId = workflowInstance.id!!
+        val domainEvent = DomainEvent.create(
+            aggregateId = workflowInstanceId.value.toString(),
+            aggregateType = AggregateTypeEnum.WORKFLOW_INSTANCE,
+            eventType = DomainEventTypeEnum.WORKFLOW_NODE_INSTANCE_STATUS_CHANGED,
+            body = JSON.writeValueAsString(WorkflowNodeInstanceStatusChangeEvent.create(workflowInstanceId))
+        )
         domainEventRepository.save(domainEvent)
     }
 

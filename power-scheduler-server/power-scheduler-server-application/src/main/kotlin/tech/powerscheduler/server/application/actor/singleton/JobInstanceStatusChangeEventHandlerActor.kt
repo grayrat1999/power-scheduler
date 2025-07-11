@@ -17,7 +17,7 @@ import tech.powerscheduler.server.domain.domainevent.DomainEventStatusEnum
 import tech.powerscheduler.server.domain.domainevent.DomainEventTypeEnum
 import tech.powerscheduler.server.domain.job.JobInstanceId
 import tech.powerscheduler.server.domain.job.JobInstanceRepository
-import tech.powerscheduler.server.domain.job.JobInstanceStatusChangeEvent
+import tech.powerscheduler.server.domain.workflow.WorkflowNodeInstanceStatusChangeEvent
 import java.time.Duration
 
 /**
@@ -29,8 +29,8 @@ class JobInstanceStatusChangeEventHandlerActor(
     val domainEventRepository: DomainEventRepository,
     val jobInstanceRepository: JobInstanceRepository,
     val transactionTemplate: TransactionTemplate,
-    val jobInstanceService: JobInstanceService,
 ) : AbstractBehavior<JobInstanceStatusChangeEventHandlerActor.Command>(context) {
+
     private val log = LoggerFactory.getLogger(javaClass)
 
     sealed interface Command {
@@ -52,7 +52,6 @@ class JobInstanceStatusChangeEventHandlerActor(
                         domainEventRepository = domainEventRepository,
                         jobInstanceRepository = jobInstanceRepository,
                         transactionTemplate = transactionTemplate,
-                        jobInstanceService = jobInstanceService,
                     )
                     timer.startTimerWithFixedDelay(
                         Command.HandleEvent,
@@ -79,7 +78,7 @@ class JobInstanceStatusChangeEventHandlerActor(
         do {
             val pageQuery = PageQuery(pageNo = pageNo++, pageSize = 200)
             val eventPage = domainEventRepository.findPendingList(
-                eventType = DomainEventTypeEnum.JOB_INSTANCE_STATUS_CHANGED,
+                eventType = DomainEventTypeEnum.WORKFLOW_NODE_INSTANCE_STATUS_CHANGED,
                 pageQuery = pageQuery,
             )
             if (eventPage.isEmpty()) {
@@ -94,7 +93,7 @@ class JobInstanceStatusChangeEventHandlerActor(
                 try {
                     firstEvent.eventStatus = DomainEventStatusEnum.PROCESSING
                     domainEventRepository.save(firstEvent)
-                    val event = JSON.readValue<JobInstanceStatusChangeEvent>(firstEvent.body)!!
+                    val event = JSON.readValue<WorkflowNodeInstanceStatusChangeEvent>(firstEvent.body)!!
                     doHandleEvent(event)
                     firstEvent.eventStatus = DomainEventStatusEnum.SUCCESS
                     domainEventRepository.save(firstEvent)
@@ -112,8 +111,8 @@ class JobInstanceStatusChangeEventHandlerActor(
         return this
     }
 
-    private fun doHandleEvent(event: JobInstanceStatusChangeEvent) {
-        val jobInstanceId = JobInstanceId(event.jobInstanceId)
+    private fun doHandleEvent(event: WorkflowNodeInstanceStatusChangeEvent) {
+        val jobInstanceId = JobInstanceId(event.workflowInstanceId)
         val jobInstance = jobInstanceRepository.findById(jobInstanceId)!!
         // 更新工作流节点实例的状态
 

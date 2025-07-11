@@ -7,5 +7,5 @@ package tech.powerscheduler.server.domain.domainevent
 enum class DomainEventTypeEnum {
     TASK_STATUS_CHANGED,
 
-    JOB_INSTANCE_STATUS_CHANGED,
+    WORKFLOW_NODE_INSTANCE_STATUS_CHANGED,
 }

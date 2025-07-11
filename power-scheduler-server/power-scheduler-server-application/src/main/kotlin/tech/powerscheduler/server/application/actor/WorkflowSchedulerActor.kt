@@ -197,7 +197,6 @@ class WorkflowSchedulerActor(
             val workflowInstance = workflow.createInstance()
             val rootNodeInstances = workflowInstance.workflowNodeInstances
                 .filter { it.parents.isEmpty() }
-                .onEach { it.schedulerAddress = serverAddressHolder.address }
             val jobInstances = rootNodeInstances.map { it.createJobInstance() }
             workflow.apply {
                 /*

@@ -37,6 +37,11 @@ class JobInstance {
     var sourceType: JobSourceTypeEnum? = null
 
     /**
+     * 工作流实例编码
+     */
+    var workflowInstanceCode: String? = null
+
+    /**
      * 工作流节点实例编码
      */
     var workflowNodeInstanceCode: String? = null

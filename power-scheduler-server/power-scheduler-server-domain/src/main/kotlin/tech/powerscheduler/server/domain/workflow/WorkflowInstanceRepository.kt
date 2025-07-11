@@ -18,5 +18,7 @@ interface WorkflowInstanceRepository {
 
     fun findById(workflowInstanceId: WorkflowInstanceId): WorkflowInstance?
 
+    fun findByCode(code: String): WorkflowInstance?
+
     fun save(workflowInstance: WorkflowInstance): WorkflowInstanceId
 }

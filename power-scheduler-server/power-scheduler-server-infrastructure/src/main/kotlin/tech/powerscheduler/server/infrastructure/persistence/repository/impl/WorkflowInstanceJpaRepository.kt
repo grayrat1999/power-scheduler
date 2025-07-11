@@ -28,5 +28,7 @@ interface WorkflowInstanceJpaRepository
         statuses: Set<WorkflowStatusEnum>
     ): List<Array<Any>>
 
+    fun findByCode(code: String): WorkflowInstanceEntity?
+
 
 }

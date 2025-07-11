@@ -91,11 +91,6 @@ class WorkflowNodeInstance {
     var workerAddress: String? = null
 
     /**
-     * 当前重试次数
-     */
-    var attemptCnt: Int? = null
-
-    /**
      * 最大重试次数
      */
     var maxAttemptCnt: Int? = null
@@ -119,11 +114,6 @@ class WorkflowNodeInstance {
      * 优先级
      */
     var priority: Int? = null
-
-    /**
-     * 调度器地址
-     */
-    var schedulerAddress: String? = null
 
     /**
      * 创建人
@@ -151,6 +141,7 @@ class WorkflowNodeInstance {
             it.appGroup = workflowInstance.appGroup
             it.sourceId = workflowInstance.workflowId!!.toSourceId()
             it.sourceType = JobSourceTypeEnum.WORKFLOW
+            it.workflowInstanceCode = workflowInstance.code
             it.workflowNodeInstanceCode = this.nodeInstanceCode
             it.jobName = this.name
             it.jobType = this.jobType
@@ -163,14 +154,13 @@ class WorkflowNodeInstance {
             it.dataTime = this.dataTime
             it.scriptType = this.scriptType
             it.scriptCode = this.scriptCode
-            it.attemptCnt = this.attemptCnt
+            it.attemptCnt = 0
             it.maxAttemptCnt = this.maxAttemptCnt
             it.attemptInterval = this.attemptInterval
             it.taskMaxAttemptCnt = this.taskMaxAttemptCnt
             it.taskAttemptInterval = this.taskAttemptInterval
             it.priority = this.priority
             it.workerAddress = this.workerAddress
-            it.schedulerAddress = this.schedulerAddress
         }
     }
 }
