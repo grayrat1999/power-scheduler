@@ -1,6 +1,7 @@
 package tech.powerscheduler.server.infrastructure.persistence.repository
 
 import org.springframework.data.jpa.domain.Specification
+import org.springframework.stereotype.Component
 import tech.powerscheduler.server.domain.scheduler.Scheduler
 import tech.powerscheduler.server.domain.scheduler.SchedulerId
 import tech.powerscheduler.server.domain.scheduler.SchedulerRepository
@@ -14,6 +15,7 @@ import java.time.LocalDateTime
  * @author grayrat
  * @since 2025/7/11
  */
+@Component
 class SchedulerRepositoryImpl(
     private val schedulerJpaRepository: SchedulerJpaRepository,
 ) : SchedulerRepository {
