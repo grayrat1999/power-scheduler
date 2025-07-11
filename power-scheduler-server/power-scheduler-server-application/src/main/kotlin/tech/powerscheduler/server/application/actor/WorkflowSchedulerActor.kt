@@ -194,6 +194,11 @@ class WorkflowSchedulerActor(
                 return@executeWithoutResult
             }
             // 前置检查全部通过后, 正式开始调度
+            val workflowInstance = workflow.createInstance()
+            val rootNodeInstances = workflowInstance.workflowNodeInstances
+                .filter { it.parents.isEmpty() }
+                .onEach { it.schedulerAddress = serverAddressHolder.address }
+            val jobInstances = rootNodeInstances.map { it.createJobInstance() }
             workflow.apply {
                 /*
                     对于固定延迟的调度模式, 先以本次调度时间为基准设置下次调度时间(避免本次调度的任务完成前, 调度方法总是将任务查出来)
@@ -205,11 +210,6 @@ class WorkflowSchedulerActor(
                     updateNextScheduleTime()
                 }
             }
-            val workflowInstance = workflow.createInstance()
-            val rootNodeInstances = workflowInstance.workflowNodeInstances
-                .filter { it.parents.isEmpty() }
-                .onEach { it.schedulerAddress = serverAddressHolder.address }
-            val jobInstances = rootNodeInstances.map { it.createJobInstance() }
 
             workflowRepository.save(workflow)
             workflowInstanceRepository.save(workflowInstance)

@@ -6,6 +6,7 @@ import akka.actor.typed.javadsl.AbstractBehavior
 import akka.actor.typed.javadsl.ActorContext
 import akka.actor.typed.javadsl.Behaviors
 import akka.actor.typed.javadsl.Receive
+import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationContext
 import org.springframework.transaction.support.TransactionTemplate
 import tech.powerscheduler.server.domain.common.PageQuery
@@ -25,6 +26,8 @@ class WorkflowAssignorActor(
     private val schedulerRepository: SchedulerRepository,
     private val transactionTemplate: TransactionTemplate,
 ) : AbstractBehavior<WorkflowAssignorActor.Command>(context) {
+
+    private val log = LoggerFactory.getLogger(javaClass)
 
     sealed interface Command {
         object Assign : Command
@@ -71,7 +74,7 @@ class WorkflowAssignorActor(
     private fun handleAssign(): Behavior<Command> {
         val availableSchedulers = schedulerRepository.findAll().filter { it.expired.not() }
         if (availableSchedulers.isEmpty()) {
-            context.log.error("handleAssign failed, no available schedulers")
+            log.error("handleAssign failed, no available schedulers")
             return this
         }
         var pageNo = 1
@@ -87,7 +90,7 @@ class WorkflowAssignorActor(
     private fun handleReassignAll(): Behavior<Command> {
         val availableSchedulers = schedulerRepository.findAll().filter { it.expired.not() }
         if (availableSchedulers.isEmpty()) {
-            context.log.error("handleReassignAll failed, no available schedulers")
+            log.error("handleReassignAll failed, no available schedulers")
             return this
         }
         var pageNo = 1
@@ -115,14 +118,14 @@ class WorkflowAssignorActor(
                     val assignedScheduler = availableSchedulers[schedulerIdx]
                     workflow.schedulerAddress = assignedScheduler.address
                     workflowRepository.save(workflow)
-                    context.log.info(
+                    log.info(
                         "assign workflow [{}] to server [{}]",
                         workflow.id!!.value,
                         workflow.schedulerAddress
                     )
                 }
             } catch (e: Exception) {
-                context.log.error("Failed to reassign workflow [{}]: {}", workflowId.value, e.message, e)
+                log.error("Failed to reassign workflow [{}]: {}", workflowId.value, e.message, e)
             }
         }
     }
