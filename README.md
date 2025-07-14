@@ -12,6 +12,9 @@ Power Scheduler 是一款分布式任务调度平台，支持多语言 Worker，
 - **多语言 Worker 支持**：基于 HTTP 协议实现 Server 与 Worker 的通信协议，支持使用不同的编程语言开发 Worker 端 SDK
 - **Docker 支持**：支持容器化运行
 
+## 在线试用
+- [试用地址](http://www.powerscheduler.tech)
+
 ## 官方文档
 
 - [中文文档](https://github.com/grayrat1999/power-scheduler-doc/tree/main)
